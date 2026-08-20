@@ -1,0 +1,65 @@
+---
+// Final homepage contact section. Light porcelain, editorial: headline and
+// quote button on the left, contact channels as a hairline list on the right.
+// The footer already closes the page with its own band, so no overlap here.
+import { SITE } from '../../data/site';
+
+const channels = [
+  { label: 'Phone', value: SITE.phoneDisplay, href: SITE.phoneHref },
+  { label: 'WhatsApp', value: 'Message us', href: SITE.whatsappHref, external: true },
+  { label: 'Email', value: null, href: null },
+  { label: 'Hours', value: SITE.hours, href: null },
+];
+---
+<section class="section-pad bg-porcelain">
+  <div class="container-wide grid gap-14 lg:grid-cols-[1.1fr_1fr] lg:gap-20">
+    <div>
+      <p class="kicker" data-reveal>Contact</p>
+      <h2 class="display mt-6 text-[clamp(2.2rem,5vw,4rem)] text-ink" data-reveal>
+        <span class="line-mask"><span>Talk to a <span class="accent-word text-gold-deep">person</span>,</span></span>
+        <span class="line-mask"><span style="--d: 0.1s">today</span></span>
+      </h2>
+      <p class="mt-8 max-w-xl text-base leading-relaxed text-ink/70 md:text-lg" data-reveal style="--d: 0.2s">
+        No obligation. Tell us what you need and we confirm your price before anything is booked.
+      </p>
+      <div class="mt-10" data-reveal style="--d: 0.3s">
+        <a href="/quote/" class="btn-primary">Get my price</a>
+        <p class="mt-6 text-sm text-ink/60">Dublin and surrounding areas</p>
+      </div>
+    </div>
+
+    <div class="self-center border-b border-ink/15">
+      {channels.map((channel, i) => (
+        <div class="flex items-baseline justify-between gap-6 border-t border-ink/15 py-5" data-reveal style={`--d: ${0.08 * i}s`}>
+          <span class="font-sans text-[0.66rem] font-semibold uppercase tracking-[0.24em] text-stone">{channel.label}</span>
+          {channel.label === 'Email' ? (
+            <span id="contact-cta-email" data-user="bpecleaning98" data-domain="gmail.com"></span>
+          ) : channel.href ? (
+            <a
+              href={channel.href}
+              class="font-sans text-sm font-medium text-ink transition-colors duration-300 hover:text-gold-deep"
+              rel={channel.external ? 'noopener' : undefined}
+            >
+              {channel.value}
+            </a>
+          ) : (
+            <span class="font-sans text-sm font-medium text-ink">{channel.value}</span>
+          )}
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<script>
+  // Email assembled at runtime so scrapers can't harvest it from the source.
+  const el = document.getElementById('contact-cta-email');
+  if (el instanceof HTMLElement) {
+    const addr = `${el.dataset.user}@${el.dataset.domain}`;
+    const a = document.createElement('a');
+    a.href = `mailto:${addr}`;
+    a.textContent = addr;
+    a.className = 'font-sans text-sm font-medium text-ink transition-colors duration-300 hover:text-gold-deep';
+    el.replaceWith(a);
+  }
+</script>

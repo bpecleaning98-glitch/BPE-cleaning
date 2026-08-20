@@ -1,0 +1,61 @@
+---
+import { COUNTIES } from '../../data/areas';
+import Diamond from '../Diamond.astro';
+
+/**
+ * Coverage, plain and premium. Left: the message. Right: one night panel
+ * that says exactly what it is, County Dublin as the home base with the
+ * ghosted diamond watermark, and the seven other confirmed counties as a
+ * clean hairline index inside the same panel. All 8 from data/areas.ts.
+ */
+const dublin = COUNTIES.find((c) => c.primary);
+const rest = COUNTIES.filter((c) => !c.primary);
+---
+<section class="section-pad bg-porcelain">
+  <div class="container-wide grid gap-14 lg:grid-cols-[1fr_1.15fr] lg:gap-20">
+    <div class="lg:sticky lg:top-32 lg:self-start">
+      <p class="kicker" data-reveal>Where We Work</p>
+      <h2 class="display mt-6 text-[clamp(2.2rem,5vw,4rem)]" data-reveal>
+        <span class="line-mask"><span>Dublin based,</span></span>
+        <span class="line-mask"><span style="--d: 0.1s"><span class="accent-word text-gold-deep">across</span> Leinster</span></span>
+      </h2>
+      <p class="mt-8 max-w-md text-base leading-relaxed text-ink/70" data-reveal style="--d: 0.2s">
+        Most of our work is in {dublin?.name}: the city, the suburbs, Northside and Southside, D1
+        to D24. For deep cleans, end of tenancy and after builders jobs we travel to seven more
+        counties.
+      </p>
+      <p class="mt-6 max-w-md text-sm leading-relaxed text-ink/55" data-reveal style="--d: 0.3s">
+        Not sure if we reach you? Send us the address and we will let you know.
+      </p>
+      <span class="mt-10 block h-px w-12 bg-gold/60" data-reveal="fade" style="--d: 0.35s" aria-hidden="true"></span>
+    </div>
+
+    {/* One panel, one story: home base on top, the travel counties below */}
+    <div class="relative overflow-hidden bg-night text-cream" data-reveal style="--d: 0.15s">
+      <Diamond class="pointer-events-none absolute -right-24 -top-24 h-[22rem] w-[22rem] opacity-[0.06]" aria-hidden="true" />
+
+      <div class="relative p-8 md:p-12">
+        <p class="font-sans text-[0.62rem] font-semibold uppercase tracking-[0.26em] text-gold">Home base</p>
+        <p class="display-caps mt-4 text-[clamp(2rem,4vw,3.2rem)] text-cream">{dublin?.name}</p>
+        <p class="mt-3 max-w-sm text-sm leading-relaxed text-cream/60">
+          City centre and suburbs, Northside and Southside, D1 to D24 and out to the county
+          boundary.
+        </p>
+
+        <p class="mt-12 font-sans text-[0.62rem] font-semibold uppercase tracking-[0.26em] text-gold">We also travel to</p>
+        <ul class="mt-4 grid grid-cols-1 border-t border-cream/12 sm:grid-cols-2 sm:gap-x-10">
+          {rest.map((c, i) => (
+            <li
+              class="flex items-baseline justify-between gap-4 border-b border-cream/12 py-3.5"
+              data-reveal
+              style={`--d: ${0.05 * i + 0.25}s`}
+            >
+              <span class="font-sans text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-cream/85">{c.name}</span>
+              <span class="h-px w-5 shrink-0 bg-gold/50" aria-hidden="true"></span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>

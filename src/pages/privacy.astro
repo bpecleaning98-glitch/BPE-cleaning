@@ -1,0 +1,102 @@
+---
+import Base from '../layouts/Base.astro';
+import { PATHS, breadcrumbs, graph } from '../lib/schema';
+import Diamond from '../components/Diamond.astro';
+import { SITE } from '../data/site';
+
+/**
+ * Written to describe what this site ACTUALLY does, line by line, not a
+ * generic template. Every claim here is checkable against the code:
+ *   src/scripts/track.ts     what the browser sends
+ *   src/pages/api/track.ts   what the server writes down
+ *   src/pages/api/lead.ts    what a quote request stores
+ *   src/lib/request.ts       the daily visitor hash, and the absence of IPs
+ *
+ * If any of those change, this page changes with them.
+ */
+const sections = [
+  {
+    title: 'No cookies, and nothing sent to anyone else',
+    body: [
+      'This site sets no cookies and carries no advertising or tracking code from anybody else. There is no Google Analytics, no Facebook pixel, no third party fonts loaded from another company, and no share buttons that watch you.',
+      'Because of that there is no consent banner to click through. There is nothing to consent to.',
+    ],
+  },
+  {
+    title: 'What is counted when you visit',
+    body: [
+      'The site counts its own visits, on its own server, so the owner can see whether the website is doing its job. For each page opened it records the page address, the website or campaign link you arrived from, whether you are on a phone, a tablet or a computer, which browser you use, your approximate country and city, your browser language, and how long the page was actually on screen.',
+      'Your IP address is not stored. It is used once, in memory, to produce a one way code that cannot be turned back into an address, and that code is regenerated from scratch every day. It exists only so that ten pages opened by one person are not counted as ten people.',
+      'If your browser sends the Global Privacy Control signal, none of the above is recorded at all.',
+    ],
+  },
+  {
+    title: 'When you ask for a price',
+    body: [
+      'The quote form stores what you type into it: your name, your phone number, the service and property size, your preferred date, your area and any note you add. It also stores which link or channel brought you to the site, so the owner knows which advert is worth paying for.',
+      'The form then opens WhatsApp with the same details written out, because that is where bookings are actually arranged. Nothing is sent anywhere else.',
+    ],
+  },
+  {
+    title: 'Who can see it',
+    body: [
+      'Only BPE Cleaning Services and the person who maintains this website. The data lives in a database that requires a named account to open, and the list of accounts allowed in is short and fixed.',
+      'It is never sold, never shared with advertisers, and never used to contact you about anything other than the request you sent.',
+    ],
+  },
+  {
+    title: 'Your requests',
+    body: [
+      'Write or ring and ask for a copy of what is held about you, or ask for it to be deleted. It will be done, and it does not need a reason.',
+    ],
+  },
+];
+
+const jsonLd = graph(breadcrumbs([{ name: 'Privacy', path: PATHS.privacy }], Astro.site));
+---
+<Base
+  title="Privacy | BPE Cleaning Services"
+  description="What this website records, what it does not, and why it needs no cookie banner. Written in plain English."
+  jsonLd={jsonLd}
+>
+  <section class="bg-night pt-40 pb-20 text-cream md:pt-48 md:pb-24">
+    <div class="container-wide">
+      <p class="kicker !text-gold" data-reveal>Privacy</p>
+      <h1 class="display-caps mt-6 text-[clamp(2.4rem,6.5vw,5rem)]" data-reveal>
+        <span class="line-mask"><span>What this site</span></span>
+        <span class="line-mask"><span style="--d: 0.1s">knows <span class="accent-word text-gold-soft">about</span> you</span></span>
+      </h1>
+      <p class="mt-8 max-w-xl text-base leading-relaxed text-cream/70" data-reveal style="--d: 0.2s">
+        Short version: no cookies, no advertising trackers, no IP addresses kept,
+        and nothing handed to anybody else. The long version is below.
+      </p>
+    </div>
+  </section>
+
+  <section class="section-pad relative overflow-hidden bg-porcelain">
+    <Diamond class="pointer-events-none absolute -right-40 -top-44 h-[38rem] w-[38rem] opacity-[0.05]" aria-hidden="true" />
+    <div class="container-x relative">
+      {sections.map((section, i) => (
+        <article class="border-t border-ink/12 py-10 first:border-t-0 first:pt-0 md:grid md:grid-cols-[6rem_1fr] md:gap-10" data-reveal>
+          <p class="font-sans text-[0.7rem] font-medium tabular-nums text-gold-deep">
+            {String(i + 1).padStart(2, '0')}
+          </p>
+          <div>
+            <h2 class="h-serif text-2xl text-ink md:text-[1.75rem]">{section.title}</h2>
+            {section.body.map((paragraph) => (
+              <p class="mt-5 max-w-2xl text-base leading-relaxed text-ink/75">{paragraph}</p>
+            ))}
+          </div>
+        </article>
+      ))}
+
+      <div class="mt-12 border-t border-ink/12 pt-10" data-reveal>
+        <p class="kicker">Questions about any of this</p>
+        <div class="mt-5 flex flex-wrap items-center gap-4">
+          <a href={SITE.phoneHref} class="btn-primary">Call {SITE.phoneDisplay}</a>
+          <a href={SITE.whatsappHref} class="btn-outline text-ink" rel="noopener">WhatsApp</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</Base>

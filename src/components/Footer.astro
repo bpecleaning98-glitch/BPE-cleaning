@@ -1,0 +1,89 @@
+---
+import BpeLogo from './brand/BpeLogo.astro';
+import { SITE, SERVICES } from '../data/site';
+import { AREAS_SENTENCE } from '../data/areas';
+const year = new Date().getFullYear();
+---
+<footer class="bg-night text-cream">
+  <div class="container-wide py-16 md:py-24">
+    <div class="flex flex-col gap-4 border-b border-cream/12 pb-12 md:flex-row md:items-end md:justify-between">
+      <p class="display-caps text-[clamp(2.4rem,6vw,5rem)] text-cream">
+        Ready when <span class="accent-word text-[0.62em] text-gold-soft">you</span> are
+      </p>
+      <div class="flex flex-wrap items-center gap-4">
+        <a href="/quote/" class="btn-gold">Get my price</a>
+        <a href={SITE.whatsappHref} class="btn-outline text-cream" rel="noopener">WhatsApp</a>
+      </div>
+    </div>
+
+    <div class="grid gap-12 pt-12 md:grid-cols-[1.4fr_1fr_1fr]">
+      <div>
+        {/* The footer column is portrait on a phone and a wide row from the
+            tablet breakpoint up, so it takes the lockup built for each. */}
+        <a href="/" class="inline-flex" aria-label={`${SITE.name}, home`}>
+          <BpeLogo variant="vertical" tone="onDark" class="h-28 md:hidden" />
+          <BpeLogo variant="horizontal" tone="onDark" class="hidden h-11 md:block" />
+        </a>
+        <p class="accent-word mt-4 text-xl text-gold-soft">Where clean meets perfection</p>
+        <p class="mt-5 max-w-sm text-sm leading-relaxed text-cream/60">{AREAS_SENTENCE}</p>
+      </div>
+
+      <nav aria-label="Services">
+        <h2 class="font-sans text-[0.62rem] font-semibold uppercase tracking-[0.28em] text-gold">Services</h2>
+        {/* block + py-1.5 on each anchor: the tap target absorbs the list
+            gap (~36px pitch) instead of leaving 20px islands a thumb misses. */}
+        <ul class="mt-5 space-y-1">
+          {SERVICES.map((s) => (
+            <li><a href={s.slug} class="block py-1.5 text-sm text-cream/70 transition-colors hover:text-gold-soft">{s.name}</a></li>
+          ))}
+          <li><a href="/prices/" class="block py-1.5 text-sm font-semibold text-cream transition-colors hover:text-gold-soft">Full price list</a></li>
+          <li><a href="/blog/" class="block py-1.5 text-sm text-cream/70 transition-colors hover:text-gold-soft">Cleaning advice</a></li>
+        </ul>
+      </nav>
+
+      <div>
+        <h2 class="font-sans text-[0.62rem] font-semibold uppercase tracking-[0.28em] text-gold">Contact</h2>
+        <ul class="mt-5 space-y-1 text-sm text-cream/70">
+          <li><a href={SITE.phoneHref} class="block py-1.5 font-semibold text-cream transition-colors hover:text-gold-soft">{SITE.phoneDisplay}</a></li>
+          <li><a href={SITE.whatsappHref} class="block py-1.5 transition-colors hover:text-gold-soft" rel="noopener">WhatsApp us</a></li>
+          <li><span id="footer-email" data-user="bpecleaning98" data-domain="gmail.com"></span></li>
+          <li>{SITE.area}</li>
+          <li>{SITE.hours}</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  {/* The sign-off: the name at colossal size, and WHOLE. These are the
+      identity's own letterforms, lifted straight out of the typographic
+      logo, not a serif standing in for them. It sits in the page container,
+      on the same gutter as every other row, so the B and the E keep their
+      outer edges. A full-bleed version that let the viewport eat the outer
+      letters was tried twice and rejected twice: a cropped glyph reads as a
+      rendering fault, not as a crop. */}
+  <div class="container-wide pb-4" aria-hidden="true">
+    <BpeLogo variant="wordmarkBpe" tone="onDark" sizing="width" class="opacity-95" />
+  </div>
+  <div class="border-t border-cream/12">
+    <div class="container-wide flex flex-col items-center justify-between gap-2 py-6 text-xs text-cream/40 md:flex-row">
+      <p>
+        &copy; {year} BPE Cleaning Services. All rights reserved.
+        <a href="/privacy/" class="ml-3 transition-colors hover:text-gold-soft">Privacy</a>
+      </p>
+      <p>Website by <a href="https://artiomotion.com" class="transition-colors hover:text-gold-soft" rel="noopener">ArtioMotion</a></p>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Email assembled at runtime so scrapers can't harvest it from the source.
+  const el = document.getElementById('footer-email');
+  if (el instanceof HTMLElement) {
+    const addr = `${el.dataset.user}@${el.dataset.domain}`;
+    const a = document.createElement('a');
+    a.href = `mailto:${addr}`;
+    a.textContent = addr;
+    a.className = 'transition-colors hover:text-gold-soft';
+    el.replaceWith(a);
+  }
+</script>

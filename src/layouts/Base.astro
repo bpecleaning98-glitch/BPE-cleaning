@@ -1,0 +1,167 @@
+---
+// Fraunces, opsz axis build, not the full one: the latin pair drops from
+// 264.4 KB to 145.3 KB, on every page load.
+//
+// The full build carries four axes (opsz, SOFT, WONK, wght) and global.css
+// pins SOFT and WONK to 0. The opsz build drops SOFT and WONK, baking SOFT
+// at 0 and WONK at 1. Note WONK, not 0: the package metadata claims a
+// default of 0 and it is wrong, measured against the real font.
+//
+// So this is not a free swap, it is a measured one. Rendering both builds
+// and diffing every glyph, WONK changes exactly five: h, m, n and s move by
+// under 0.6px at a 200px size, which is nothing, and & becomes the swashy
+// calligraphic form, which is unmistakable. The site's only two ampersands
+// (prices.astro, office-cleaning-dublin.astro) are both set in Manrope, so
+// today nothing on the site renders differently.
+//
+// The one place it could surface is a blog heading, which is Fraunces and is
+// typed by the client. If an ampersand ever lands in one it will be the
+// swash. Going back is a two line change to the imports below.
+import '@fontsource-variable/fraunces/opsz.css';
+import '@fontsource-variable/fraunces/opsz-italic.css';
+import '@fontsource-variable/manrope';
+import '../styles/global.css';
+
+// The two files the first screen paints with, imported so Vite hands back the
+// fingerprinted URL. A hand written path would go stale at the next build, and
+// a preload pointing at a file the page never requests is pure waste. Vite
+// keys emitted assets by source path, so these are the same two files the
+// @font-face rules above resolve to, not second copies.
+import frauncesLatin from '@fontsource-variable/fraunces/files/fraunces-latin-opsz-normal.woff2?url';
+import manropeLatin from '@fontsource-variable/manrope/files/manrope-latin-wght-normal.woff2?url';
+
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+
+interface Props {
+  title: string;
+  description: string;
+  /** Absolute or root-relative image for the social card. */
+  image?: string;
+  ogType?: 'website' | 'article';
+  /** Blog articles pass their own JSON-LD in here. */
+  jsonLd?: unknown;
+  noindex?: boolean;
+}
+const { title, description, image = '/og-image.jpg', ogType = 'website', jsonLd, noindex = false } = Astro.props;
+const canonical = new URL(Astro.url.pathname, Astro.site);
+const ogImage = new URL(image, Astro.site);
+---
+<!doctype html>
+<html lang="en-IE">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    {/* Fonts first, ahead of the metadata and the icons, so the preload
+        scanner starts them on the very first bytes of the head. It matters
+        here: Astro appends the stylesheet at the END of the head, and a font
+        is only requested once the CSSOM is complete, so without these the
+        two faces that carry the headline and every label queue behind the
+        whole stylesheet download.
+        Only the latin subsets are listed. Fontsource splits each family
+        across latin, latin-ext, vietnamese and, for Manrope, greek and two
+        cyrillic ranges, each gated behind a unicode-range this site never
+        reaches, so preloading any of them would fetch a file the page then
+        never uses. Fraunces italic is deliberately left out too: it carries
+        one word of the hero headline at 0.62em, and a third high priority
+        79.6 KB request would race the hero photo for the same bandwidth. */}
+    <link rel="preload" as="font" type="font/woff2" href={frauncesLatin} crossorigin />
+    <link rel="preload" as="font" type="font/woff2" href={manropeLatin} crossorigin />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    {noindex && <meta name="robots" content="noindex, nofollow" />}
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content={ogType} />
+    <meta property="og:locale" content="en_IE" />
+    <meta property="og:site_name" content="BPE Cleaning Services" />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:image" content={ogImage} />
+    {/* The identity, from the designer's pack: the diamond alone is the only
+        part of the lockup that survives at 16 pixels. */}
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <link rel="alternate" type="application/rss+xml" title="BPE Cleaning Services, cleaning advice" href="/blog/rss.xml" />
+    <meta name="theme-color" content="#14110D" />
+    {jsonLd && <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />}
+    <script is:inline>
+      // Gate all reveal styling on this class: no JS, no hidden content.
+      document.documentElement.classList.add('js');
+      // A refresh always lands at the top of the page, never mid-scroll:
+      // the browser's automatic scroll restoration fights the intro and the
+      // scroll choreography, so it is disabled site-wide.
+      if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+      window.scrollTo(0, 0);
+    </script>
+  </head>
+  <body class="min-h-screen bg-porcelain font-sans text-ink antialiased">
+    <Header />
+    <main><slot /></main>
+    <Footer />
+
+    <script>
+      // GSAP + Lenis signature motion (hero clip opening, pinned manifesto,
+      // floating frames). Loaded on every page; each piece guards its own
+      // elements, so pages without them pay only the import.
+      import '../scripts/motion.ts';
+    </script>
+    <script>
+      // Cookie-free, first-party traffic tracking, feeding the cabinet at
+      // /admin. Nothing leaves this domain.
+      import '../scripts/track.ts';
+    </script>
+    <script>
+      // Scroll reveals. IntersectionObserver where it works, and a hard
+      // timer fallback because the in-app Browser pane never fires IO.
+      const targets = document.querySelectorAll<HTMLElement>('[data-reveal]');
+      const revealAll = () => targets.forEach((el) => el.classList.add('in'));
+
+      if ('IntersectionObserver' in window) {
+        const io = new IntersectionObserver(
+          (entries) => {
+            for (const entry of entries) {
+              if (entry.isIntersecting) {
+                entry.target.classList.add('in');
+                io.unobserve(entry.target);
+              }
+            }
+          },
+          { threshold: 0.12, rootMargin: '0px 0px -6% 0px' }
+        );
+        targets.forEach((el) => io.observe(el));
+        setTimeout(revealAll, 2400);
+      } else {
+        revealAll();
+      }
+
+      // Soft parallax: data-parallax="0.12" drifts against scroll. rAF-gated.
+      const layers = document.querySelectorAll<HTMLElement>('[data-parallax]');
+      if (layers.length && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        let ticking = false;
+        const update = () => {
+          ticking = false;
+          const vh = window.innerHeight;
+          layers.forEach((el) => {
+            const speed = parseFloat(el.dataset.parallax || '0.1');
+            const box = el.getBoundingClientRect();
+            const delta = box.top + box.height / 2 - vh / 2;
+            el.style.transform = `translate3d(0, ${(-delta * speed).toFixed(1)}px, 0)`;
+          });
+        };
+        const onScroll = () => {
+          if (!ticking) {
+            ticking = true;
+            requestAnimationFrame(update);
+          }
+        };
+        addEventListener('scroll', onScroll, { passive: true });
+        addEventListener('resize', onScroll, { passive: true });
+        update();
+      }
+    </script>
+  </body>
+</html>

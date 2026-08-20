@@ -1,0 +1,129 @@
+---
+import { Image } from 'astro:assets';
+import imgKitchen from '../../assets/work/airbnb-02.jpg';
+import imgShower from '../../assets/work/eot-after-16.jpg';
+import imgHall from '../../assets/work/eot-after-30.jpg';
+import imgWindow from '../../assets/work/airbnb-01.jpg';
+
+/**
+ * The company presentation, the true Elicyon mechanic this time: the section
+ * pins, PHRASE A stands fully visible, then its unique words dissolve, the
+ * words the two phrases SHARE travel to their new positions, and PHRASE B's
+ * new words arrive around them. Driven by motion.ts.
+ *
+ * Both phrases are rendered in the same container with identical typography;
+ * phrase B is the invisible measuring target. Shared words carry data-key,
+ * matching pairs across phrases. Screen readers get one clean sentence via
+ * aria-label; the animated spans are hidden from them.
+ *
+ * Facts: 7 years and 80+ properties from the reference letters, "and beyond"
+ * covered by the 8 confirmed counties. Nothing else is claimed.
+ */
+type Token = { t: string; s?: 'caps' | 'it'; key?: string };
+
+const phraseA: Token[] = [
+  { t: 'We', s: 'caps' },
+  { t: 'clean', s: 'caps', key: 'clean' },
+  { t: 'homes,' },
+  { t: 'offices' },
+  { t: 'and' },
+  { t: 'Airbnb stays', s: 'caps' },
+  { t: 'across', key: 'across' },
+  { t: 'Dublin.', s: 'caps', key: 'dublin' },
+];
+
+const phraseB: Token[] = [
+  { t: 'Seven years', s: 'caps' },
+  { t: 'of' },
+  { t: 'trusted', s: 'it' },
+  { t: 'hands' },
+  { t: 'across', key: 'across' },
+  { t: 'Dublin.', s: 'caps', key: 'dublin' },
+  { t: 'Every detail', s: 'caps' },
+  { t: 'clean', s: 'caps', key: 'clean' },
+  { t: 'and checked' },
+  { t: 'twice.', s: 'it' },
+];
+
+const stats = [
+  { value: '7+', label: 'Years of experience' },
+  { value: '80+', label: 'Properties cared for' },
+  { value: '8', label: 'Counties covered' },
+  { value: '7/7', label: 'Days a week' },
+];
+
+const tokenClass = (token: Token) =>
+  [
+    token.key ? 'm-shared' : 'm-word',
+    token.s === 'caps' && 'display-caps',
+    token.s === 'it' && 'accent-word text-gold-deep',
+  ]
+    .filter(Boolean)
+    .join(' ');
+
+const label =
+  'We clean homes, offices and Airbnb stays across Dublin. Seven years of trusted hands, every detail clean and checked twice.';
+---
+<section class="relative overflow-hidden bg-porcelain" data-manifesto>
+  {/* Floating frames in the margins. The text column is CENTRED, so on wide
+      screens the margins are real and the frames can be large without ever
+      sitting under a word. Visible from xl, where the margins exist. */}
+  {/* The photo STREAM, the true Elicyon statement mechanic: while the pinned
+      text morphs in place, these frames travel UPWARD through the section in
+      the scroll direction, each in its own lane and at its own speed, from
+      below the fold to above it (motion.ts drives them on the pinned scrub).
+      Hidden until the script launches them; decorative only. */}
+  <div class="pointer-events-none absolute inset-0 hidden xl:block" aria-hidden="true">
+    <div class="m-frame absolute right-[-2rem] top-1/2 w-[24rem] border border-ink/10 opacity-0 2xl:w-[28rem]" data-lane="fast">
+      <Image src={imgHall} alt="" class="h-full w-full object-cover" widths={[768, 896]} sizes="448px" format="webp" quality={74} />
+    </div>
+    <div class="m-frame absolute left-[-3rem] top-1/2 w-[22rem] border border-ink/10 opacity-0 2xl:w-[26rem]" data-lane="mid">
+      <Image src={imgKitchen} alt="" class="h-full w-full object-cover" widths={[704, 832]} sizes="416px" format="webp" quality={74} />
+    </div>
+    <div class="m-frame absolute right-[14%] top-1/2 w-[19rem] border border-ink/10 opacity-0 2xl:w-[22rem]" data-lane="slow">
+      <Image src={imgShower} alt="" class="h-full w-full object-cover" widths={[608, 704]} sizes="352px" format="webp" quality={74} />
+    </div>
+    {/* The fourth frame owns the lower-left CORNER, bleeding off the page
+        edge like the reference frames do. The first position (left-26%) was
+        rejected because the frame passed under the words; at -4.5rem its
+        right edge stays short of the centred text column at every width, so
+        it never crosses a letter. It shares the kitchen's horizontal
+        corridor, which the lanes rule forbids, EXCEPT that its script in
+        motion.ts waits below the fold until the kitchen has cleared the
+        zone, so their passes cannot meet. airbnb-01 is the bright window
+        shot the hero freed up when it switched to the stock photograph. */}
+    <div class="m-frame absolute left-[-4.5rem] top-1/2 w-[16rem] border border-ink/10 opacity-0 2xl:w-[20rem]" data-lane="linger">
+      <Image src={imgWindow} alt="" class="h-full w-full object-cover" widths={[608, 704]} sizes="352px" format="webp" quality={74} />
+    </div>
+  </div>
+
+  <div class="container-wide relative z-10 flex min-h-[100svh] flex-col justify-center py-24">
+    <div class="mx-auto w-full max-w-4xl">
+    <p class="kicker" data-reveal>The Company</p>
+
+    {/* pb reserves a line: phrase B runs one line longer than phrase A and
+        overlays it absolutely, so without this it would kiss the stats row. */}
+    <div class="relative mt-10 pb-[1.6em]" aria-label={label} role="img">
+      <p class="m-phrase m-phrase-a font-display text-[clamp(1.9rem,4.3vw,3.6rem)] leading-[1.16] text-ink" aria-hidden="true">
+        {phraseA.map((token) => (
+          <span class={tokenClass(token)} data-key={token.key}>{token.t}{' '}</span>
+        ))}
+      </p>
+      <p class="m-phrase m-phrase-b absolute inset-0 font-display text-[clamp(1.9rem,4.3vw,3.6rem)] leading-[1.16] text-ink opacity-0" aria-hidden="true">
+        {phraseB.map((token) => (
+          <span class={tokenClass(token)} data-key={token.key}>{token.t}{' '}</span>
+        ))}
+      </p>
+    </div>
+
+    <div class="mt-16 grid max-w-3xl grid-cols-2 gap-x-8 gap-y-8 sm:grid-cols-4" data-reveal>
+      {stats.map((stat) => (
+        <div class="border-t border-ink/15 pt-4">
+          <p class="display text-3xl text-ink md:text-4xl">{stat.value}</p>
+          <p class="mt-2 font-sans text-[0.6rem] font-semibold uppercase tracking-[0.22em] text-stone">{stat.label}</p>
+        </div>
+      ))}
+    </div>
+    </div>
+  </div>
+</section>

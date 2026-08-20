@@ -1,0 +1,61 @@
+---
+import { Image } from 'astro:assets';
+import BpeLogo from '../brand/BpeLogo.astro';
+import bgPhoto from '../../assets/work/eot-after-24.jpg';
+import innerPhoto from '../../assets/work/airbnb-07.jpg';
+
+/**
+ * The Elicyon closing card: a full-height photo backdrop with a porcelain
+ * panel floating in the middle, an invitation in caps serif, a small inner
+ * photo, one underlined link, and the tagline as the sign-off line.
+ */
+---
+<section class="relative flex min-h-[92svh] items-center justify-center overflow-hidden bg-night py-24">
+  <div class="absolute inset-[-6%]" data-parallax="0.06" aria-hidden="true">
+    <Image
+      src={bgPhoto}
+      alt=""
+      class="h-full w-full object-cover"
+      widths={[540, 1080, 1600]}
+      sizes="100vw"
+      format="webp"
+      quality={72}
+    />
+    <div class="absolute inset-0 bg-night/45"></div>
+  </div>
+
+  <div class="container-wide relative flex justify-center">
+    <div class="w-full max-w-xl bg-porcelain px-8 py-12 text-center md:px-14 md:py-16" data-reveal>
+      {/* The vertical lockup seals the card. A centred portrait panel is
+          exactly the shape it was drawn for, and at this size its second
+          line still reads, which is the whole test for using it at all. */}
+      <BpeLogo variant="vertical" tone="site" class="mx-auto mb-10 h-24 md:h-28" />
+
+      <h2 class="display-caps text-[clamp(1.5rem,3.2vw,2.3rem)] leading-[1.12] text-ink">
+        Get in touch to book
+        <span class="accent-word text-[0.8em] text-gold-deep">your</span>
+        next clean
+      </h2>
+
+      <div class="media-zoom frame-hover mx-auto mt-10 w-56 md:w-64" data-reveal style="--d: 0.15s">
+        <Image
+          src={innerPhoto}
+          alt="A freshly made bedroom after a BPE turnover clean"
+          class="aspect-[3/4] w-full object-cover"
+          widths={[448, 512]}
+          sizes="256px"
+          format="webp"
+          quality={74}
+        />
+      </div>
+
+      <a href="/quote/" class="link-caps mt-10 inline-flex text-ink after:scale-x-100 after:origin-left hover:text-gold-deep" data-reveal style="--d: 0.25s">
+        Let&rsquo;s begin
+      </a>
+
+      <p class="display-caps mt-12 text-[0.95rem] tracking-[0.04em] text-ink/80" data-reveal style="--d: 0.3s">
+        Where clean <span class="accent-word text-[0.85em] text-gold-deep">meets</span> perfection
+      </p>
+    </div>
+  </div>
+</section>

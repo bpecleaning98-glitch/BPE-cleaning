@@ -1,0 +1,52 @@
+---
+import { FIXED, HOURLY, VAT_NOTE } from '../../data/pricing';
+
+/**
+ * Homepage pricing TEASER, light and airy. The full tables live on /prices/
+ * only: the homepage never repeats an inner page in full.
+ * Here: the philosophy in one breath, three "from" figures floating on
+ * porcelain with nothing but air and two hairlines, and the invitation.
+ * No dark band, no boxes, no table.
+ */
+const figures = [
+  { label: 'House cleaning', value: HOURLY.regular.label },
+  { label: 'Deep & end of tenancy', value: `from €${FIXED.deep['1bed']}` },
+  { label: 'Airbnb turnover', value: `from €${FIXED.airbnbTurnover['1bed']}` },
+];
+---
+<section class="section-pad bg-ivory">
+  <div class="container-wide">
+    <div class="grid gap-12 lg:grid-cols-[1.1fr_1fr] lg:gap-20">
+      <div>
+        <p class="kicker" data-reveal>Transparent Pricing</p>
+        <h2 class="display mt-6 text-[clamp(2.2rem,5vw,4rem)]" data-reveal>
+          <span class="line-mask"><span>Honest prices,</span></span>
+          <span class="line-mask"><span style="--d: 0.1s">no <span class="accent-word text-gold-deep">surprises</span></span></span>
+        </h2>
+      </div>
+      <div class="flex flex-col justify-end" data-reveal style="--d: 0.2s">
+        <p class="max-w-md text-base leading-relaxed text-ink/70">
+          Most Dublin cleaning companies hide their prices. We publish every one of ours, and your
+          final price is always confirmed before we book you in.
+        </p>
+      </div>
+    </div>
+
+    <div class="mt-16 grid gap-y-10 border-y border-ink/12 py-10 sm:grid-cols-3" data-reveal>
+      {figures.map((figure, i) => (
+        <div class:list={['sm:px-10', i === 0 && 'sm:pl-0', i > 0 && 'sm:border-l sm:border-ink/12']}>
+          <p class="font-sans text-[0.62rem] font-semibold uppercase tracking-[0.24em] text-stone">{figure.label}</p>
+          <p class="mt-3 font-sans text-3xl font-medium tracking-[-0.02em] text-ink [font-variant-numeric:tabular-nums] md:text-4xl">
+            {figure.value.replace('from ', '')}
+            <span class="ml-2 align-middle font-sans text-[0.62rem] font-semibold uppercase tracking-[0.2em] text-ink/45">from</span>
+          </p>
+        </div>
+      ))}
+    </div>
+
+    <div class="mt-10 flex flex-wrap items-center justify-between gap-6" data-reveal style="--d: 0.1s">
+      <p class="text-xs text-ink/45">{VAT_NOTE}</p>
+      <a href="/prices/" class="link-caps text-gold-deep">See the full price list</a>
+    </div>
+  </div>
+</section>

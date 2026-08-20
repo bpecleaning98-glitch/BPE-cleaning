@@ -1,0 +1,548 @@
+---
+import Base from '../layouts/Base.astro';
+import { serviceGraph } from '../lib/schema';
+import BeforeAfter from '../components/BeforeAfter.astro';
+import Gallery from '../components/Gallery.astro';
+import Diamond from '../components/Diamond.astro';
+import { Image } from 'astro:assets';
+import { SITE, SERVICES } from '../data/site';
+import { HOURLY, FIXED, SIZE_LABELS, EXTRAS, VAT_NOTE, ESTIMATE_NOTE } from '../data/pricing';
+import { BUILDERS_PAIR, END_OF_TENANCY_ROOMS, DEEP_CLEAN } from '../data/work';
+import { TESTIMONIALS } from '../data/testimonials';
+import { COUNTIES, AREAS_SENTENCE } from '../data/areas';
+
+/** Fixed prices, straight from pricing.ts. Studio is deliberately omitted: the
+ *  studio figure mirrors 1 bedroom in the data but the client has not confirmed
+ *  it, so it is not advertised here. */
+const tiers = (['1bed', '2bed', '3bed', '4bed'] as const).map((size) => ({
+  rooms: SIZE_LABELS[size],
+  price: FIXED.afterBuilders[size],
+}));
+
+/** Only the four proof points that are actually evidenced. Nothing else. */
+const facts = [
+  { label: 'Experience', value: 'Over seven years' },
+  { label: 'Coverage', value: `${COUNTIES.length} counties` },
+  { label: 'Hours', value: SITE.hours },
+  { label: 'Insurance', value: 'Fully insured' },
+];
+
+/** The method, in the order the work is actually done. High level before low
+ *  level, floors last, because that is what stops dust settling twice. */
+const included = [
+  {
+    title: 'Debris and packaging',
+    text: 'Offcuts, tape, protective sheeting, packaging and empty tubs collected and bagged before any cleaning starts.',
+  },
+  {
+    title: 'High level first',
+    text: 'Light fittings, extractor vents, tops of doors, door frames, curtain poles and radiators taken down first, so nothing falls onto finished surfaces.',
+  },
+  {
+    title: 'Walls and joinery',
+    text: 'Wiped where the finish allows, with skirting boards, architraves, handles, hinges, sockets and switch plates done by hand.',
+  },
+  {
+    title: 'Paint and adhesive marks',
+    text: 'Spots and splashes lifted off glass, tiles, sanitary ware, worktops and floors. Sticker residue and protective film removed.',
+  },
+  {
+    title: 'Kitchen',
+    text: 'Units cleaned inside and out, worktops, sink and taps, hob, splashback and appliance exteriors, including the tops of the units.',
+  },
+  {
+    title: 'Bathrooms',
+    text: 'Sanitary ware, tiling and grout, shower screens, mirrors, chrome and extractor covers. Grout haze removed rather than smeared around.',
+  },
+  {
+    title: 'Windows, sills and tracks',
+    text: 'Frames, sills and runners hoovered out and wiped down, and the glass cleared of paint spots and stickers.',
+  },
+  {
+    title: 'Floors, last of all',
+    text: 'Hoovered thoroughly, then washed. Corners, thresholds and the edge against the skirting done by hand, because that is where builders dust hides.',
+  },
+];
+
+/**
+ * No after builders gallery exists in work.ts. The hallway pair is the only post
+ * construction set the client sent, and it is above. These frames are other BPE
+ * jobs and they keep their own captions, so nothing is passed off as something
+ * it is not.
+ */
+const finishShots = [
+  END_OF_TENANCY_ROOMS[0], // living and dining room
+  END_OF_TENANCY_ROOMS[1], // kitchen at handover
+  END_OF_TENANCY_ROOMS[3], // hallway, floor washed up to the skirting
+  DEEP_CLEAN[0], // worktop, sink and hob
+  DEEP_CLEAN[2], // shower tray, glass and tiling
+  DEEP_CLEAN[3], // grout and chrome
+];
+
+/** One oversized drifting frame leading the work section. The bedroom is the
+ *  only room photo in the imported sets that is not already in finishShots, so
+ *  nothing repeats on the page. Its own caption renders with it. */
+const leadShot = END_OF_TENANCY_ROOMS[2];
+
+/** The two construction references. Both were written by building companies, so
+ *  they are the relevant social proof on a post construction page. */
+const tradeRefs = TESTIMONIALS.filter(
+  (t) => t.author === 'Ivan Spanjic' || t.author === 'Gareth Robinson',
+);
+
+/** The EEM reference leads as a scroll-brightening quote: it is the one about
+ *  cleaning multiple apartment units on site, the closest fit to this page.
+ *  Words are split here, ahead of render, for the q-word scrub in motion.ts. */
+const leadRef = tradeRefs.find((t) => t.author === 'Ivan Spanjic') ?? tradeRefs[0];
+const otherRefs = tradeRefs.filter((t) => t !== leadRef);
+const leadRefWords = leadRef ? leadRef.quote.split(' ') : [];
+
+const faqs = [
+  {
+    q: 'How is this different from a deep clean?',
+    a: `Both are top to bottom cleans. The difference is what is being removed. A deep clean deals with everyday build up, limescale, grease and grime. An after builders clean deals with construction residue: fine plaster and MDF dust that settles a second time after the first pass, paint and adhesive marks, silicone smears, stickers and protective film. It takes longer and it takes more passes, so it is priced higher. For a 1 bedroom, a deep clean is €${FIXED.deep['1bed']} and an after builders clean is €${FIXED.afterBuilders['1bed']}.`,
+  },
+  {
+    q: 'When should we book you in?',
+    a: 'Once the trades have finished and the property is clear of tools, materials and skips, so nothing gets walked back through. If you need two visits, one after the messy work is done and a final one before handover, tell us and we will price both.',
+  },
+  {
+    q: 'How long does it take?',
+    a: `That depends on the size of the property and how much residue the works left behind, so we agree the scope with you first rather than guess. ${ESTIMATE_NOTE}`,
+  },
+  {
+    q: 'Do you work with builders and contractors?',
+    a: 'Yes. We clean for homeowners and for construction companies, and two of the written references on this page were sent to us by building companies. We are fully insured, we work seven days a week between 8:00 and 20:00, and we can work around a handover date.',
+  },
+  {
+    q: 'Do you bring your own products and equipment?',
+    a: `Yes. Our team arrives with professional, eco-friendly products and the equipment for the job. ${AREAS_SENTENCE}`,
+  },
+];
+
+const relatedSlugs = [
+  '/deep-cleaning-dublin/',
+  '/end-of-tenancy-cleaning-dublin/',
+  '/office-cleaning-dublin/',
+];
+const related = SERVICES.filter((s) => relatedSlugs.includes(s.slug));
+
+/**
+ * Service, FAQPage and BreadcrumbList for this page. `faqs` is handed over as it
+ * stands, so the questions and answers in the markup are literally the ones
+ * rendered below. The price in the offer is read from data/pricing.ts by
+ * lib/schema.ts, never typed here.
+ */
+const jsonLd = serviceGraph('/after-builders-cleaning-dublin/', faqs, Astro.site);
+---
+<Base
+  title={`After Builders Cleaning Dublin from €${FIXED.afterBuilders['1bed']} | BPE Cleaning`}
+  description={`After builders cleaning in Dublin from €${FIXED.afterBuilders['1bed']}. Construction dust, paint spots and residue removed, your new space ready to live in.`}
+  jsonLd={jsonLd}
+>
+  <section class="bg-night pt-40 pb-20 text-cream md:pt-48 md:pb-24">
+    <div class="container-wide">
+      <p class="kicker !text-gold" data-reveal>Post Construction</p>
+      <h1 class="display-caps mt-6 text-[clamp(2.6rem,7vw,5.5rem)]" data-reveal>
+        <span class="line-mask"><span>After Builders</span></span>
+        <span class="line-mask"><span style="--d: 0.1s">Cleaning <span class="accent-word text-[0.62em] text-gold-soft">in</span> Dublin</span></span>
+      </h1>
+      <p class="mt-8 max-w-xl text-base leading-relaxed text-cream/70" data-reveal style="--d: 0.2s">
+        Construction dust, paint spots and residue removed, your new space ready to live in.
+      </p>
+      <div class="mt-10 flex flex-wrap items-center gap-4" data-reveal style="--d: 0.3s">
+        <a href="/quote/" class="btn-gold">Get my price</a>
+        <a href={SITE.phoneHref} class="btn-outline text-cream">Call {SITE.phoneDisplay}</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-pad bg-porcelain">
+    <div class="container-wide grid gap-14 lg:grid-cols-[1fr_1.15fr] lg:gap-20">
+      <div>
+        <p class="kicker" data-reveal>The Last Job On Site</p>
+        <h2 class="display mt-6 text-[clamp(2.2rem,5vw,4rem)] text-ink" data-reveal>
+          <span class="line-mask"><span>The build is finished.</span></span>
+          <span class="line-mask"><span style="--d: 0.1s">The dust is <span class="accent-word text-gold-deep">not</span></span></span>
+        </h2>
+      </div>
+
+      <div class="self-center">
+        <p class="max-w-xl text-base leading-relaxed text-ink/70 md:text-lg" data-reveal>
+          Plaster and MDF dust is not ordinary dust. It stays in the air for hours, so it lands a
+          second time on everything you have just wiped, and it works its way into window tracks,
+          socket faces, radiator fins and the tops of door frames. Reach for a mop too early and it
+          turns into a grey film right across a new floor.
+        </p>
+        <p class="mt-6 max-w-xl text-base leading-relaxed text-ink/70" data-reveal style="--d: 0.1s">
+          An after builders clean has to be done in order. Debris and packaging out first, then the
+          dust taken down from high level to low, then paint, adhesive and silicone marks lifted off
+          glass, tiles and sanitary ware, and only then the floors washed. We do this for homeowners
+          at the end of a renovation and for builders handing a finished unit over to a client.
+        </p>
+
+        <div class="mt-12 grid grid-cols-2 gap-x-8 lg:grid-cols-4">
+          {facts.map((fact, i) => (
+            <div class="border-t border-ink/15 pt-4" data-reveal style={`--d: ${0.08 * i}s`}>
+              <p class="font-sans text-[0.66rem] font-semibold uppercase tracking-[0.24em] text-stone">{fact.label}</p>
+              <p class="mt-2 font-sans text-sm font-medium text-ink">{fact.value}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {/* The eight steps of the method as a numbered editorial index beside a
+      sticky headline, the WhyBpe treatment. Copy untouched, clothes only. */}
+  <section class="section-pad bg-ivory">
+    <div class="container-wide grid gap-14 lg:grid-cols-[1fr_1.5fr] lg:gap-20">
+      <div class="lg:sticky lg:top-32 lg:self-start">
+        <p class="kicker" data-reveal>What Is Included</p>
+        <h2 class="display mt-6 text-[clamp(2.2rem,5vw,4rem)] text-ink" data-reveal>
+          <span class="line-mask"><span>Every surface the</span></span>
+          <span class="line-mask"><span style="--d: 0.1s">works <span class="accent-word text-gold-deep">touched</span></span></span>
+        </h2>
+        <p class="mt-8 max-w-sm text-base leading-relaxed text-ink/70" data-reveal style="--d: 0.2s">
+          A full property clean after construction or renovation work, done in the order that keeps
+          the dust from coming back.
+        </p>
+        <span class="mt-10 block h-px w-12 bg-gold/60" data-reveal="fade" style="--d: 0.3s" aria-hidden="true"></span>
+      </div>
+
+      <div>
+        <div class="border-t border-ink/15">
+          {included.map((item, i) => (
+            <div
+              class="grid grid-cols-[2.6rem_1fr] items-baseline gap-x-6 border-b border-ink/15 py-7 md:grid-cols-[3.2rem_1fr_1.4fr] md:gap-x-10"
+              data-reveal
+              style={`--d: ${0.06 * i}s`}
+            >
+              <span class="font-sans text-[0.66rem] font-semibold tracking-[0.2em] text-stone">{String(i + 1).padStart(2, '0')}</span>
+              <h3 class="display text-xl text-ink md:text-2xl">{item.title}</h3>
+              <p class="col-start-2 mt-2 text-sm leading-relaxed text-ink/60 md:col-start-3 md:mt-0">{item.text}</p>
+            </div>
+          ))}
+        </div>
+        <p class="mt-8 max-w-2xl text-sm leading-relaxed text-ink/60" data-reveal>
+          Oven and fridge interiors, carpets and full interior window cleaning sit outside the
+          standard job and are priced as add-ons, listed with the prices below.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  {/* THE moment of the page: the only genuine before/after pair the client
+      owns, staged alone on the night band with the ghosted mark behind it.
+      The slider component and its props are exactly as before; only the room
+      around it changed. */}
+  <section class="relative overflow-hidden bg-night py-24 text-cream md:py-36">
+    <Diamond class="pointer-events-none absolute -right-40 -top-44 h-[38rem] w-[38rem] opacity-[0.05]" aria-hidden="true" />
+    <Diamond class="pointer-events-none absolute -bottom-52 -left-48 h-[38rem] w-[38rem] opacity-[0.04]" aria-hidden="true" />
+
+    <div class="container-wide relative">
+      <div class="flex flex-wrap items-end justify-between gap-6">
+        <div>
+          <p class="kicker !text-gold" data-reveal>Before And After</p>
+          <h2 class="display mt-6 text-[clamp(2.2rem,5vw,4rem)]" data-reveal>
+            <span class="line-mask"><span>Our own job,</span></span>
+            <span class="line-mask"><span style="--d: 0.1s">start and <span class="accent-word text-gold-soft">finish</span></span></span>
+          </h2>
+        </div>
+        <p class="max-w-sm text-sm leading-relaxed text-cream/60" data-reveal style="--d: 0.2s">
+          A Dublin apartment hallway, photographed by our team before we started and again when we
+          were done. Drag the handle across to compare.
+        </p>
+      </div>
+
+      <div class="mx-auto mt-16 w-full max-w-[34rem] md:mt-24" data-reveal>
+        <p class="mb-5 text-center font-sans text-[0.62rem] font-semibold uppercase tracking-[0.26em] text-cream/50">
+          Apartment hallway &middot; Dublin
+        </p>
+        <BeforeAfter
+          before={BUILDERS_PAIR.before}
+          after={BUILDERS_PAIR.after}
+          beforeAlt={BUILDERS_PAIR.beforeAlt}
+          afterAlt={BUILDERS_PAIR.afterAlt}
+          caption={BUILDERS_PAIR.caption}
+          start={BUILDERS_PAIR.start}
+          class="[&>div]:border-cream/15 [&_figcaption]:text-cream/50"
+        />
+      </div>
+
+      <div class="mt-16 grid gap-10 border-t border-cream/15 pt-10 md:mt-24 lg:grid-cols-[1fr_1.4fr_auto] lg:gap-14">
+        <p class="text-sm leading-relaxed text-cream/60" data-reveal>
+          The debris and tape went out first, the heater, skirting boards and door frames were wiped
+          down, and the floor was washed last.
+        </p>
+        <p class="text-sm leading-relaxed text-cream/60" data-reveal style="--d: 0.1s">
+          The pale band across the middle of the after photo is the floor still drying, not a mark
+          left behind. We would rather point it out than hope nobody notices. It is also the only
+          matched pair we have, because our team tends to photograph the mess up close and the
+          result from the doorway. More finished work is further down the page.
+        </p>
+        <div data-reveal style="--d: 0.2s">
+          <a href="/quote/" class="btn-gold">Get my price</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-pad bg-porcelain">
+    <div class="container-wide">
+      <div class="flex flex-wrap items-end justify-between gap-6">
+        <div>
+          <p class="kicker" data-reveal>Our Work</p>
+          <h2 class="display mt-6 max-w-2xl text-[clamp(2.2rem,5vw,4rem)] text-ink" data-reveal>
+            <span class="line-mask"><span>How a space is left</span></span>
+            <span class="line-mask"><span style="--d: 0.1s">when we <span class="accent-word text-gold-deep">finish</span></span></span>
+          </h2>
+        </div>
+        <p class="max-w-sm text-sm leading-relaxed text-ink/60" data-reveal style="--d: 0.2s">
+          Photographs from real BPE jobs in Dublin. These frames come from deep cleans and end of
+          tenancy cleans, and each caption says what was cleaned, so nothing here is dressed up as
+          something it is not.
+        </p>
+      </div>
+
+      {/* One oversized drifting frame leads, Projects-style, then the grid. */}
+      <div class="mt-16 md:ml-auto md:w-[74%]" data-reveal>
+        <div class="media-zoom frame-hover overflow-hidden border border-ink/10">
+          <div data-drift>
+            <Image
+              src={leadShot.src}
+              alt={leadShot.alt}
+              class="aspect-[16/10] w-full scale-110 object-cover"
+              widths={[768, 1080, 1440]}
+              sizes="(min-width: 768px) 74vw, 100vw"
+              format="webp"
+              quality={78}
+            />
+          </div>
+        </div>
+        <p class="mt-4 font-sans text-xs text-ink/55">{leadShot.caption}</p>
+      </div>
+
+      <div class="mt-16 md:mt-20" data-reveal>
+        <Gallery items={finishShots} cols={3} />
+      </div>
+    </div>
+  </section>
+
+  <section class="section-pad bg-night text-cream">
+    <div class="container-wide">
+      <div class="flex flex-wrap items-end justify-between gap-6">
+        <div>
+          <p class="kicker !text-gold" data-reveal>Prices</p>
+          <h2 class="display mt-6 max-w-2xl text-[clamp(2.2rem,5vw,4rem)]" data-reveal>
+            <span class="line-mask"><span>Priced by the size</span></span>
+            <span class="line-mask"><span style="--d: 0.1s">of the <span class="accent-word text-gold-soft">property</span></span></span>
+          </h2>
+        </div>
+        <p class="max-w-sm text-sm leading-relaxed text-cream/60" data-reveal style="--d: 0.2s">
+          One figure for the whole property, agreed with you before anything is booked in.
+        </p>
+      </div>
+
+      <p class="mt-14 font-sans text-[0.62rem] font-semibold uppercase tracking-[0.26em] text-cream/50" data-reveal>
+        After builders cleaning &middot; fixed price per property
+      </p>
+      <div class="mt-4 grid border-t border-cream/15 sm:grid-cols-2 lg:grid-cols-4">
+        {tiers.map((tier, i) => (
+          <div
+            class:list={[
+              'border-b border-cream/15 px-1 py-8 sm:px-7 lg:border-b-0 lg:py-10',
+              i > 0 && 'lg:border-l lg:border-cream/15',
+              i === 0 && 'sm:pl-0',
+            ]}
+            data-reveal
+            style={`--d: ${0.08 * i}s`}
+          >
+            <p class="font-sans text-[0.66rem] font-semibold uppercase tracking-[0.24em] text-cream/60">{tier.rooms}</p>
+            <p class="font-sans font-medium tracking-[-0.01em] mt-5 text-[3.4rem] leading-none text-cream [font-variant-numeric:tabular-nums] md:text-[4rem]">
+              <span class="text-gold">€</span>{tier.price}
+            </p>
+            <span class="mt-6 block h-px w-10 bg-gold/60" aria-hidden="true"></span>
+          </div>
+        ))}
+      </div>
+
+      <div class="mt-16 grid gap-12 lg:grid-cols-2 lg:gap-20">
+        <div data-reveal>
+          <p class="font-sans text-[0.62rem] font-semibold uppercase tracking-[0.26em] text-cream/50">
+            By the hour instead
+          </p>
+          <p class="font-sans font-medium tracking-[-0.01em] mt-5 text-[2.6rem] leading-none text-cream [font-variant-numeric:tabular-nums]">{HOURLY.afterBuilders.label}</p>
+          <p class="mt-6 max-w-md text-sm leading-relaxed text-cream/60">
+            If the job is one room, a stairwell or a single bathroom after a small piece of work, the
+            hourly rate is usually the better fit. Tell us what was done and we will say which of the
+            two costs you less.
+          </p>
+        </div>
+
+        <div data-reveal style="--d: 0.1s">
+          <p class="font-sans text-[0.62rem] font-semibold uppercase tracking-[0.26em] text-cream/50">
+            Add-ons
+          </p>
+          <ul class="mt-5">
+            {EXTRAS.map((extra) => (
+              <li class="flex items-baseline justify-between gap-6 border-t border-cream/15 py-4">
+                <span class="text-sm text-cream/75">{extra.name}</span>
+                <span class="font-sans text-[0.68rem] font-semibold uppercase tracking-[0.2em] text-gold-soft [font-variant-numeric:tabular-nums]">{extra.label}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+
+      <div class="mt-12 flex flex-col justify-between gap-8 border-t border-cream/15 pt-8 md:flex-row md:items-center" data-reveal>
+        <p class="max-w-lg text-sm text-cream/60">{ESTIMATE_NOTE}</p>
+        <div class="flex flex-wrap items-center gap-4">
+          <a href="/quote/" class="btn-gold shrink-0">Get my price</a>
+          <a href="/prices/" class="link-caps text-cream/80 hover:text-cream">Full price list</a>
+        </div>
+      </div>
+      <p class="mt-6 text-xs text-cream/40">{VAT_NOTE}</p>
+    </div>
+  </section>
+
+  {/* The EEM reference as the page's lead quote, words brightening with the
+      scroll, the giant serif mark hanging in the margin. Hoffman follows on a
+      hairline row. Same testimonials, same store, new stage. */}
+  {tradeRefs.length > 0 && (
+    <section class="section-pad bg-porcelain">
+      <div class="container-wide">
+        <div class="flex flex-wrap items-end justify-between gap-6">
+          <div>
+            <p class="kicker" data-reveal>Trade References</p>
+            <h2 class="display mt-6 text-[clamp(2.2rem,5vw,4rem)] text-ink" data-reveal>
+              <span class="line-mask"><span>Builders who</span></span>
+              <span class="line-mask"><span style="--d: 0.1s">call us <span class="accent-word text-gold-deep">back</span></span></span>
+            </h2>
+          </div>
+          <p class="max-w-sm text-sm leading-relaxed text-ink/60" data-reveal style="--d: 0.2s">
+            Both of these were sent to us as written references by construction companies we clean
+            for.
+          </p>
+        </div>
+
+        {leadRef && (
+          <figure class="mt-16 grid gap-6 md:grid-cols-[auto_1fr] md:gap-10">
+            <span class="display block select-none text-[6rem] leading-[0.6] text-gold md:text-[9rem]" aria-hidden="true">&ldquo;</span>
+            <div class="max-w-3xl">
+              <blockquote data-quote-scrub>
+                <p class="display text-[clamp(1.4rem,2.7vw,2.2rem)] leading-[1.3] text-ink">
+                  {leadRefWords.map((word) => (
+                    <span class="q-word">{word}{' '}</span>
+                  ))}
+                </p>
+              </blockquote>
+              <figcaption class="mt-8 flex items-center gap-4">
+                <span class="h-px w-10 bg-gold" aria-hidden="true"></span>
+                <span class="font-sans text-[0.66rem] font-semibold uppercase tracking-[0.24em] text-ink/70">
+                  {leadRef.author} &middot; {leadRef.area}
+                </span>
+              </figcaption>
+            </div>
+          </figure>
+        )}
+
+        {otherRefs.map((t) => (
+          <figure class="mt-20 grid gap-8 border-t border-ink/15 pt-10 md:grid-cols-[1fr_1.6fr] md:gap-12" data-reveal>
+            <figcaption class="order-2 md:order-1">
+              <span class="block h-px w-10 bg-gold/60" aria-hidden="true"></span>
+              <span class="mt-5 block font-sans text-[0.66rem] font-semibold uppercase tracking-[0.24em] text-ink/70">{t.author}</span>
+              <span class="mt-1.5 block font-sans text-[0.62rem] font-semibold uppercase tracking-[0.22em] text-stone">{t.area}</span>
+            </figcaption>
+            <blockquote class="order-1 md:order-2">
+              <p class="font-display text-lg leading-relaxed text-ink/80 md:text-xl">&ldquo;{t.quote}&rdquo;</p>
+            </blockquote>
+          </figure>
+        ))}
+      </div>
+    </section>
+  )}
+
+  <section class="section-pad bg-ivory">
+    <div class="container-wide grid gap-14 lg:grid-cols-[1fr_1.6fr] lg:gap-20">
+      <div class="lg:sticky lg:top-32 lg:self-start">
+        <p class="kicker" data-reveal>Questions</p>
+        <h2 class="display mt-6 text-[clamp(2.2rem,5vw,4rem)] text-ink" data-reveal>
+          <span class="line-mask"><span>Before you</span></span>
+          <span class="line-mask"><span style="--d: 0.1s">book the <span class="accent-word text-gold-deep">handover</span></span></span>
+        </h2>
+      </div>
+
+      <div class="border-t border-ink/15">
+        {faqs.map((item, i) => (
+          <details class="group border-b border-ink/15" data-reveal style={`--d: ${0.08 * i}s`}>
+            <summary class="flex cursor-pointer list-none items-center justify-between gap-6 py-6 [&::-webkit-details-marker]:hidden">
+              <span class="font-display text-lg text-ink md:text-xl">{item.q}</span>
+              <svg
+                class="h-4 w-4 shrink-0 text-gold-deep transition-transform duration-300 group-open:rotate-45"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.5"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+              >
+                <path stroke-linecap="round" d="M12 5v14M5 12h14" />
+              </svg>
+            </summary>
+            <p class="max-w-2xl pb-6 text-sm leading-relaxed text-ink/65 md:text-base">{item.a}</p>
+          </details>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section-pad bg-night text-cream">
+    <div class="container-wide">
+      <div class="grid gap-14 lg:grid-cols-[1.1fr_1fr] lg:gap-20">
+        <div>
+          <p class="kicker !text-gold" data-reveal>Book It In</p>
+          <h2 class="display mt-6 text-[clamp(2.2rem,5vw,4rem)]" data-reveal>
+            <span class="line-mask"><span>Give us the address</span></span>
+            <span class="line-mask"><span style="--d: 0.1s">and the <span class="accent-word text-gold-soft">handover</span> date</span></span>
+          </h2>
+          <p class="mt-8 max-w-xl text-base leading-relaxed text-cream/70" data-reveal style="--d: 0.2s">
+            Tell us the size of the property and what the works involved, and we will come back with
+            a price. No obligation, and nothing is booked until you say so.
+          </p>
+          <div class="mt-10 flex flex-wrap items-center gap-4" data-reveal style="--d: 0.3s">
+            <a href="/quote/" class="btn-gold">Get my price</a>
+            <a href={SITE.phoneHref} class="btn-outline text-cream">Call {SITE.phoneDisplay}</a>
+            <a href={SITE.whatsappHref} class="btn-outline text-cream" rel="noopener">WhatsApp us</a>
+          </div>
+        </div>
+
+        <div class="self-center border-b border-cream/15">
+          <div class="flex items-baseline justify-between gap-6 border-t border-cream/15 py-5" data-reveal>
+            <span class="font-sans text-[0.66rem] font-semibold uppercase tracking-[0.24em] text-cream/50">Hours</span>
+            <span class="font-sans text-sm font-medium text-cream">{SITE.hours}</span>
+          </div>
+          <div class="flex items-baseline justify-between gap-6 border-t border-cream/15 py-5" data-reveal style="--d: 0.08s">
+            <span class="font-sans text-[0.66rem] font-semibold uppercase tracking-[0.24em] text-cream/50">Areas</span>
+            <span class="font-sans text-sm font-medium text-cream">{COUNTIES.length} counties</span>
+          </div>
+          <div class="flex items-baseline justify-between gap-6 border-t border-cream/15 py-5" data-reveal style="--d: 0.16s">
+            <span class="font-sans text-[0.66rem] font-semibold uppercase tracking-[0.24em] text-cream/50">From</span>
+            <span class="font-sans text-sm font-medium text-cream [font-variant-numeric:tabular-nums]">€{FIXED.afterBuilders['1bed']} fixed, or {HOURLY.afterBuilders.label}</span>
+          </div>
+          <p class="py-5 text-xs text-cream/40">{VAT_NOTE}</p>
+        </div>
+      </div>
+
+      <div class="mt-16 border-t border-cream/15 pt-8" data-reveal>
+        <p class="font-sans text-[0.62rem] font-semibold uppercase tracking-[0.26em] text-cream/50">
+          Related services
+        </p>
+        <div class="mt-5 flex flex-wrap gap-x-12 gap-y-5">
+          {related.map((service) => (
+            <a href={service.slug} class="link-caps text-cream/80 hover:text-cream">{service.name}</a>
+          ))}
+        </div>
+      </div>
+    </div>
+  </section>
+</Base>

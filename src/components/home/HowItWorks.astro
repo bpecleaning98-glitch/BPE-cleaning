@@ -1,0 +1,40 @@
+---
+const steps = [
+  {
+    title: 'Tell us what you need',
+    body: 'Answer six quick questions online or call us. It takes about a minute.',
+  },
+  {
+    title: 'Get your price',
+    body: 'A clear price upfront. We confirm every detail before your booking.',
+  },
+  {
+    title: 'We clean',
+    body: 'A vetted, insured team arrives with eco-friendly products and everything needed.',
+  },
+  {
+    title: 'You inspect',
+    body: 'Walk through the finished space with us. We are not done until you are happy.',
+  },
+];
+---
+
+<section class="section-pad bg-porcelain">
+  <div class="container-wide">
+    <p class="kicker" data-reveal>How It Works</p>
+    <h2 class="display mt-6 max-w-3xl text-[clamp(2.2rem,5vw,4rem)] text-ink" data-reveal>
+      <span class="line-mask"><span>Booked in minutes,</span></span>
+      <span class="line-mask"><span style="--d: 0.1s"><span class="accent-word text-gold-deep">spotless</span> in hours</span></span>
+    </h2>
+
+    <ol class="mt-14 grid grid-cols-1 gap-x-8 gap-y-10 sm:grid-cols-2 md:grid-cols-4">
+      {steps.map((step, i) => (
+        <li class="border-t border-ink/15 pt-4" data-reveal style={`--d: ${0.08 * i}s`}>
+          <p class="display text-4xl text-stone" aria-hidden="true">{String(i + 1).padStart(2, '0')}</p>
+          <h3 class="mt-6 font-sans text-base font-semibold text-ink">{step.title}</h3>
+          <p class="mt-2 text-sm leading-relaxed text-ink/60">{step.body}</p>
+        </li>
+      ))}
+    </ol>
+  </div>
+</section>

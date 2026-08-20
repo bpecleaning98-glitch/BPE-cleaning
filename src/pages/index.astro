@@ -1,0 +1,45 @@
+---
+import Base from '../layouts/Base.astro';
+import Hero from '../components/home/Hero.astro';
+import Manifesto from '../components/home/Manifesto.astro';
+import Projects from '../components/home/Projects.astro';
+import ServicesGrid from '../components/home/ServicesGrid.astro';
+import PricingBand from '../components/home/PricingBand.astro';
+import HowItWorks from '../components/home/HowItWorks.astro';
+import WhyBpe from '../components/home/WhyBpe.astro';
+import Testimonials from '../components/home/Testimonials.astro';
+import LetsBegin from '../components/home/LetsBegin.astro';
+import { graph, localBusiness } from '../lib/schema';
+
+/**
+ * The homepage is the IDENTITY page: who we are, what we do, the proof, the
+ * invitation. Anything that has its own page appears here only as a teaser,
+ * never in full: full price tables live on
+ * /prices/, the service index on /services/, FAQs and coverage on their own
+ * pages, the remaining references on /about/. Removed from home on that
+ * basis: OurWork, AirbnbBand, AreasServed, OffersStrip, Faq.
+ */
+
+/**
+ * The identity page carries the identity markup: one LocalBusiness node with the
+ * phone number, the opening hours, the eight counties and the six services. It is
+ * the node every other page's Service and provider block points back at, so it is
+ * declared here and on /contact/ and nowhere else.
+ */
+const jsonLd = graph(localBusiness(Astro.site));
+---
+<Base
+  title="Cleaning Services Dublin | BPE Cleaning Services"
+  description="Professional cleaning services in Dublin: house, deep, end of tenancy, after builders, office and Airbnb. Published prices, fully insured, 7 days a week."
+  jsonLd={jsonLd}
+>
+  <Hero />
+  <Manifesto />
+  <Projects />
+  <ServicesGrid />
+  <PricingBand />
+  <HowItWorks />
+  <WhyBpe />
+  <Testimonials />
+  <LetsBegin />
+</Base>

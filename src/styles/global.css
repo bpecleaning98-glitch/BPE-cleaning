@@ -1,0 +1,436 @@
+@import "tailwindcss";
+
+@theme {
+  /*
+   * BPE palette v2, 9 Aug. Direction: elicyon.com. Calm, warm, editorial.
+   * Porcelain white surfaces, warm near-black bands, bronze as a whisper of
+   * the client's gold, never as a surface. Old token names (gold, night,
+   * cream, ink) are kept and remapped so existing pages keep compiling.
+   */
+  --color-porcelain: #F5F2EC;
+  --color-ivory: #FAF8F4;
+  --color-ink: #191512;
+  --color-night: #14110D;
+  --color-cream: #EFEAE0;
+  --color-stone: #857D70;
+  --color-gold: #A8875A;
+  --color-gold-deep: #8C6F45;
+  --color-gold-soft: #E6DCC8;
+
+  --font-display: "Fraunces Variable", Georgia, "Times New Roman", serif;
+  --font-sans: "Manrope Variable", ui-sans-serif, system-ui, sans-serif;
+
+  --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  /* Lenis drives the scrolling when motion.ts runs; native smooth scrolling
+   * on top of it would double-animate every jump. */
+  html.lenis {
+    scroll-behavior: auto;
+  }
+  .lenis.lenis-smooth {
+    scroll-behavior: auto !important;
+  }
+  body {
+    font-family: var(--font-sans);
+    color: var(--color-ink);
+    background: var(--color-porcelain);
+  }
+  ::selection {
+    background: var(--color-gold-soft);
+    color: var(--color-ink);
+  }
+  /* Fraunces: optical sizing on, soft terminals off, for a Canela feel.
+   * Base.astro loads the opsz axis build, which has no SOFT or WONK axis at
+   * all, so this pin does nothing there. It is kept for two reasons: the
+   * admin cabinet and anything else that ever loads the full build still
+   * needs it, and it records the intent. See the comment in Base.astro for
+   * what the lighter build actually changes, which is the ampersand and
+   * nothing else that shows on this site. */
+  .font-display,
+  .display,
+  .display-caps {
+    font-optical-sizing: auto;
+    font-variation-settings: "SOFT" 0, "WONK" 0;
+  }
+}
+
+@layer components {
+  .container-x {
+    @apply mx-auto w-full max-w-6xl px-5 md:px-8;
+  }
+  .container-wide {
+    @apply mx-auto w-full max-w-[88rem] px-5 md:px-10;
+  }
+  .section-pad {
+    @apply py-20 md:py-32;
+  }
+
+  /* Small tracked uppercase label. The only place letterspacing gets loud. */
+  .kicker {
+    @apply font-sans text-[0.66rem] font-semibold uppercase tracking-[0.28em] text-gold-deep;
+  }
+
+  /* Editorial display type. Light Fraunces, tight leading, mixed-case ready. */
+  .display {
+    @apply font-display font-[340] leading-[1.02] tracking-[-0.01em];
+  }
+  .display-caps {
+    @apply font-display font-[360] uppercase leading-[0.98] tracking-[0.01em];
+  }
+  /* The lowercase italic word inside an uppercase headline, the Elicyon move */
+  .accent-word {
+    @apply font-display lowercase italic font-[320] tracking-normal;
+  }
+
+  .h-serif {
+    @apply font-display font-[420] tracking-tight text-balance;
+  }
+
+  .hairline {
+    @apply block h-px w-full bg-ink/12;
+  }
+
+  /* Buttons v2: sharp, tracked caps, hairline borders. No pills. */
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-3 border border-ink bg-ink px-8 py-4 font-sans text-[0.7rem] font-semibold uppercase tracking-[0.22em] text-cream transition-all duration-300 hover:bg-transparent hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold;
+  }
+  .btn-gold {
+    @apply inline-flex items-center justify-center gap-3 border border-cream bg-cream px-8 py-4 font-sans text-[0.7rem] font-semibold uppercase tracking-[0.22em] text-night transition-all duration-300 hover:bg-transparent hover:text-cream focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold;
+  }
+  .btn-outline {
+    @apply inline-flex items-center justify-center gap-3 border border-current/40 px-8 py-4 font-sans text-[0.7rem] font-semibold uppercase tracking-[0.22em] transition-all duration-300 hover:border-current focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold;
+  }
+  /* Tracked caps text link with a hairline underline that slides in.
+   * The ::before is an invisible hit zone: the visible text is 17px tall,
+   * far under the ~40px a thumb needs, and padding would move the ::after
+   * underline. A ±12px overlay grows every tap target to ~41px with zero
+   * visual change, sitewide. */
+  .link-caps {
+    @apply relative inline-flex items-center gap-2 font-sans text-[0.7rem] font-semibold uppercase tracking-[0.22em] before:absolute before:inset-x-0 before:-inset-y-3 before:content-[''] after:absolute after:-bottom-1 after:left-0 after:h-px after:w-full after:origin-right after:scale-x-0 after:bg-current after:transition-transform after:duration-300 hover:after:origin-left hover:after:scale-x-100;
+  }
+}
+
+/*
+ * Scroll reveal system. Two failsafes, deliberately:
+ *  1. Styles only apply under html.js, so no JS means everything is visible.
+ *  2. Base.astro force-reveals leftovers on a timer, because the in-app
+ *     Browser pane never fires IntersectionObserver.
+ */
+html.js [data-reveal] {
+  opacity: 0;
+  transform: translateY(26px);
+  transition:
+    opacity 0.9s var(--ease-out-soft),
+    transform 0.9s var(--ease-out-soft);
+  transition-delay: var(--d, 0s);
+}
+html.js [data-reveal="fade"] {
+  transform: none;
+}
+html.js [data-reveal].in {
+  opacity: 1;
+  transform: none;
+}
+
+/* Headline line masks: each line rises out of an overflow-hidden row */
+html.js .line-mask {
+  display: block;
+  overflow: hidden;
+}
+html.js .line-mask > span {
+  display: block;
+  transform: translateY(112%);
+  transition: transform 1.05s var(--ease-out-soft);
+  transition-delay: var(--d, 0s);
+}
+html.js .in .line-mask > span,
+html.js .line-mask.in > span {
+  transform: translateY(0);
+}
+
+/* Media reveal: image de-zooms as its frame fades in */
+html.js .media-zoom img {
+  transform: scale(1.1);
+  transition: transform 1.4s var(--ease-out-soft);
+  transition-delay: var(--d, 0s);
+}
+html.js .media-zoom.in img,
+html.js .in .media-zoom img {
+  transform: scale(1);
+}
+
+/* Gentle hover zoom for gallery frames */
+.frame-hover {
+  overflow: hidden;
+}
+.frame-hover img {
+  transition: transform 0.8s var(--ease-out-soft);
+}
+.frame-hover:hover img {
+  transform: scale(1.045);
+}
+
+/*
+ * Intro overlay: only meaningful when the motion script can run it. Without
+ * JS, or under reduced motion, it must never block the page.
+ */
+html:not(.js) #bpe-intro {
+  display: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  #bpe-intro {
+    display: none;
+  }
+}
+
+/* Services carousel: card transforms are driven by JS setting --tx/--sc. */
+.svc-card {
+  transform: translateX(var(--tx, 0px)) scale(var(--sc, 1));
+  transition:
+    transform 0.8s var(--ease-out-soft),
+    opacity 0.8s var(--ease-out-soft);
+}
+/* The centred card wears a THICK gold frame hugging its edge, like the
+ * reference's coloured mat. Constant width, only the colour transitions,
+ * so nothing shifts in layout. */
+.svc-card .svc-frame {
+  outline: 8px solid transparent;
+  outline-offset: 0px;
+  transition: outline-color 0.6s var(--ease-out-soft);
+}
+.svc-card.is-active .svc-frame {
+  outline-color: color-mix(in srgb, var(--color-gold) 45%, var(--color-porcelain));
+}
+
+/* Carousel captions. Outgoing text FADES where it stands; the incoming
+ * text slides up from behind its row masks, row after row. The transform
+ * on a non-active caption changes with zero duration AFTER the fade, so
+ * the fade happens in place and the reset jump is never seen. */
+.svc-caption {
+  pointer-events: none;
+}
+.svc-caption .cap-inner {
+  opacity: 0;
+  transform: translateY(112%);
+  transition:
+    opacity 0.32s var(--ease-out-soft),
+    transform 0s 0.38s;
+}
+.svc-caption.active {
+  pointer-events: auto;
+}
+.svc-caption.active .cap-inner {
+  opacity: 1;
+  transform: translateY(0);
+  transition:
+    opacity 0.01s,
+    transform 0.6s var(--ease-out-soft);
+}
+.svc-caption.active .cap-row:nth-child(1) .cap-inner { transition-delay: 0s, 0.2s; }
+.svc-caption.active .cap-row:nth-child(2) .cap-inner { transition-delay: 0s, 0.29s; }
+.svc-caption.active .cap-row:nth-child(3) .cap-inner { transition-delay: 0s, 0.38s; }
+.svc-caption.active .cap-row:nth-child(4) .cap-inner { transition-delay: 0s, 0.47s; }
+
+/*
+ * Custom select (QuoteForm enhances native <select>s at runtime). The native
+ * control stays functional without JS; with JS it is hidden and replaced by
+ * this hairline listbox in the site's own clothes.
+ */
+.qfs {
+  position: relative;
+}
+.qfs-btn {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  border-bottom: 1px solid color-mix(in srgb, var(--color-ink) 25%, transparent);
+  padding: 0.75rem 0;
+  color: var(--color-ink);
+  text-align: left;
+  transition: border-color 0.3s;
+}
+.qfs.open .qfs-btn,
+.qfs-btn:focus-visible {
+  border-color: var(--color-gold-deep);
+  outline: none;
+}
+.qfs-btn svg {
+  width: 0.8rem;
+  height: 0.8rem;
+  color: var(--color-gold-deep);
+  transition: transform 0.3s var(--ease-out-soft);
+  flex-shrink: 0;
+}
+.qfs.open .qfs-btn svg {
+  transform: rotate(180deg);
+}
+.qfs-list {
+  position: absolute;
+  inset-inline: 0;
+  top: calc(100% + 0.4rem);
+  z-index: 30;
+  border: 1px solid color-mix(in srgb, var(--color-ink) 15%, transparent);
+  background: var(--color-ivory);
+  padding: 0.35rem 0;
+  opacity: 0;
+  transform: translateY(-6px);
+  pointer-events: none;
+  transition:
+    opacity 0.25s var(--ease-out-soft),
+    transform 0.25s var(--ease-out-soft);
+}
+.qfs.open .qfs-list {
+  opacity: 1;
+  transform: none;
+  pointer-events: auto;
+}
+.qfs-opt {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.62rem 1.1rem;
+  font-size: 0.875rem;
+  color: color-mix(in srgb, var(--color-ink) 80%, transparent);
+  cursor: pointer;
+  transition:
+    background-color 0.2s,
+    color 0.2s;
+}
+.qfs-opt:hover {
+  background: var(--color-porcelain);
+  color: var(--color-gold-deep);
+}
+.qfs-opt.selected {
+  color: var(--color-gold-deep);
+  font-weight: 600;
+}
+.qfs-opt.selected::before {
+  content: '';
+  display: inline-block;
+  width: 0.9rem;
+  height: 1px;
+  background: var(--color-gold);
+}
+/* Nothing chosen yet: the button reads as quietly as a field placeholder. */
+.qfs[data-empty] .qfs-btn > span {
+  color: color-mix(in srgb, var(--color-ink) 35%, transparent);
+}
+
+/*
+ * Dark sections. QuoteForm builds the listbox in the browser, so it marks the
+ * wrapper data-dark="true" when it was given the dark prop, and these rules
+ * put the control in cream on night, matching the text fields beside it.
+ */
+.qfs[data-dark] .qfs-btn {
+  border-bottom-color: color-mix(in srgb, var(--color-cream) 25%, transparent);
+  color: var(--color-cream);
+}
+.qfs[data-dark][data-empty] .qfs-btn > span {
+  color: color-mix(in srgb, var(--color-cream) 35%, transparent);
+}
+.qfs[data-dark].open .qfs-btn,
+.qfs[data-dark] .qfs-btn:focus-visible {
+  border-color: var(--color-gold);
+}
+.qfs[data-dark] .qfs-btn svg {
+  color: var(--color-gold);
+}
+.qfs[data-dark] .qfs-list {
+  border-color: color-mix(in srgb, var(--color-cream) 18%, transparent);
+  background: var(--color-night);
+}
+.qfs[data-dark] .qfs-opt {
+  color: color-mix(in srgb, var(--color-cream) 75%, transparent);
+}
+.qfs[data-dark] .qfs-opt:hover {
+  background: color-mix(in srgb, var(--color-cream) 8%, transparent);
+  color: var(--color-gold);
+}
+.qfs[data-dark] .qfs-opt.selected {
+  color: var(--color-gold);
+}
+
+/*
+ * Custom cursor (built by motion.ts, fine pointers only), 1:1 with
+ * Elicyon's: a small gold arrow under mix-blend-mode: difference, its tip
+ * at the exact pointer position, instant follow. The blend keeps it
+ * readable on anything: bronze over the dark bands, shifted over light.
+ * Over data-cursor-label elements a gold label rides 16px beside the tip;
+ * over data-cursor-arrow elements the arrow becomes their white chevron.
+ */
+.bpe-cursor {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 9999;
+  pointer-events: none;
+  mix-blend-mode: difference;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+.bpe-cursor.is-on {
+  opacity: 1;
+}
+.bpe-cursor .c-arrow,
+.bpe-cursor .c-chevron,
+.bpe-cursor .c-label {
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+.bpe-cursor .c-chevron {
+  display: none;
+  transform: translate(-50%, -50%);
+}
+.bpe-cursor.is-chevron .c-arrow {
+  display: none;
+}
+.bpe-cursor.is-chevron .c-chevron {
+  display: block;
+}
+.bpe-cursor.is-chevron-left .c-chevron {
+  transform: translate(-50%, -50%) scaleX(-1);
+}
+.bpe-cursor .c-label {
+  left: 16px;
+  top: 16px;
+  white-space: nowrap;
+  font-family: var(--font-sans);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #907533;
+  opacity: 0;
+  transition: opacity 0.25s;
+}
+.bpe-cursor.is-label .c-label {
+  opacity: 1;
+}
+/* The arrow replaces the native cursor wherever it exists */
+@media (pointer: fine) {
+  html.has-cursor,
+  html.has-cursor * {
+    cursor: none !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  html.js [data-reveal],
+  html.js .line-mask > span,
+  html.js .media-zoom img {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+}

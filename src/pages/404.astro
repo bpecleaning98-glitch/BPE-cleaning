@@ -1,0 +1,57 @@
+---
+import Base from '../layouts/Base.astro';
+import BpeLogo from '../components/brand/BpeLogo.astro';
+import { SITE, SERVICES } from '../data/site';
+
+/**
+ * The page a wrong address lands on. It exists mostly for one reason: a
+ * printed flyer or a QR code with a typo in it should still put the visitor
+ * one tap away from a price, not at a dead end.
+ *
+ * It is also the natural home for the vertical lockup, which needs real
+ * height to read and gets it here.
+ */
+---
+<Base
+  title="Page not found | BPE Cleaning Services"
+  description="That address does not exist on this site. Here is the way back to prices, services and a quote."
+  noindex
+>
+  <section class="flex min-h-[100svh] items-center bg-night pt-32 pb-20 text-cream">
+    <div class="container-wide grid gap-14 md:grid-cols-[auto_1fr] md:items-center md:gap-20">
+      <BpeLogo variant="vertical" tone="onDark" class="h-40 md:h-52" />
+
+      <div>
+        <p class="kicker !text-gold" data-reveal>Error 404</p>
+        <h1 class="display-caps mt-6 text-[clamp(2.4rem,6.5vw,4.8rem)]" data-reveal>
+          <span class="line-mask"><span>This page</span></span>
+          <span class="line-mask"><span style="--d: 0.1s">went <span class="accent-word text-gold-soft">missing</span></span></span>
+        </h1>
+        <p class="mt-8 max-w-md text-base leading-relaxed text-cream/70" data-reveal style="--d: 0.2s">
+          The address you followed does not exist here. Everything else does, so
+          pick up where you meant to be.
+        </p>
+
+        <div class="mt-10 flex flex-wrap items-center gap-4" data-reveal style="--d: 0.3s">
+          <a href="/quote/" class="btn-gold">Get my price</a>
+          <a href={SITE.phoneHref} class="btn-outline text-cream">Call {SITE.phoneDisplay}</a>
+        </div>
+
+        <ul class="mt-14 grid gap-x-10 gap-y-3 border-t border-cream/15 pt-6 sm:grid-cols-2" data-reveal style="--d: 0.4s">
+          {SERVICES.map((service) => (
+            <li>
+              <a href={service.slug} class="text-sm text-cream/70 transition-colors hover:text-gold-soft">
+                {service.name}
+              </a>
+            </li>
+          ))}
+          <li>
+            <a href="/prices/" class="text-sm font-semibold text-cream transition-colors hover:text-gold-soft">
+              Full price list
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </section>
+</Base>

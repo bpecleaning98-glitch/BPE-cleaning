@@ -1,0 +1,144 @@
+---
+import BpeLogo from './brand/BpeLogo.astro';
+import { SITE } from '../data/site';
+
+// Elicyon header anatomy: nav on the LEFT, logo dead centre, a single
+// underlined CONTACT US on the RIGHT. Fixed and transparent over the dark
+// band every page opens with, porcelain once scrolled.
+const nav = [
+  // A real page, not an anchor jump on the homepage: clearer UX.
+  { href: '/services/', label: 'Services' },
+  { href: '/prices/', label: 'Prices' },
+  { href: '/airbnb-cleaning-dublin/', label: 'Airbnb' },
+  { href: '/blog/', label: 'Blog' },
+  { href: '/about/', label: 'About' },
+];
+---
+{/* Always transparent, never a bar. Contrast is solved the same way as the
+    cursor: the whole header renders under mix-blend-mode difference, so
+    over dark sections it shows warm gold-soft and over light ones it
+    re-colours itself dark automatically, wherever it happens to overlap.
+    Scrolling DOWN slides it away gently; scrolling UP brings it back. */}
+{/* data-scrolled adds a soft backdrop blur, so when the bar reappears over
+    section text mid-page the two never garble into each other. */}
+<header
+  id="site-header"
+  class="fixed inset-x-0 top-0 z-50 mix-blend-difference text-gold-soft transition-transform duration-700 [transition-timing-function:cubic-bezier(0.22,1,0.36,1)] data-[hidden]:-translate-y-full data-[scrolled]:backdrop-blur-md"
+>
+  <div class="container-wide grid h-[84px] grid-cols-[1fr_auto_1fr] items-center md:h-[88px]">
+    <nav class="hidden items-center gap-8 lg:flex" aria-label="Main">
+      {nav.map((item) => (
+        <a href={item.href} class="link-caps opacity-80 transition-opacity hover:opacity-100">{item.label}</a>
+      ))}
+    </nav>
+    <button
+      id="menu-toggle"
+      class="link-caps justify-self-start lg:hidden"
+      type="button"
+      aria-expanded="false"
+      aria-controls="menu-overlay"
+    >
+      Menu
+    </button>
+
+    {/* The primary horizontal lockup, at every width. The vertical one was
+        tried here first and rejected on evidence: a header bar gives it about
+        44px of height, and at that size its CLEANING SERVICES line collapses
+        into a smudge. It needs roughly 90px to read, which it gets in the
+        footer and the closing card instead. 36px is the smallest height at
+        which the horizontal lockup still holds its second line together.
+        Mono, because the whole header renders under mix-blend-difference and
+        the brand gold would come out blue-violet over light sections. */}
+    <a href="/" class="logo-slot flex items-center justify-self-center" aria-label={`${SITE.name}, home`}>
+      <BpeLogo variant="horizontal" tone="mono" class="h-9 md:h-10" />
+    </a>
+
+    <div class="flex items-center gap-8 justify-self-end">
+      <a href={SITE.phoneHref} class="link-caps hidden opacity-80 hover:opacity-100 xl:inline-flex" aria-label={`Call ${SITE.phoneDisplay}`}>
+        {SITE.phoneDisplay}
+      </a>
+      <a href="/contact/" class="link-caps after:scale-x-100 after:origin-left hover:after:scale-x-0 hover:after:origin-right">
+        Contact us
+      </a>
+    </div>
+  </div>
+</header>
+
+{/* Full-screen overlay menu, ink background, oversized serif links */}
+<div
+  id="menu-overlay"
+  class="pointer-events-none fixed inset-0 z-[60] overflow-y-auto overscroll-contain bg-night pb-16 text-cream opacity-0 transition-opacity duration-500"
+  aria-hidden="true"
+  data-lenis-prevent
+>
+  <div class="container-wide flex h-[84px] items-center justify-between md:h-[88px]">
+    <BpeLogo variant="horizontal" tone="onDark" class="h-9" title={SITE.name} />
+    <button id="menu-close" class="link-caps" type="button">Close</button>
+  </div>
+  <nav class="container-wide mt-10 flex flex-col gap-1" aria-label="Menu">
+    {[...nav, { href: '/contact/', label: 'Contact' }].map((item, i) => (
+      <a
+        href={item.href}
+        class="menu-link display-caps border-b border-cream/10 py-4 text-[2.1rem] text-cream/90 transition-colors hover:text-gold sm:text-[2.6rem]"
+        style={`--d: ${0.06 * i + 0.1}s`}
+      >
+        {item.label}
+      </a>
+    ))}
+  </nav>
+  <div class="container-wide mt-10 flex flex-col gap-4">
+    <a href={SITE.phoneHref} class="link-caps text-gold">{SITE.phoneDisplay}</a>
+    <a href={SITE.whatsappHref} class="link-caps opacity-70" rel="noopener">WhatsApp</a>
+    <a href="/quote/" class="btn-gold mt-4 w-fit">Get my price</a>
+  </div>
+</div>
+
+<script>
+  const header = document.getElementById('site-header');
+  let lastY = window.scrollY;
+  const onScroll = () => {
+    if (!header) return;
+    const y = window.scrollY;
+    if (y < 28) {
+      // At the very top: always present, no backdrop.
+      header.removeAttribute('data-hidden');
+      header.removeAttribute('data-scrolled');
+    } else {
+      header.setAttribute('data-scrolled', '');
+      // Direction decides visibility; the 6px deadband ignores jitter.
+      if (y > lastY + 6) header.setAttribute('data-hidden', '');
+      else if (y < lastY - 6) header.removeAttribute('data-hidden');
+    }
+    lastY = y;
+  };
+  addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+
+  const overlay = document.getElementById('menu-overlay');
+  const toggle = document.getElementById('menu-toggle');
+  const close = document.getElementById('menu-close');
+  /* Holding the page still while the menu is open must NOT be done with
+   * overflow:hidden. That deletes the scrollbar, the viewport grows by its
+   * width, and any ScrollTrigger measurement that lands in that window bakes
+   * the wider number into the pinned Manifesto section, leaving the whole
+   * site 15px too wide with a horizontal scrollbar under it once the menu
+   * closes. Lenis owns the wheel and touch, so stopping it is enough, and
+   * the layout never moves. */
+  const lenis = () => (window as unknown as { __lenis?: { stop: () => void; start: () => void } }).__lenis;
+
+  const setOpen = (open: boolean) => {
+    if (!overlay || !toggle) return;
+    overlay.classList.toggle('opacity-0', !open);
+    overlay.classList.toggle('pointer-events-none', !open);
+    overlay.setAttribute('aria-hidden', String(!open));
+    toggle.setAttribute('aria-expanded', String(open));
+    if (open) lenis()?.stop();
+    else lenis()?.start();
+  };
+  toggle?.addEventListener('click', () => setOpen(true));
+  close?.addEventListener('click', () => setOpen(false));
+  overlay?.querySelectorAll('a').forEach((a) => a.addEventListener('click', () => setOpen(false)));
+  addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') setOpen(false);
+  });
+</script>

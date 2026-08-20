@@ -1,0 +1,325 @@
+---
+import { Image } from 'astro:assets';
+import Base from '../layouts/Base.astro';
+import QuoteForm from '../components/QuoteForm.astro';
+import Diamond from '../components/Diamond.astro';
+import { SITE } from '../data/site';
+import { COUNTIES } from '../data/areas';
+import { ESTIMATE_NOTE } from '../data/pricing';
+import { PATHS, breadcrumbs, graph, localBusiness } from '../lib/schema';
+// Real job photo beside the form, from the approved work set (see data/work.ts).
+import formPhoto from '../assets/stock/hero-living-room.jpg';
+
+// Every route to a human, in the order they actually get used. Phone first,
+// WhatsApp second: the client answers both on the same number.
+const routes = [
+  {
+    label: 'Phone',
+    value: SITE.phoneDisplay,
+    href: SITE.phoneHref,
+    note: 'One tap on mobile.',
+    action: 'Call now',
+    cursor: 'Call',
+    big: true,
+  },
+  {
+    label: 'WhatsApp',
+    value: 'Message us',
+    href: SITE.whatsappHref,
+    note: 'Send photos of the property and we can quote from those.',
+    action: 'Open chat',
+    cursor: 'Chat',
+    big: true,
+  },
+  {
+    label: 'Email',
+    value: SITE.email,
+    href: `mailto:${SITE.email}`,
+    note: 'Best for longer details, offices and letting agents.',
+    action: 'Write to us',
+    cursor: 'Email',
+    big: false,
+  },
+];
+
+const steps = [
+  {
+    title: 'You get in touch',
+    body: 'Call, WhatsApp or email with the size of the property, the service you need and the dates that suit you.',
+  },
+  {
+    title: 'We price the job',
+    body: `Your quote is free and there is no obligation to book. ${ESTIMATE_NOTE}`,
+  },
+  {
+    title: 'We clean',
+    body: 'We arrive fully insured and clean with eco-friendly products.',
+  },
+];
+
+const dublin = COUNTIES.find((c) => c.primary);
+const rest = COUNTIES.filter((c) => !c.primary);
+
+// Keyless Google Maps embed, centred on the primary service area.
+const mapSrc = 'https://www.google.com/maps?q=Dublin,+Ireland&z=10&output=embed';
+
+// The second and last page to carry the full business node. This is the page a
+// search engine follows for a phone number and an opening time, so the markup
+// and the visible contact panel say the same thing.
+const jsonLd = graph(
+  localBusiness(Astro.site),
+  breadcrumbs([{ name: 'Contact', path: PATHS.contact }], Astro.site)
+);
+---
+<Base
+  title={`Contact BPE Cleaning Dublin | Free Quote | ${SITE.phoneDisplay}`}
+  description={`Contact BPE Cleaning Services in Dublin by phone, WhatsApp or the quote form. Open ${SITE.hours}. Your quote is free, with no obligation.`}
+  jsonLd={jsonLd}
+>
+  <section class="bg-night pt-40 pb-20 text-cream md:pt-48 md:pb-24">
+    <div class="container-wide">
+      <p class="kicker !text-gold" data-reveal>Contact</p>
+      <h1 class="display-caps mt-6 text-[clamp(2.6rem,7vw,5.5rem)]" data-reveal>
+        <span class="line-mask"><span>Get a free</span></span>
+        <span class="line-mask"><span style="--d: 0.1s">cleaning <span class="accent-word text-gold-soft">quote</span></span></span>
+      </h1>
+      <p class="mt-8 max-w-xl text-base leading-relaxed text-cream/70" data-reveal style="--d: 0.2s">
+        Call, message us on WhatsApp or use the quote form. We answer Mon to Sun, 8:00 to 20:00.
+      </p>
+      <div class="mt-10 flex flex-wrap items-center gap-4" data-reveal style="--d: 0.3s">
+        <a href="/quote/" class="btn-gold">Get my price</a>
+        <a href={SITE.phoneHref} class="btn-outline text-cream">Call {SITE.phoneDisplay}</a>
+      </div>
+    </div>
+  </section>
+
+  {/* Written request, for people who would rather not ring */}
+  <section class="section-pad bg-porcelain">
+    <div class="container-wide grid gap-14 lg:grid-cols-[1fr_1.4fr] lg:gap-20">
+      <div class="lg:sticky lg:top-32 lg:self-start">
+        <p class="kicker" data-reveal>Leave A Request</p>
+        <h2 class="display mt-6 text-[clamp(2.2rem,5vw,4rem)]" data-reveal>
+          <span class="line-mask"><span>Write to us</span></span>
+          <span class="line-mask"><span style="--d: 0.1s">in <span class="accent-word text-gold-deep">seconds</span></span></span>
+        </h2>
+        <p class="mt-8 max-w-md text-base leading-relaxed text-ink/70" data-reveal style="--d: 0.2s">
+          The essentials only. Your request arrives with everything we need to give you a price
+          and a date.
+        </p>
+        <span class="mt-10 block h-px w-12 bg-gold/60" data-reveal="fade" style="--d: 0.3s" aria-hidden="true"></span>
+        <div class="media-zoom frame-hover mt-10 hidden max-w-sm overflow-hidden border border-ink/10 lg:block" data-reveal style="--d: 0.35s">
+          <div data-drift>
+            <Image
+              src={formPhoto}
+              alt="A calm living room in warm neutral tones"
+              class="aspect-[3/4] w-full scale-110 object-cover"
+              widths={[448, 640]}
+              sizes="384px"
+              format="webp"
+              quality={74}
+            />
+          </div>
+        </div>
+      </div>
+      <div data-reveal style="--d: 0.15s">
+        <QuoteForm />
+      </div>
+    </div>
+  </section>
+
+  <section class="section-pad bg-ivory">
+    <div class="container-wide">
+      <div class="flex flex-wrap items-end justify-between gap-6">
+        <div>
+          <p class="kicker" data-reveal>Reach Us</p>
+          <h2 class="display mt-6 max-w-2xl text-[clamp(2.2rem,5vw,4rem)] text-ink" data-reveal>
+            <span class="line-mask"><span>Every way to</span></span>
+            <span class="line-mask"><span style="--d: 0.1s">get in <span class="accent-word text-gold-deep">touch</span></span></span>
+          </h2>
+        </div>
+        <p class="max-w-sm text-sm leading-relaxed text-ink/60" data-reveal style="--d: 0.2s">
+          Tell us the size of the property, the service you want and roughly when. Quotes are free
+          and there is no obligation to book.
+        </p>
+      </div>
+
+      {/* Each channel as one oversized index row: number, micro-label, serif value */}
+      <div class="mt-14 border-t border-ink/15">
+        {routes.map((route, i) => (
+          <a
+            href={route.href}
+            rel="noopener"
+            class="group grid grid-cols-[2.6rem_minmax(0,1fr)] items-baseline gap-x-5 gap-y-4 border-b border-ink/15 py-10 md:grid-cols-[3.2rem_minmax(0,1fr)_minmax(0,18rem)] md:items-center md:gap-x-10 md:py-14"
+            data-reveal
+            style={`--d: ${0.08 * i}s`}
+            data-cursor-label={route.cursor}
+          >
+            <span class="font-sans text-[0.66rem] font-semibold tracking-[0.2em] text-stone">{String(i + 1).padStart(2, '0')}</span>
+            <span class="min-w-0">
+              <span class="block font-sans text-[0.66rem] font-semibold uppercase tracking-[0.24em] text-stone">{route.label}</span>
+              <span
+                class:list={[
+                  'display mt-3 block text-ink transition-colors duration-300 group-hover:text-gold-deep',
+                  route.big ? 'text-[clamp(2.2rem,5.5vw,4.2rem)] leading-[1.08] md:leading-none' : 'break-all text-[clamp(1.4rem,3.5vw,2.5rem)] leading-tight',
+                ]}
+              >
+                {route.value}
+              </span>
+            </span>
+            <span class="col-start-2 flex flex-col gap-3 md:col-start-3 md:items-end">
+              <span class="text-sm leading-relaxed text-ink/60 md:text-right">{route.note}</span>
+              <span class="link-caps text-gold-deep">{route.action}</span>
+            </span>
+          </a>
+        ))}
+
+        <div
+          class="grid grid-cols-[2.6rem_minmax(0,1fr)] items-baseline gap-x-5 gap-y-4 border-b border-ink/15 py-10 md:grid-cols-[3.2rem_minmax(0,1fr)_minmax(0,18rem)] md:items-center md:gap-x-10 md:py-14"
+          data-reveal
+          style="--d: 0.24s"
+        >
+          <span class="font-sans text-[0.66rem] font-semibold tracking-[0.2em] text-stone">04</span>
+          <span class="min-w-0">
+            <span class="block font-sans text-[0.66rem] font-semibold uppercase tracking-[0.24em] text-stone">Opening hours</span>
+            <span class="display mt-3 block text-[clamp(2.2rem,5.5vw,4.2rem)] leading-[1.08] md:leading-none text-ink">{SITE.hours}</span>
+          </span>
+          <span class="col-start-2 flex flex-col gap-3 md:col-start-3 md:items-end">
+            <span class="text-sm leading-relaxed text-ink/60 md:text-right">
+              Seven days a week, weekends included. Same hours every day.
+            </span>
+            <span class="block h-px w-10 bg-gold/60" aria-hidden="true"></span>
+          </span>
+        </div>
+      </div>
+
+      <div class="mt-10 flex flex-wrap items-center gap-4" data-reveal style="--d: 0.08s">
+        <a href={SITE.phoneHref} class="btn-primary">Call {SITE.phoneDisplay}</a>
+        <a href="/quote/" class="btn-outline text-ink">Get my price online</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-pad relative overflow-hidden bg-night text-cream">
+    {/* Ghosted mark, barely there, gives the band a back layer */}
+    <Diamond class="pointer-events-none absolute -right-40 -top-44 h-[38rem] w-[38rem] opacity-[0.05]" aria-hidden="true" />
+
+    <div class="container-wide relative grid gap-14 lg:grid-cols-[1fr_1.5fr] lg:gap-20">
+      <div class="lg:sticky lg:top-32 lg:self-start">
+        <p class="kicker !text-gold" data-reveal>What Happens Next</p>
+        <h2 class="display mt-6 text-[clamp(2.2rem,5vw,4rem)]" data-reveal>
+          <span class="line-mask"><span>What happens</span></span>
+          <span class="line-mask"><span style="--d: 0.1s">after you <span class="accent-word text-gold-soft">call</span></span></span>
+        </h2>
+        <p class="mt-8 max-w-sm text-sm leading-relaxed text-cream/60" data-reveal style="--d: 0.2s">
+          Three steps, no paperwork and nothing to pay for a quote.
+        </p>
+        <span class="mt-10 block h-px w-12 bg-gold/60" data-reveal="fade" style="--d: 0.3s" aria-hidden="true"></span>
+      </div>
+
+      <div>
+        <ol class="border-t border-cream/15">
+          {steps.map((step, i) => (
+            <li
+              class="grid grid-cols-[2.6rem_1fr] items-baseline gap-x-6 border-b border-cream/15 py-9 md:grid-cols-[3.2rem_1fr_1.2fr] md:gap-x-10 md:py-11"
+              data-reveal
+              style={`--d: ${0.08 * i}s`}
+            >
+              <span class="font-sans text-[0.66rem] font-semibold tracking-[0.2em] text-cream/40" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+              <h3 class="display text-xl text-cream md:text-2xl">{step.title}</h3>
+              <p class="col-start-2 mt-2 text-sm leading-relaxed text-cream/65 md:col-start-3 md:mt-0">{step.body}</p>
+            </li>
+          ))}
+        </ol>
+
+        <div class="mt-12 flex flex-col justify-between gap-6 md:flex-row md:items-center" data-reveal>
+          <p class="max-w-lg text-sm leading-relaxed text-cream/60">
+            Our price list is published, so you can check the numbers before you ring.
+          </p>
+          <div class="flex flex-wrap items-center gap-6">
+            <a href={SITE.whatsappHref} class="btn-gold" rel="noopener">WhatsApp us</a>
+            <a href="/prices/" class="link-caps text-gold-soft">Full price list</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-pad bg-porcelain">
+    <div class="container-wide">
+      <p class="kicker" data-reveal>Coverage</p>
+      <h2 class="display mt-6 max-w-3xl text-[clamp(2.2rem,5vw,4rem)] text-ink" data-reveal>
+        <span class="line-mask"><span>Where we</span></span>
+        <span class="line-mask"><span style="--d: 0.1s">come to <span class="accent-word text-gold-deep">you</span></span></span>
+      </h2>
+      <p class="mt-8 max-w-xl text-base leading-relaxed text-ink/70" data-reveal style="--d: 0.2s">
+        Dublin is our home ground, city and county. We also travel to seven neighbouring counties.
+        Not sure if we reach you? Send us the address or the Eircode and we will let you know.
+      </p>
+
+      <div class="mt-14 grid gap-x-10 gap-y-3 sm:grid-cols-2 lg:grid-cols-4">
+        <div class="border-t border-ink/15 py-4" data-reveal>
+          <p class="font-sans text-[0.66rem] font-semibold uppercase tracking-[0.24em] text-gold-deep">Primary area</p>
+          <p class="display mt-3 text-2xl text-ink">{dublin?.name}</p>
+        </div>
+        {rest.map((county, i) => (
+          <div class="border-t border-ink/15 py-4" data-reveal style={`--d: ${0.06 * (i + 1)}s`}>
+            <p class="font-sans text-[0.66rem] font-semibold uppercase tracking-[0.24em] text-stone">Also covering</p>
+            <p class="display mt-3 text-2xl text-ink">{county.name}</p>
+          </div>
+        ))}
+      </div>
+
+      <p class="mt-16 font-sans text-[0.66rem] font-semibold uppercase tracking-[0.24em] text-stone" data-reveal>
+        Our service area
+      </p>
+      {/* The map is Google's, and loading it hands Google the visitor's IP and
+          sets its cookies. Nothing else on this site does that, and the
+          privacy page says so, so the frame stays empty until the visitor
+          asks for it. One tap, and only then. */}
+      <div
+        id="map-frame"
+        class="relative mt-5 border border-ink/15 bg-night"
+        data-map={mapSrc}
+        data-reveal
+        style="--d: 0.08s"
+      >
+        <div class="flex aspect-[4/3] flex-col items-center justify-center gap-5 px-6 text-center md:aspect-[21/9]">
+          <Diamond class="h-12 w-12 opacity-60" />
+          <p class="max-w-sm text-sm leading-relaxed text-cream/70">
+            The map comes from Google, which sets its own cookies. Nothing else on this
+            site does, so it stays off until you ask for it.
+          </p>
+          <button id="map-load" type="button" class="btn-outline text-cream">Show the map</button>
+        </div>
+      </div>
+      <p class="mt-5 max-w-2xl text-sm leading-relaxed text-ink/60" data-reveal style="--d: 0.16s">
+        The map is centred on Dublin. We are a mobile team, so we come to your home, office or rental
+        anywhere in the areas listed above.
+      </p>
+
+      <div class="mt-12 flex flex-wrap items-center gap-4 border-t border-ink/15 pt-8" data-reveal style="--d: 0.24s">
+        <a href={SITE.phoneHref} class="btn-primary">Call {SITE.phoneDisplay}</a>
+        <a href={SITE.whatsappHref} class="btn-outline text-ink" rel="noopener">WhatsApp us</a>
+      </div>
+    </div>
+  </section>
+
+<script>
+  // Click to load: the iframe is built only when the visitor presses the
+  // button, so no request reaches Google on a normal visit.
+  const frame = document.getElementById('map-frame');
+  document.getElementById('map-load')?.addEventListener('click', () => {
+    if (!(frame instanceof HTMLElement)) return;
+    const src = frame.dataset.map;
+    if (!src) return;
+    const iframe = document.createElement('iframe');
+    iframe.src = src;
+    iframe.title = 'Map of Dublin, Ireland, the main service area of BPE Cleaning Services';
+    iframe.className = 'block aspect-[4/3] w-full md:aspect-[21/9]';
+    iframe.style.border = '0';
+    iframe.loading = 'lazy';
+    iframe.referrerPolicy = 'no-referrer';
+    frame.replaceChildren(iframe);
+  });
+</script>
+</Base>

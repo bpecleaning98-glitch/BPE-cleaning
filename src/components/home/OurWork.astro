@@ -1,0 +1,59 @@
+---
+import BeforeAfter from '../BeforeAfter.astro';
+import Gallery from '../Gallery.astro';
+import { BUILDERS_PAIR, END_OF_TENANCY_PROOF } from '../../data/work';
+
+/**
+ * Homepage proof section.
+ *
+ * The plan called for a photo hero. The client's photos cannot carry one: they are
+ * honest phone snaps of real jobs, and at full-bleed behind a serif headline they
+ * read amateur and pull the whole page down with them. At tile size, with a plain
+ * caption, the same photos read as evidence and build trust. So the hero keeps its
+ * CSS treatment and the photography lives here instead, at a size it can carry.
+ *
+ * The mix is deliberate: one wide room to show finish, one made-up bedroom because
+ * it is the most inviting frame we have, and the oven interior because it is the
+ * least pretty and the most convincing.
+ */
+// The PROOF set (oven, fridge, cupboards, shower): none of these appear in
+// the hero, Projects or the services carousel, so nothing on the homepage
+// repeats, and the appliance interiors are the strongest evidence we own.
+const tiles = END_OF_TENANCY_PROOF;
+---
+
+<section class="section-pad bg-ivory">
+  <div class="container-wide">
+    <p class="kicker" data-reveal>Our Work</p>
+    <h2 class="display mt-6 max-w-2xl text-[clamp(2.2rem,5vw,4rem)] text-ink" data-reveal>
+      <span class="line-mask"><span>Real jobs,</span></span>
+      <span class="line-mask"><span style="--d: 0.1s">not <span class="accent-word text-gold-deep">stock</span> photos</span></span>
+    </h2>
+    <p class="mt-8 max-w-xl text-base leading-relaxed text-ink/70" data-reveal style="--d: 0.2s">
+      Every photo below is from an actual BPE job in Dublin. Drag the slider to see an apartment
+      hallway before and after a builders clean.
+    </p>
+
+    <div class="mt-14 grid gap-6 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:gap-8">
+      <div data-reveal>
+        <BeforeAfter
+          before={BUILDERS_PAIR.before}
+          after={BUILDERS_PAIR.after}
+          beforeAlt={BUILDERS_PAIR.beforeAlt}
+          afterAlt={BUILDERS_PAIR.afterAlt}
+          caption={BUILDERS_PAIR.caption}
+          start={BUILDERS_PAIR.start}
+        />
+      </div>
+
+      <div data-reveal style="--d: 0.1s">
+        {/* Portrait tiles so the 2x2 grid stands roughly as tall as the slider
+            beside it. Landscape tiles leave an obvious gap under the grid. */}
+        <Gallery items={tiles} cols={2} aspect="portrait" />
+        <a href="/end-of-tenancy-cleaning-dublin/" class="link-caps mt-8 text-ink/70 hover:text-ink">
+          See more of our work
+        </a>
+      </div>
+    </div>
+  </div>
+</section>

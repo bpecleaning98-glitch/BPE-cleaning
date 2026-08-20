@@ -1,0 +1,88 @@
+---
+import { Image } from 'astro:assets';
+// Chosen to not repeat the hero, the manifesto floats or the carousel
+// thumbnails: each photo on the homepage should be seen once.
+import projAirbnb from '../../assets/work/airbnb-07.jpg';
+import projEot from '../../assets/work/eot-after-24.jpg';
+
+/**
+ * The Elicyon "Projects" treatment for our two strongest jobs: oversized
+ * staggered frames, a serif title and a view link under each, images
+ * drifting slowly (data-drift) as the page scrolls. Every photo is a real
+ * BPE job from work.ts assets; titles name the SERVICE, not an invented
+ * project or address, because no location is on record.
+ *
+ * There were three. The After Builders hallway was cut: a third frame under
+ * the stagger read as a static leftover rather than part of the rhythm. Two
+ * frames keep the zigzag clean, and after-builders still has the carousel
+ * card and its own page.
+ */
+const projects = [
+  {
+    title: 'Airbnb turnover',
+    note: 'Reset between guests: beds made, towels replaced, every surface guest-ready.',
+    href: '/airbnb-cleaning-dublin/',
+    photo: projAirbnb,
+    alt: 'Bedroom of a short let apartment made up with fresh towels between guests',
+  },
+  {
+    title: 'End of tenancy clean',
+    note: 'A landlord-ready handover, from the oven interior to the last skirting board.',
+    href: '/end-of-tenancy-cleaning-dublin/',
+    photo: projEot,
+    alt: 'Living and dining room cleaned at the end of a tenancy',
+  },
+];
+---
+<section class="section-pad bg-ivory">
+  <div class="container-wide">
+    <div class="flex flex-wrap items-end justify-between gap-6">
+      <div>
+        <p class="kicker" data-reveal>Recent Work</p>
+        <h2 class="display mt-6 text-[clamp(2.2rem,5vw,4rem)]" data-reveal>
+          <span class="line-mask"><span>Jobs we are <span class="accent-word text-gold-deep">proud</span> of</span></span>
+        </h2>
+      </div>
+      <p class="max-w-sm text-sm leading-relaxed text-ink/60" data-reveal style="--d: 0.2s">
+        Photographed by our own team on real jobs, exactly as we left them. Every photo of our work is our own.
+      </p>
+    </div>
+
+    {/* Staggered two-column grid, like the reference projects listing: the
+        right column starts lower, so the eye travels down a zigzag instead
+        of a stack. Portrait frames, title and link under each. */}
+    <div class="mt-16 grid gap-x-8 gap-y-16 md:grid-cols-2 md:gap-x-12">
+      {projects.map((project, i) => (
+        <a
+          href={project.href}
+          class:list={[
+            'group block',
+            i % 2 === 1 && 'md:mt-40',
+            i % 2 === 0 && i > 0 && 'md:-mt-24',
+          ]}
+          data-reveal
+          style={`--d: ${0.08 * (i % 2)}s`}
+        >
+          <span class="media-zoom frame-hover block overflow-hidden border border-ink/10">
+            <span class="block" data-drift>
+              <Image
+                src={project.photo}
+                alt={project.alt}
+                class="aspect-[4/5] w-full scale-110 object-cover"
+                widths={[420, 640, 900, 1200]}
+                sizes="(min-width: 768px) 46vw, 100vw"
+                format="webp"
+                quality={78}
+              />
+            </span>
+          </span>
+          <span class="mt-6 block">
+            <span class="display-caps block text-xl text-ink transition-colors duration-300 group-hover:text-gold-deep md:text-2xl">{project.title}</span>
+            <span class="mt-2 block max-w-md text-sm leading-relaxed text-ink/60">{project.note}</span>
+            <span class="link-caps mt-4 inline-flex text-gold-deep">View service</span>
+          </span>
+        </a>
+      ))}
+    </div>
+  </div>
+</section>

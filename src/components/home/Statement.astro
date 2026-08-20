@@ -1,0 +1,52 @@
+---
+import { Image } from 'astro:assets';
+import sidePhoto from '../../assets/work/eot-after-24.jpg';
+
+// Editorial statement after the hero: one oversized serif sentence, a short
+// paragraph, and the proof figures. Every figure is sourced, none invented:
+// 7+ years from the EEM reference letter, 80+ properties from City Stays,
+// 8 counties confirmed by the client on 5 Aug.
+const stats = [
+  { value: '7+', label: 'Years of experience' },
+  { value: '80+', label: 'Properties cared for' },
+  { value: '8', label: 'Counties covered' },
+  { value: '7/7', label: 'Days a week' },
+];
+---
+<section class="section-pad bg-porcelain">
+  <div class="container-wide grid items-center gap-14 lg:grid-cols-[1.25fr_1fr] lg:gap-20">
+    <div>
+      <p class="kicker" data-reveal>The Standard</p>
+      <h2 class="display mt-7 text-[clamp(2.2rem,5vw,4rem)] text-ink" data-reveal>
+        <span class="line-mask"><span>Every room, every visit,</span></span>
+        <span class="line-mask"><span style="--d: 0.1s">finished <span class="accent-word text-gold-deep">properly</span>.</span></span>
+      </h2>
+      <p class="mt-8 max-w-xl text-base leading-relaxed text-ink/70 md:text-lg" data-reveal style="--d: 0.2s">
+        We are a Dublin cleaning team trusted by letting agents, construction firms and homeowners
+        for years, not visits. Eco-friendly products, vetted people and a standard you can see in
+        the detail: taps, skirting boards, the inside of the oven.
+      </p>
+
+      <div class="mt-12 grid grid-cols-2 gap-x-8 gap-y-10 sm:grid-cols-4" data-reveal style="--d: 0.3s">
+        {stats.map((stat) => (
+          <div class="border-t border-ink/15 pt-4">
+            <p class="display text-4xl text-ink md:text-5xl">{stat.value}</p>
+            <p class="mt-2 font-sans text-[0.62rem] font-semibold uppercase tracking-[0.22em] text-stone">{stat.label}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+
+    <div class="media-zoom frame-hover hidden lg:block" data-reveal>
+      <Image
+        src={sidePhoto}
+        alt="A finished living room after a BPE end of tenancy clean"
+        class="h-[560px] w-full object-cover"
+        widths={[640, 960]}
+        sizes="(min-width: 1024px) 40vw, 100vw"
+        format="webp"
+        quality={78}
+      />
+    </div>
+  </div>
+</section>

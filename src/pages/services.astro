@@ -1,0 +1,98 @@
+---
+import { Image } from 'astro:assets';
+import Base from '../layouts/Base.astro';
+import { PATHS, breadcrumbs, graph } from '../lib/schema';
+import { SITE, SERVICES } from '../data/site';
+import { VAT_NOTE } from '../data/pricing';
+import houseImg from '../assets/work/eot-after-24.jpg';
+import deepImg from '../assets/work/eot-after-14.jpg';
+import eotImg from '../assets/work/eot-after-11.jpg';
+import buildersImg from '../assets/work/builders-hall-after.jpg';
+import officeImg from '../assets/work/eot-after-04.jpg';
+import airbnbImg from '../assets/work/airbnb-07.jpg';
+
+/**
+ * The services INDEX page. The header's "Services" link lands here (a real
+ * page, not an anchor jump on the homepage). Each service is an oversized
+ * editorial row: number, drifting photo, serif title, blurb, price, arrow.
+ * All service data from data/site.ts, photos from the approved work set.
+ */
+const photos = [houseImg, deepImg, eotImg, buildersImg, officeImg, airbnbImg];
+const rows = SERVICES.map((service, i) => ({ ...service, photo: photos[i], nr: String(i + 1).padStart(2, '0') }));
+
+// The six Service nodes live on the six service pages, one each, so this index
+// carries the trail only and does not restate them.
+const jsonLd = graph(breadcrumbs([{ name: 'Services', path: PATHS.services }], Astro.site));
+---
+<Base
+  title={`All ${SERVICES.length} Cleaning Services in Dublin | BPE Cleaning`}
+  description="Every BPE cleaning service in one place: house, deep, end of tenancy, after builders, office and Airbnb cleaning across Dublin, with prices."
+  jsonLd={jsonLd}
+>
+  <section class="bg-night pt-40 pb-20 text-cream md:pt-48 md:pb-24">
+    <div class="container-wide">
+      <p class="kicker !text-gold" data-reveal>Our Services</p>
+      <h1 class="display-caps mt-6 text-[clamp(2.6rem,7vw,5.5rem)]" data-reveal>
+        <span class="line-mask"><span>Six ways we</span></span>
+        <span class="line-mask"><span style="--d: 0.1s">take <span class="accent-word text-gold-soft">care</span> of it</span></span>
+      </h1>
+      <p class="mt-8 max-w-xl text-base leading-relaxed text-cream/70" data-reveal style="--d: 0.2s">
+        Homes, offices and Airbnb properties across Dublin and seven neighbouring counties.
+        Every service has its own page, its own checklist and a published price.
+      </p>
+      <div class="mt-10 flex flex-wrap items-center gap-4" data-reveal style="--d: 0.3s">
+        <a href="/quote/" class="btn-gold">Get my price</a>
+        <a href={SITE.phoneHref} class="btn-outline text-cream">Call {SITE.phoneDisplay}</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-pad bg-porcelain">
+    <div class="container-wide">
+      <div class="border-t border-ink/15">
+        {rows.map((row, i) => (
+          <a
+            href={row.slug}
+            class="group grid grid-cols-[2.6rem_1fr] items-center gap-x-5 gap-y-6 border-b border-ink/15 py-10 md:grid-cols-[3.2rem_220px_1fr_auto_auto] md:gap-x-10 md:py-12"
+            data-reveal
+            style={`--d: ${0.06 * i}s`}
+          >
+            <span class="font-sans text-[0.66rem] font-semibold tracking-[0.2em] text-stone">{row.nr}</span>
+            <span class="media-zoom frame-hover order-last col-span-2 block overflow-hidden border border-ink/10 md:order-none md:col-span-1">
+              <span class="block" data-drift>
+                <Image
+                  src={row.photo}
+                  alt=""
+                  class="aspect-[4/3] w-full scale-110 object-cover"
+                  widths={[440, 660]}
+                  sizes="(min-width: 768px) 220px, 100vw"
+                  format="webp"
+                  quality={74}
+                />
+              </span>
+            </span>
+            <span>
+              <span class="display block text-2xl text-ink transition-colors duration-300 group-hover:text-gold-deep md:text-[2.2rem]">{row.name}</span>
+              <span class="mt-2 block max-w-lg text-sm leading-relaxed text-ink/60">{row.blurb}</span>
+            </span>
+            {/* col-start-2: on the phone grid the photo is order-last and the arrow
+                is hidden, so auto-placement would drop the price into the
+                2.6rem number column, a two-line sliver under the row number. */}
+            <span class="col-start-2 font-sans text-sm font-medium tracking-[-0.01em] text-ink/80 [font-variant-numeric:tabular-nums] md:col-start-auto md:text-right">{row.from}</span>
+            <span class="hidden h-10 w-10 items-center justify-center border border-ink/20 transition-all duration-300 group-hover:border-ink group-hover:bg-ink group-hover:text-cream md:flex" aria-hidden="true">
+              <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7" /><path d="M8 7h9v9" /></svg>
+            </span>
+          </a>
+        ))}
+      </div>
+      <p class="mt-6 text-xs text-ink/45">{VAT_NOTE}</p>
+    </div>
+  </section>
+
+  {/* No closing call to action here on purpose. The footer opens with its own
+      night band, "Ready when you are", carrying the same two buttons. Stacking
+      a second one directly above it gave the page two identical asks back to
+      back, and the reader reads that as a page that has run out of things to
+      say. The other service pages keep theirs because each one earns its
+      place: they add a paragraph, a phone number or a related-services row. */}
+</Base>

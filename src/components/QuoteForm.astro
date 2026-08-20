@@ -1,0 +1,307 @@
+---
+import { SERVICES, SITE } from '../data/site';
+import { SIZE_LABELS } from '../data/pricing';
+
+/**
+ * Minimal request form, hairline style: tracked-caps labels over underline
+ * fields, one accent action. Submitting composes a structured WhatsApp
+ * message to the business number, which is where the client actually takes
+ * her bookings today. The same request is also posted to /api/lead, so the
+ * cabinet can report which campaign produced a real enquiry rather than only
+ * a visit. That save is never allowed to delay the hand off to WhatsApp.
+ */
+interface Props {
+  /** Dark sections pass true to switch the field palette. */
+  dark?: boolean;
+}
+const { dark = false } = Astro.props;
+
+const field = dark
+  ? 'w-full border-b border-cream/25 bg-transparent py-3 text-cream placeholder:text-cream/35 focus:border-gold focus:outline-none transition-colors'
+  : 'w-full border-b border-ink/25 bg-transparent py-3 text-ink placeholder:text-ink/35 focus:border-gold-deep focus:outline-none transition-colors';
+const label = dark
+  ? 'block font-sans text-[0.62rem] font-semibold uppercase tracking-[0.24em] text-cream/60'
+  : 'block font-sans text-[0.62rem] font-semibold uppercase tracking-[0.24em] text-stone';
+---
+<form
+  id="quote-form"
+  class="grid gap-8 sm:grid-cols-2"
+  novalidate
+  data-wa={SITE.whatsappHref}
+  data-dark={dark ? 'true' : undefined}
+>
+  <div>
+    <label class={label} for="qf-name">Name</label>
+    <input class={field} id="qf-name" name="name" type="text" autocomplete="name" placeholder="Your name" />
+  </div>
+  <div>
+    <label class={label} for="qf-phone">Phone</label>
+    <input class={field} id="qf-phone" name="phone" type="tel" autocomplete="tel" placeholder="08x xxx xxxx" />
+  </div>
+  <div>
+    <label class={label} for="qf-service">Service</label>
+    <select class={field} id="qf-service" name="service">
+      {/* Empty first option, so an untouched control asserts nothing. */}
+      <option value="">Choose a service</option>
+      {SERVICES.map((s) => (
+        <option value={s.name}>{s.name}</option>
+      ))}
+    </select>
+  </div>
+  <div>
+    <label class={label} for="qf-size">Property size</label>
+    <select class={field} id="qf-size" name="size">
+      <option value="">Choose a size</option>
+      {Object.values(SIZE_LABELS).map((l) => (
+        <option value={l}>{l}</option>
+      ))}
+      <option value="5+ bedrooms or other">5+ bedrooms or other</option>
+    </select>
+  </div>
+  <div>
+    <label class={label} for="qf-date">Preferred date</label>
+    <input class={field} id="qf-date" name="date" type="date" />
+  </div>
+  <div>
+    <label class={label} for="qf-area">Area / Eircode</label>
+    <input class={field} id="qf-area" name="area" type="text" placeholder="e.g. D04, Swords" />
+  </div>
+  <div class="sm:col-span-2">
+    <label class={label} for="qf-notes">Anything we should know</label>
+    <input class={field} id="qf-notes" name="notes" type="text" maxlength="2000" placeholder="Optional" />
+  </div>
+  {/*
+    Honeypot. A real field, pushed off screen rather than hidden with
+    display:none, which some bots look for before deciding a field is bait.
+    Nobody reaches it: it is out of the tab order, out of the accessibility
+    tree, and never autofilled. The API discards any submission that fills it.
+  */}
+  <div class="absolute left-[-9999px] top-0 h-px w-px overflow-hidden" aria-hidden="true">
+    <label for="qf-company">Company</label>
+    <input id="qf-company" name="company" type="text" tabindex="-1" autocomplete="off" aria-hidden="true" />
+  </div>
+  <div class="flex flex-wrap items-center gap-6 sm:col-span-2">
+    <button type="submit" class={dark ? 'btn-gold' : 'btn-primary'}>Send my request</button>
+    <p class={`text-xs ${dark ? 'text-cream/45' : 'text-ink/45'}`}>
+      Opens WhatsApp with your details filled in, ready to send to {SITE.phoneDisplay}.
+    </p>
+    {/*
+      Shown by the submit handler when a request carries neither a name nor a
+      phone number. Nothing useful can reach the client in that case, so the
+      hand off stops here instead of opening an empty chat.
+    */}
+    <p
+      id="qf-error"
+      role="alert"
+      class={`hidden w-full font-sans text-xs ${dark ? 'text-gold' : 'text-gold-deep'}`}
+    >
+      Please leave a name or a phone number so we can come back to you.
+    </p>
+  </div>
+</form>
+
+<script>
+  // Replace the native <select>s (system-styled, off-brand) with the site's
+  // hairline listbox. The native control stays in the DOM, hidden, so it
+  // keeps holding the value the submit handler reads out of the form.
+  const enhanceSelects = (form: HTMLFormElement) => {
+    // The listbox is built here, not written in the template, so the dark
+    // palette cannot reach it through a class. It rides along on the wrapper
+    // as a data attribute that global.css matches.
+    const isDark = form.dataset.dark === 'true';
+    form.querySelectorAll('select').forEach((select) => {
+      const wrap = document.createElement('div');
+      wrap.className = 'qfs';
+      if (isDark) wrap.dataset.dark = 'true';
+      select.parentElement?.insertBefore(wrap, select);
+      wrap.appendChild(select);
+      select.classList.add('hidden');
+      select.setAttribute('tabindex', '-1');
+
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.id = `${select.id}-btn`;
+      btn.className = 'qfs-btn';
+      btn.setAttribute('aria-haspopup', 'listbox');
+      btn.setAttribute('aria-expanded', 'false');
+      const label = document.createElement('span');
+      btn.appendChild(label);
+      btn.insertAdjacentHTML(
+        'beforeend',
+        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>'
+      );
+
+      // The visible label pointed at the select, which is now hidden, so it
+      // named nothing reachable. Move it onto the button and name the button
+      // with both, so the field is announced as its name and then its value.
+      const lbl = form.querySelector<HTMLLabelElement>(`label[for="${select.id}"]`);
+      if (lbl) {
+        if (!lbl.id) lbl.id = `${select.id}-label`;
+        lbl.htmlFor = btn.id;
+        btn.setAttribute('aria-labelledby', `${lbl.id} ${btn.id}`);
+      }
+
+      const list = document.createElement('ul');
+      list.id = `${select.id}-list`;
+      list.className = 'qfs-list';
+      list.setAttribute('role', 'listbox');
+      btn.setAttribute('aria-controls', list.id);
+
+      // Index of the first real option. The empty placeholder holds the
+      // nothing-chosen-yet state and is never offered in the listbox.
+      const first = select.options[0] && !select.options[0].value ? 1 : 0;
+
+      const setOpen = (open: boolean) => {
+        wrap.classList.toggle('open', open);
+        btn.setAttribute('aria-expanded', String(open));
+      };
+      const paint = () => {
+        const i = select.selectedIndex;
+        label.textContent = select.options[i]?.text ?? '';
+        wrap.toggleAttribute('data-empty', !select.value);
+        list.querySelectorAll<HTMLLIElement>('.qfs-opt').forEach((el) => {
+          const on = Number(el.dataset.i) === i;
+          el.classList.toggle('selected', on);
+          el.setAttribute('aria-selected', String(on));
+        });
+      };
+      const choose = (i: number) => {
+        select.selectedIndex = i;
+        select.dispatchEvent(new Event('change', { bubbles: true }));
+        paint();
+        setOpen(false);
+      };
+
+      [...select.options].forEach((opt, i) => {
+        if (i < first) return;
+        const li = document.createElement('li');
+        li.className = 'qfs-opt';
+        li.dataset.i = String(i);
+        li.setAttribute('role', 'option');
+        li.textContent = opt.text;
+        li.addEventListener('click', () => choose(i));
+        list.appendChild(li);
+      });
+
+      wrap.append(btn, list);
+      paint();
+      btn.addEventListener('click', () => setOpen(!wrap.classList.contains('open')));
+      btn.addEventListener('keydown', (e) => {
+        const i = select.selectedIndex;
+        if (e.key === 'ArrowDown') {
+          e.preventDefault();
+          if (wrap.classList.contains('open')) choose(Math.min(Math.max(i + 1, first), select.options.length - 1));
+          else setOpen(true);
+        } else if (e.key === 'ArrowUp') {
+          e.preventDefault();
+          // Same rule as ArrowDown: a closed control opens the list, it never
+          // changes the answer while nothing is on screen.
+          if (wrap.classList.contains('open')) choose(Math.max(i - 1, first));
+          else setOpen(true);
+        } else if (e.key === 'Escape') {
+          setOpen(false);
+        }
+      });
+      document.addEventListener('click', (e) => {
+        const target = e.target as Node;
+        // The label now belongs to the button, so its click is not an outside
+        // click, otherwise the list would close in the same breath it opened.
+        if (!wrap.contains(target) && !lbl?.contains(target)) setOpen(false);
+      });
+    });
+  };
+
+  // Write the request down before handing it to WhatsApp, together with the
+  // campaign the visit came from. It has to happen here: once WhatsApp takes
+  // over there is no page left to report from, and the attribution the
+  // cabinet needs lives only in this tab. It can never hold anyone up, since
+  // the call is raced against a 1.2s timer and every failure is ignored, so
+  // the worst case is a lost row, never a lost booking. The tab that will
+  // carry the visitor to WhatsApp is already open by then, so the cap only
+  // decides how long it sits blank, never whether it opens at all.
+  const saveLead = (data: FormData) => {
+    const attr = (window as unknown as { __bpeAttr?: Record<string, string | null> }).__bpeAttr ?? {};
+    const val = (key: string) => String(data.get(key) || '').trim();
+    const send = fetch('/api/lead', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      keepalive: true,
+      body: JSON.stringify({
+        name: val('name'),
+        phone: val('phone'),
+        service: val('service'),
+        size: val('size'),
+        date: val('date'),
+        area: val('area'),
+        notes: val('notes'),
+        company: val('company'),
+        us: attr.us ?? null,
+        um: attr.um ?? null,
+        uc: attr.uc ?? null,
+        code: attr.code ?? null,
+        ref: attr.ref ?? null,
+        landing: attr.landing ?? null,
+        sid: attr.sid ?? null,
+      }),
+    }).catch(() => {});
+    const giveUp = new Promise<void>((resolve) => setTimeout(resolve, 1200));
+    return Promise.race([send, giveUp]);
+  };
+
+  // Compose a clean, structured WhatsApp message from the fields. WhatsApp
+  // is where bookings are actually handled, so the request lands exactly
+  // where the work gets scheduled.
+  const form = document.getElementById('quote-form') as HTMLFormElement | null;
+  if (form) enhanceSelects(form);
+  form?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const data = new FormData(form);
+    const part = (label: string, key: string) => {
+      const v = String(data.get(key) || '').trim();
+      return v ? `${label}: ${v}` : '';
+    };
+    // Without a name or a phone number there is nobody to call back, and the
+    // API drops the row as empty anyway. Say so here instead of opening a
+    // chat that says nothing.
+    const notice = document.getElementById('qf-error');
+    if (!part('Name', 'name') && !part('Phone', 'phone')) {
+      notice?.classList.remove('hidden');
+      (document.getElementById('qf-name') as HTMLInputElement | null)?.focus();
+      return;
+    }
+    notice?.classList.add('hidden');
+    const lines = [
+      'New quote request from the website',
+      part('Name', 'name'),
+      part('Phone', 'phone'),
+      part('Service', 'service'),
+      part('Size', 'size'),
+      part('Date', 'date'),
+      part('Area', 'area'),
+      part('Notes', 'notes'),
+    ].filter(Boolean);
+    // The tab has to be claimed here, in the same synchronous turn as the tap.
+    // Safari and iOS Safari only hand a user gesture to window.open inside
+    // that turn: after an awaited fetch the popup is blocked, which is exactly
+    // the slow connection this code exists to survive. So open it blank now
+    // and point it at WhatsApp once the save settles. If the browser refused
+    // the tab anyway, walk this one over instead of leaving the visitor with
+    // nothing.
+    const win = window.open('', '_blank');
+    if (win) {
+      try {
+        win.opener = null;
+      } catch {
+        /* nothing to strip, the tab is on its own already */
+      }
+    }
+    const waUrl = `${form.dataset.wa}?text=${encodeURIComponent(lines.join('\n'))}`;
+    try {
+      await saveLead(data);
+    } catch {
+      /* the record is a bonus, the WhatsApp hand off is the job */
+    }
+    if (win) win.location.href = waUrl;
+    else location.href = waUrl;
+  });
+</script>

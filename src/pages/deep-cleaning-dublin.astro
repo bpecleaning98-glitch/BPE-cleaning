@@ -1,0 +1,580 @@
+---
+import { Image } from 'astro:assets';
+import Base from '../layouts/Base.astro';
+import { serviceGraph } from '../lib/schema';
+import Gallery from '../components/Gallery.astro';
+import Diamond from '../components/Diamond.astro';
+import { SITE, SERVICES } from '../data/site';
+import {
+  HOURLY,
+  FIXED,
+  SIZE_LABELS,
+  END_OF_TENANCY,
+  EXTRAS,
+  VAT_NOTE,
+  ESTIMATE_NOTE,
+} from '../data/pricing';
+import { COUNTIES, AREAS_SENTENCE } from '../data/areas';
+import { TESTIMONIALS } from '../data/testimonials';
+import { DEEP_CLEAN, END_OF_TENANCY_ROOMS } from '../data/work';
+
+// Studio is deliberately left out of the visible table: pricing.ts flags it as
+// unconfirmed (it currently mirrors the 1 bedroom rate). Same four tiers as the
+// homepage band, so the two never disagree.
+const tiers = (['1bed', '2bed', '3bed', '4bed'] as const).map((size) => ({
+  label: SIZE_LABELS[size],
+  price: FIXED.deep[size],
+}));
+
+// Meta and hero figures read off pricing.ts too, so a price change never leaves
+// a stale number in the title tag or the first paragraph.
+const deepFrom = FIXED.deep['1bed'];
+const deepTop = FIXED.deep['4bed'];
+
+// Facts panel. Every line is traceable to site.ts, areas.ts or the confirmed
+// proof points. Nothing here is a number we made up.
+const facts = [
+  { label: 'Booking', value: 'Once-off, no contract' },
+  { label: 'Priced by', value: 'Property size or by the hour' },
+  { label: 'Available', value: SITE.hours },
+  { label: 'Cover', value: 'Fully insured, eco-friendly products' },
+  { label: 'Areas', value: `County Dublin and ${COUNTIES.length - 1} other counties` },
+];
+
+// What the fixed price buys, grouped the way a customer walks a property.
+// Interior window GLASS is a priced extra, so only sills, frames and tracks
+// appear here. The two lists must never contradict each other.
+const included = [
+  {
+    room: 'Kitchen',
+    items: [
+      'Worktops, splashback and wall tiling degreased',
+      'Hob, extractor and appliance exteriors wiped down',
+      'Sink, taps and drainer descaled, chrome polished',
+      'Cupboard doors, handles and kickboards cleaned',
+      'Floor washed into the corners and along the units',
+    ],
+  },
+  {
+    room: 'Bathrooms',
+    items: [
+      'Limescale removed from taps, shower screen and head',
+      'Grout and tiling scrubbed, then dried off',
+      'Toilet cleaned inside and out, base and behind included',
+      'Mirrors, glass and chrome finished streak free',
+      'Extractor vent, shelving and radiator wiped',
+    ],
+  },
+  {
+    room: 'Bedrooms and living areas',
+    items: [
+      'Skirting boards, doors and door frames wiped down',
+      'Light switches, sockets, handles and plates cleaned',
+      'Radiators, window sills, frames and tracks',
+      'Wardrobe fronts and the tops of units dusted',
+      'Under and behind furniture we can safely move',
+    ],
+  },
+  {
+    room: 'Throughout the property',
+    items: [
+      'Cobwebs cleared from ceiling corners and coving',
+      'Tops of doors, picture rails and high shelving',
+      'Bannisters, stair edges and hallway floors',
+      'Bins emptied, washed out and re-lined',
+      'Every floor hoovered first, then mopped',
+    ],
+  },
+];
+
+// Looked up by key, not by index, so reordering EXTRAS can never silently
+// swap the two figures quoted in the FAQ answer below.
+const ovenExtra = EXTRAS.find((e) => e.key === 'oven')!;
+const fridgeExtra = EXTRAS.find((e) => e.key === 'fridge')!;
+
+const faqs = [
+  {
+    q: 'What does a deep clean add over a regular clean?',
+    a: 'A regular clean keeps a home ticking over: surfaces, floors, kitchen, bathroom, bins. A deep clean does all of that and then keeps going, into limescale on taps and screens, grease on appliance exteriors, skirting boards, doors and frames, window sills and tracks, radiators, switch plates and the high or awkward spots that get skipped when the clock is running.',
+  },
+  {
+    q: 'How long does it take?',
+    a: 'It depends on the size of the property and the state it is in, so we agree the day and the start time with you when you book rather than quoting a number of hours you cannot check. A deep clean takes considerably longer than a regular visit, which is why it is priced as a whole job.',
+  },
+  {
+    q: 'Is the inside of the oven and fridge included?',
+    a: `The fixed price covers appliance exteriors, hob and extractor. A full oven interior is an extra at ${ovenExtra.label}, and a fridge interior at ${fridgeExtra.label}. Add either when you book and it is in the price you are quoted.`,
+  },
+  {
+    q: 'Do I need to be there, or supply anything?',
+    a: 'No on both counts. Our team arrives with professional, eco-friendly products and all the equipment needed for the job. You are welcome to be there, but you can also leave a key or an entry code instead. Access is arranged with you in advance.',
+  },
+  {
+    q: 'Is a deep clean the same as an end of tenancy clean?',
+    a: `The work is the same standard and the price is identical, from €${END_OF_TENANCY['1bed']} for a 1 bedroom. The difference is the audience: an end of tenancy clean is aimed at a landlord or letting agent inspection, so the property is cleaned empty and the appliance interiors matter more. If you are moving out, book that one.`,
+  },
+];
+
+// Only references the client actually supplied, filtered to the ones that
+// evidence deep cleaning. No placeholder reviews, ever.
+const references = TESTIMONIALS.filter((t) => t.tags.includes('deep'));
+
+// Names come from SERVICES so the wording matches the nav, but the "from"
+// figures are recomputed off pricing.ts rather than reusing the strings baked
+// into site.ts. One source of truth for money, always.
+const relatedSlugs = [
+  '/end-of-tenancy-cleaning-dublin/',
+  '/after-builders-cleaning-dublin/',
+  '/house-cleaning-dublin/',
+] as const;
+const relatedFrom: Record<(typeof relatedSlugs)[number], string> = {
+  '/end-of-tenancy-cleaning-dublin/': `from €${END_OF_TENANCY['1bed']}`,
+  '/after-builders-cleaning-dublin/': `from €${FIXED.afterBuilders['1bed']}`,
+  '/house-cleaning-dublin/': HOURLY.regular.label,
+};
+const related = relatedSlugs
+  .map((slug) => {
+    const service = SERVICES.find((s) => s.slug === slug);
+    return service ? { name: service.name, slug: service.slug, from: relatedFrom[slug] } : null;
+  })
+  .filter((s) => s !== null);
+
+// Presentation picks, all pulled from the curated groups in data/work so the
+// alt text and captions stay the honest ones written there. The statement band
+// wears the first DEEP_CLEAN frame; the two oversized drift frames are the
+// whole-room shots, chosen so they repeat nothing in the DEEP_CLEAN grid.
+const bandPhoto = DEEP_CLEAN[0];
+const workFrames = [END_OF_TENANCY_ROOMS[1], END_OF_TENANCY_ROOMS[2]];
+
+// The lead reference brightens word by word on scroll (data-quote-scrub in
+// motion.ts), so it is split into words here in the fence, never inline.
+const leadRef = references[0];
+const leadRefWords = leadRef ? leadRef.quote.split(' ') : [];
+const restRefs = references.slice(1);
+
+/**
+ * Service, FAQPage and BreadcrumbList for this page. `faqs` is handed over as it
+ * stands, so the questions and answers in the markup are literally the ones
+ * rendered below. The price in the offer is read from data/pricing.ts by
+ * lib/schema.ts, never typed here.
+ */
+const jsonLd = serviceGraph('/deep-cleaning-dublin/', faqs, Astro.site);
+---
+<Base
+  title={`Deep Cleaning Dublin | Once-Off from €${deepFrom} | BPE Cleaning`}
+  description={`Once-off deep cleaning in Dublin with fixed prices by property size, from €${deepFrom} for a 1 bedroom to €${deepTop} for a 4 bedroom.`}
+  jsonLd={jsonLd}
+>
+  <section class="bg-night pt-40 pb-20 text-cream md:pt-48 md:pb-24">
+    <div class="container-wide">
+      <p class="kicker !text-gold" data-reveal>Residential</p>
+      <h1 class="display-caps mt-6 text-[clamp(2.6rem,7vw,5.5rem)]" data-reveal>
+        <span class="line-mask"><span>Deep Cleaning</span></span>
+        <span class="line-mask"><span style="--d: 0.1s"><span class="accent-word text-[0.62em] text-gold-soft">in</span> Dublin</span></span>
+      </h1>
+      <p class="mt-8 max-w-xl text-base leading-relaxed text-cream/70" data-reveal style="--d: 0.2s">
+        A top-to-bottom once-off clean with fixed prices by property size, starting from €{deepFrom}.
+      </p>
+      <div class="mt-10 flex flex-wrap items-center gap-4" data-reveal style="--d: 0.3s">
+        <a href="/quote/" class="btn-gold">Get my price</a>
+        <a href={SITE.phoneHref} class="btn-outline text-cream">Call {SITE.phoneDisplay}</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Intro: what a deep clean actually is, beside the facts panel that
+       stays pinned while the copy is read -->
+  <section class="section-pad bg-porcelain">
+    <div class="container-wide grid gap-14 lg:grid-cols-[1.25fr_1fr] lg:gap-20">
+      <div>
+        <p class="kicker" data-reveal>Once-off deep clean</p>
+        <h2 class="display mt-6 text-[clamp(2.2rem,5vw,4rem)] text-ink" data-reveal>
+          <span class="line-mask"><span>Every room, right</span></span>
+          <span class="line-mask"><span style="--d: 0.1s">down to the <span class="accent-word text-gold-deep">detail</span></span></span>
+        </h2>
+        <p class="mt-8 max-w-2xl text-base leading-relaxed text-ink/70 md:text-lg" data-reveal style="--d: 0.2s">
+          A deep clean is the one you book when hoovering and wiping is no longer enough. We work
+          through the property room by room and spend the time on everything a weekly visit never
+          reaches: limescale on taps and shower screens, grease on appliance exteriors, skirting
+          boards, doors and frames, window sills and tracks, radiators, switch plates and the high
+          or awkward corners that get left when the clock is running.
+        </p>
+        <p class="mt-6 max-w-2xl text-base leading-relaxed text-ink/70" data-reveal style="--d: 0.26s">
+          It is a single visit, with nothing recurring and nothing to sign. Choose a fixed price for
+          the size of your property or buy time by the hour, and your price is confirmed before we
+          put you in the diary. It is the clean to book before guests arrive, after a long winter,
+          before a new baby, or when a property has sat empty for a while.
+        </p>
+        <div class="mt-10 flex flex-wrap items-center gap-6" data-reveal style="--d: 0.32s">
+          <a href="/quote/" class="btn-primary">Get my price</a>
+          <a href={SITE.whatsappHref} rel="noopener" class="link-caps text-ink">Ask on WhatsApp</a>
+        </div>
+      </div>
+
+      <div class="self-start lg:sticky lg:top-32 lg:mt-24">
+        <p class="font-sans text-[0.66rem] font-semibold uppercase tracking-[0.24em] text-stone" data-reveal>
+          At a glance
+        </p>
+        <dl class="mt-5 border-b border-ink/15">
+          {facts.map((fact, i) => (
+            <div class="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1 border-t border-ink/15 py-5" data-reveal style={`--d: ${0.08 * i}s`}>
+              <dt class="font-sans text-[0.66rem] font-semibold uppercase tracking-[0.24em] text-stone">{fact.label}</dt>
+              <dd class="font-sans text-sm font-medium text-ink">{fact.value}</dd>
+            </div>
+          ))}
+        </dl>
+        <span class="mt-8 block h-px w-12 bg-gold/60" data-reveal="fade" style="--d: 0.4s" aria-hidden="true"></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Full-bleed statement band: a real deep clean frame drifting behind the
+       three places the work is actually judged -->
+  <section class="relative flex min-h-[68svh] items-center overflow-hidden bg-night py-28 text-cream">
+    <div class="absolute inset-[-6%]" data-parallax="0.06" aria-hidden="true">
+      <Image
+        src={bandPhoto.src}
+        alt=""
+        class="h-full w-full object-cover"
+        widths={[1080, 1600, 2000]}
+        sizes="100vw"
+        format="webp"
+        quality={72}
+      />
+      <div class="absolute inset-0 bg-night/60"></div>
+    </div>
+
+    <div class="container-wide relative">
+      <p class="font-sans text-[0.66rem] font-semibold uppercase tracking-[0.24em] text-cream/70" data-reveal>
+        Where a deep clean is judged
+      </p>
+      <h2 class="display-caps mt-8 max-w-4xl text-[clamp(2rem,5.5vw,4.4rem)]" data-reveal>
+        <span class="line-mask"><span>Inside the oven,</span></span>
+        <span class="line-mask"><span style="--d: 0.1s">behind the tap,</span></span>
+        <span class="line-mask"><span style="--d: 0.2s">along the <span class="accent-word text-[0.8em] text-gold-soft">grout line</span></span></span>
+      </h2>
+      <div class="mt-12 flex flex-wrap items-center gap-6" data-reveal style="--d: 0.3s">
+        <a href="/quote/" class="btn-gold">Get my price</a>
+        <span class="text-sm text-cream/70">From €{deepFrom} for a 1 bedroom.</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- What the fixed price buys: the four room groups as a numbered index
+       beside a pinned headline, extras and the VAT line closing the column -->
+  <section class="section-pad bg-ivory">
+    <div class="container-wide grid gap-14 lg:grid-cols-[1fr_1.6fr] lg:gap-20">
+      <div class="lg:sticky lg:top-32 lg:self-start">
+        <p class="kicker" data-reveal>What is included</p>
+        <h2 class="display mt-6 text-[clamp(2.2rem,5vw,4rem)] text-ink" data-reveal>
+          <span class="line-mask"><span>Everything a regular</span></span>
+          <span class="line-mask"><span style="--d: 0.1s">clean <span class="accent-word text-gold-deep">skips</span></span></span>
+        </h2>
+        <p class="mt-8 max-w-sm text-sm leading-relaxed text-ink/60" data-reveal style="--d: 0.2s">
+          The full checklist for a fixed price deep clean. If something on it does not apply to your
+          property, tell us and we will spend that time elsewhere.
+        </p>
+        <span class="mt-10 block h-px w-12 bg-gold/60" data-reveal="fade" style="--d: 0.3s" aria-hidden="true"></span>
+      </div>
+
+      <div>
+        <div class="border-t border-ink/15">
+          {included.map((group, i) => (
+            <div
+              class="grid grid-cols-[2.6rem_1fr] items-baseline gap-x-6 border-b border-ink/15 py-8 md:grid-cols-[3.2rem_1fr_1.4fr] md:gap-x-10"
+              data-reveal
+              style={`--d: ${0.06 * i}s`}
+            >
+              <span class="font-sans text-[0.66rem] font-semibold tracking-[0.2em] text-stone">{String(i + 1).padStart(2, '0')}</span>
+              <h3 class="display text-xl text-ink md:text-2xl">{group.room}</h3>
+              <ul class="col-start-2 mt-5 space-y-3.5 md:col-start-3 md:mt-0">
+                {group.items.map((item) => (
+                  <li class="flex gap-4">
+                    <span class="mt-2.5 h-px w-5 shrink-0 bg-gold/70" aria-hidden="true"></span>
+                    <span class="text-sm leading-relaxed text-ink/70">{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+
+        <div class="pt-9" data-reveal>
+          <p class="font-sans text-[0.66rem] font-semibold uppercase tracking-[0.24em] text-stone">
+            Add on request
+          </p>
+          <ul class="mt-6 grid gap-x-10 gap-y-4 sm:grid-cols-2">
+            {EXTRAS.map((extra) => (
+              <li class="flex items-baseline justify-between gap-4 border-b border-ink/10 pb-3">
+                <span class="text-sm text-ink/75">{extra.name}</span>
+                <span class="shrink-0 font-sans text-sm font-medium text-gold-deep [font-variant-numeric:tabular-nums]">{extra.label}</span>
+              </li>
+            ))}
+          </ul>
+          <p class="mt-6 text-xs text-ink/50">{VAT_NOTE}</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Pricing: the fixed table inverted onto porcelain and overhanging the
+       band, hourly and moving-out beside it, the ghosted mark behind -->
+  <section class="relative overflow-hidden bg-night py-20 text-cream md:py-32">
+    <Diamond class="pointer-events-none absolute -bottom-44 -left-40 h-[38rem] w-[38rem] opacity-[0.05]" aria-hidden="true" />
+
+    <div class="container-wide relative">
+      <div class="flex flex-wrap items-end justify-between gap-6">
+        <div>
+          <p class="kicker !text-gold" data-reveal>Deep clean pricing</p>
+          <h2 class="display mt-6 max-w-2xl text-[clamp(2.2rem,5vw,4rem)]" data-reveal>
+            <span class="line-mask"><span>Fixed price, or</span></span>
+            <span class="line-mask"><span style="--d: 0.1s">by the <span class="accent-word text-gold-soft">hour</span></span></span>
+          </h2>
+        </div>
+        <p class="max-w-sm text-sm leading-relaxed text-cream/60" data-reveal style="--d: 0.2s">
+          The fixed price covers the whole property for one number. The hourly rate suits smaller
+          jobs and single rooms.
+        </p>
+      </div>
+
+      <div class="mt-16 grid gap-6 lg:grid-cols-3 lg:gap-0">
+        {/* Option one, the number most people book: inverted onto porcelain */}
+        <div class="relative flex flex-col bg-porcelain p-8 text-ink md:p-10 lg:-my-6 lg:py-16 shadow-[0_0_0_1px] shadow-gold/40" data-reveal>
+          <p class="font-sans text-[0.66rem] font-semibold uppercase tracking-[0.24em] text-gold-deep">
+            Option one &middot; Fixed price
+          </p>
+          <p class="mt-6 flex items-baseline gap-3">
+            <span class="font-sans text-[0.62rem] font-semibold uppercase tracking-[0.22em] text-ink/45">From</span>
+            <span class="font-sans font-medium tracking-[-0.01em] text-[3.4rem] leading-none text-ink [font-variant-numeric:tabular-nums]">
+              <span class="text-gold">€</span>{deepFrom}
+            </span>
+          </p>
+          <p class="mt-4 text-sm leading-relaxed text-ink/60">
+            The whole property for one number, confirmed before we put you in the diary.
+          </p>
+          <ul class="mt-6 border-t border-ink/12">
+            {tiers.map((tier) => (
+              <li class="flex items-baseline justify-between border-b border-ink/12 py-3.5">
+                <span class="font-sans text-[0.68rem] font-semibold uppercase tracking-[0.2em] text-ink/60">{tier.label}</span>
+                <span class="font-sans font-medium tracking-[-0.01em] text-xl text-ink [font-variant-numeric:tabular-nums]">€{tier.price}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        {/* Option two: time by the hour, for partial jobs */}
+        <div class="flex flex-col border border-cream/12 p-8 md:p-10 lg:border-l-0 lg:border-r-0" data-reveal style="--d: 0.1s">
+          <p class="font-sans text-[0.66rem] font-semibold uppercase tracking-[0.24em] text-gold">
+            Option two &middot; By the hour
+          </p>
+          <p class="font-sans font-medium tracking-[-0.01em] mt-6 text-[2.6rem] leading-none text-cream [font-variant-numeric:tabular-nums]">{HOURLY.deep.label}</p>
+          <span class="mt-6 block h-px w-10 bg-gold/60" aria-hidden="true"></span>
+          <p class="mt-6 text-sm leading-relaxed text-cream/60">
+            Useful when it is one kitchen, one bathroom or a single room that needs the work rather
+            than the whole property. Tell us what you want covered and we will tell you how long it
+            is likely to take.
+          </p>
+        </div>
+
+        {/* Moving out: same table, different audience */}
+        <div class="flex flex-col border border-cream/12 p-8 md:p-10" data-reveal style="--d: 0.2s">
+          <p class="font-sans text-[0.66rem] font-semibold uppercase tracking-[0.24em] text-gold">
+            Moving out
+          </p>
+          <p class="display mt-6 text-[2.6rem] leading-none text-cream">Same prices</p>
+          <span class="mt-6 block h-px w-10 bg-gold/60" aria-hidden="true"></span>
+          <p class="mt-6 text-sm leading-relaxed text-cream/60">
+            End of tenancy cleaning is priced from exactly the same table, from €{END_OF_TENANCY['1bed']}
+            for a 1 bedroom. If your clean is for a handover or a deposit, book that one instead.
+          </p>
+          <a href="/end-of-tenancy-cleaning-dublin/" class="link-caps mt-6 self-start text-gold-soft">End of tenancy cleaning</a>
+        </div>
+      </div>
+
+      <div class="mt-14 flex flex-col justify-between gap-8 border-t border-cream/15 pt-8 md:flex-row md:items-center" data-reveal>
+        <p class="max-w-xl text-sm text-cream/60">{ESTIMATE_NOTE}</p>
+        <div class="flex flex-wrap items-center gap-4">
+          <a href="/quote/" class="btn-gold shrink-0">Get my price</a>
+          <a href="/prices/" class="btn-outline shrink-0 text-cream">Full price list</a>
+        </div>
+      </div>
+      <p class="mt-6 text-xs text-cream/40">{VAT_NOTE}</p>
+    </div>
+  </section>
+
+  <!-- Real job photos: two oversized drifting room frames, then the
+       detail evidence in the enlargeable grid -->
+  <section class="section-pad bg-porcelain">
+    <div class="container-wide">
+      <div class="flex flex-wrap items-end justify-between gap-6">
+        <div>
+          <p class="kicker" data-reveal>Our work</p>
+          <h2 class="display mt-6 max-w-2xl text-[clamp(2.2rem,5vw,4rem)] text-ink" data-reveal>
+            <span class="line-mask"><span>The detail is the</span></span>
+            <span class="line-mask"><span style="--d: 0.1s"><span class="accent-word text-gold-deep">difference</span></span></span>
+          </h2>
+        </div>
+        <p class="max-w-sm text-sm leading-relaxed text-ink/60" data-reveal style="--d: 0.2s">
+          A deep clean is judged on the parts a regular clean skips. These are photographs from
+          real BPE jobs, not stock images.
+        </p>
+      </div>
+
+      <div class="mt-16 space-y-20 md:space-y-28">
+        {workFrames.map((photo, i) => (
+          <figure class:list={['md:w-[74%]', i % 2 === 1 && 'md:ml-auto']} data-reveal>
+            <span class="media-zoom frame-hover block overflow-hidden border border-ink/10">
+              <span class="block" data-drift>
+                <Image
+                  src={photo.src}
+                  alt={photo.alt}
+                  class="aspect-[16/10] w-full scale-110 object-cover"
+                  widths={[768, 1080, 1440]}
+                  sizes="(min-width: 768px) 74vw, 100vw"
+                  format="webp"
+                  quality={78}
+                />
+              </span>
+            </span>
+            <figcaption class="mt-5 flex items-center gap-4">
+              <span class="h-px w-8 shrink-0 bg-gold/70" aria-hidden="true"></span>
+              <span class="text-sm leading-relaxed text-ink/60">{photo.caption}</span>
+            </figcaption>
+          </figure>
+        ))}
+      </div>
+
+      <p class="mt-20 font-sans text-[0.66rem] font-semibold uppercase tracking-[0.24em] text-stone md:mt-24" data-reveal>
+        The detail, close up
+      </p>
+      <Gallery items={DEEP_CLEAN} cols={4} class="mt-14" />
+    </div>
+  </section>
+
+  {references.length > 0 && (
+    <section class="section-pad bg-ivory">
+      <div class="container-wide">
+        <p class="kicker" data-reveal>References</p>
+        <h2 class="display mt-6 max-w-2xl text-[clamp(2.2rem,5vw,4rem)] text-ink" data-reveal>
+          <span class="line-mask"><span>In their own</span></span>
+          <span class="line-mask"><span style="--d: 0.1s"><span class="accent-word text-gold-deep">words</span></span></span>
+        </h2>
+
+        {/* Lead reference: words brighten one by one as the page scrolls,
+            the giant quote mark hanging in the left margin */}
+        <figure class="mt-16 grid gap-6 md:grid-cols-[auto_1fr] md:gap-10">
+          <span class="display block select-none text-[6rem] leading-[0.6] text-gold md:text-[9rem]" aria-hidden="true">&ldquo;</span>
+          <div class="max-w-3xl">
+            <blockquote data-quote-scrub>
+              <p class="display text-[clamp(1.5rem,2.8vw,2.3rem)] leading-[1.32] text-ink">
+                {leadRefWords.map((word) => (
+                  <span class="q-word">{word}{' '}</span>
+                ))}
+              </p>
+            </blockquote>
+            <figcaption class="mt-8 flex items-center gap-4">
+              <span class="h-px w-10 bg-gold" aria-hidden="true"></span>
+              <span class="font-sans text-[0.66rem] font-semibold uppercase tracking-[0.24em] text-ink/70">
+                {leadRef.author} &middot; {leadRef.area}
+              </span>
+            </figcaption>
+          </div>
+        </figure>
+
+        {restRefs.length > 0 && (
+          <div class="mt-20 grid gap-10 border-t border-ink/15 pt-12 md:grid-cols-2 md:gap-16">
+            {restRefs.map((t, i) => (
+              <figure data-reveal style={`--d: ${0.08 * i}s`}>
+                <span class="block h-px w-8 bg-gold/60" aria-hidden="true"></span>
+                <blockquote class="mt-5">
+                  <p class="font-display text-lg leading-relaxed text-ink/80">&ldquo;{t.quote}&rdquo;</p>
+                </blockquote>
+                <figcaption class="mt-6 flex items-center gap-4">
+                  <span class="h-px w-8 bg-gold" aria-hidden="true"></span>
+                  <span class="font-sans text-[0.66rem] font-semibold uppercase tracking-[0.24em] text-ink/70">
+                    {t.author} &middot; {t.area}
+                  </span>
+                </figcaption>
+              </figure>
+            ))}
+          </div>
+        )}
+      </div>
+    </section>
+  )}
+
+  <!-- FAQ -->
+  <section class="section-pad bg-porcelain">
+    <div class="container-wide grid gap-14 lg:grid-cols-[1fr_1.6fr] lg:gap-20">
+      <div class="lg:sticky lg:top-32 lg:self-start">
+        <p class="kicker" data-reveal>Questions</p>
+        <h2 class="display mt-6 text-[clamp(2.2rem,5vw,4rem)] text-ink" data-reveal>
+          <span class="line-mask"><span>Deep cleaning,</span></span>
+          <span class="line-mask"><span style="--d: 0.1s"><span class="accent-word text-gold-deep">answered</span></span></span>
+        </h2>
+        <p class="mt-8 max-w-sm text-sm leading-relaxed text-ink/60" data-reveal style="--d: 0.2s">
+          {AREAS_SENTENCE} Not sure we reach you? Send your Eircode and we will confirm.
+        </p>
+        <span class="mt-10 block h-px w-12 bg-gold/60" data-reveal="fade" style="--d: 0.3s" aria-hidden="true"></span>
+      </div>
+
+      <div class="border-t border-ink/15">
+        {faqs.map((item, i) => (
+          <details class="group border-b border-ink/15" data-reveal style={`--d: ${0.08 * i}s`}>
+            <summary class="flex cursor-pointer list-none items-center justify-between gap-6 py-6 [&::-webkit-details-marker]:hidden">
+              <span class="font-display text-lg text-ink md:text-xl">{item.q}</span>
+              <svg
+                class="h-4 w-4 shrink-0 text-gold-deep transition-transform duration-300 group-open:rotate-45"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.5"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+              >
+                <path stroke-linecap="round" d="M12 5v14M5 12h14" />
+              </svg>
+            </summary>
+            <p class="max-w-2xl pb-6 text-sm leading-relaxed text-ink/65 md:text-base">{item.a}</p>
+          </details>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Closing CTA and sibling services -->
+  <section class="section-pad bg-night text-cream">
+    <div class="container-wide">
+      <div class="grid gap-14 lg:grid-cols-[1.1fr_1fr] lg:gap-20">
+        <div>
+          <p class="kicker !text-gold" data-reveal>Book a deep clean</p>
+          <h2 class="display mt-6 text-[clamp(2.2rem,5vw,4rem)]" data-reveal>
+            <span class="line-mask"><span>Tell us the size,</span></span>
+            <span class="line-mask"><span style="--d: 0.1s">we do the <span class="accent-word text-gold-soft">rest</span></span></span>
+          </h2>
+          <p class="mt-8 max-w-xl text-base leading-relaxed text-cream/70" data-reveal style="--d: 0.2s">
+            Send us the number of bedrooms and bathrooms and roughly when you need it. You get a
+            price back, and nothing is booked until you say yes.
+          </p>
+          <div class="mt-10 flex flex-wrap items-center gap-4" data-reveal style="--d: 0.28s">
+            <a href="/quote/" class="btn-gold">Get my price</a>
+            <a href={SITE.phoneHref} class="btn-outline text-cream">Call {SITE.phoneDisplay}</a>
+            <a href={SITE.whatsappHref} rel="noopener" class="btn-outline text-cream">WhatsApp</a>
+          </div>
+          <p class="mt-8 text-sm text-cream/50" data-reveal style="--d: 0.34s">{SITE.hours}</p>
+        </div>
+
+        <div class="self-center border-b border-cream/15">
+          <p class="pb-5 font-sans text-[0.66rem] font-semibold uppercase tracking-[0.24em] text-cream/50">
+            You may also need
+          </p>
+          {related.map((service, i) => (
+            <div class="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2 border-t border-cream/15 py-6" data-reveal style={`--d: ${0.08 * i}s`}>
+              <a href={service.slug} class="link-caps text-cream">{service.name}</a>
+              <span class="font-sans text-sm text-cream/50">{service.from}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  </section>
+</Base>

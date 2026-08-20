@@ -1,0 +1,36 @@
+---
+// Slim recurring-discount strip between homepage sections. No card, no icon:
+// a hairline-framed porcelain band with one serif line, the three offers as
+// tracked caps separated by gold dashes, and a caps link to the price list.
+const offers = [
+  'Weekly saves 10%',
+  'Bi-weekly saves 5%',
+  'Monthly contracts available',
+];
+---
+<section class="border-y border-ink/15 bg-porcelain">
+  <div class="container-wide py-10 md:py-12">
+    <div class="flex flex-wrap items-center justify-center gap-x-10 gap-y-6 md:justify-start">
+      <p class="display text-xl text-ink md:text-2xl" data-reveal>
+        Clean regularly, pay <span class="accent-word text-gold-deep">less</span>.
+      </p>
+
+      <div class="flex flex-wrap items-center justify-center gap-x-5 gap-y-3" data-reveal style="--d: 0.08s">
+        {offers.map((offer, i) => (
+          <Fragment>
+            {i > 0 && <span class="h-px w-6 bg-gold/60" aria-hidden="true"></span>}
+            <span class="font-sans text-[0.66rem] font-semibold uppercase tracking-[0.24em] text-ink/70">{offer}</span>
+          </Fragment>
+        ))}
+      </div>
+
+      <a href="/prices/" class="link-caps text-ink/70 hover:text-ink md:ml-auto" data-reveal style="--d: 0.16s">
+        See prices
+      </a>
+    </div>
+
+    <p class="mt-4 text-center text-xs text-stone md:text-left" data-reveal style="--d: 0.2s">
+      Discounts apply to recurring cleaning.
+    </p>
+  </div>
+</section>

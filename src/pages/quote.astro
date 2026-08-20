@@ -1,0 +1,392 @@
+---
+import Base from '../layouts/Base.astro';
+import { PATHS, breadcrumbs, graph } from '../lib/schema';
+import QuoteForm from '../components/QuoteForm.astro';
+import Diamond from '../components/Diamond.astro';
+import { SITE } from '../data/site';
+import {
+  HOURLY,
+  FIXED,
+  EXTRAS,
+  DISCOUNTS,
+  SIZE_LABELS,
+  VAT_NOTE,
+  ESTIMATE_NOTE,
+} from '../data/pricing';
+import { COUNTIES, AREAS_SENTENCE } from '../data/areas';
+
+// Studio is deliberately absent from every table on this page: pricing.ts flags
+// it as unconfirmed by the client, so it is handled by the "ask us" line under
+// the tables instead of being published as a figure.
+const sizes = ['1bed', '2bed', '3bed', '4bed'] as const;
+
+const fixedTables = [
+  {
+    title: 'Deep clean and end of tenancy',
+    rows: sizes.map((size) => ({ label: SIZE_LABELS[size], price: FIXED.deep[size] })),
+    note: 'One fixed price for the whole property. End of tenancy is priced exactly the same as a deep clean.',
+  },
+  {
+    title: 'After builders',
+    rows: sizes.map((size) => ({ label: SIZE_LABELS[size], price: FIXED.afterBuilders[size] })),
+    note: 'Builders dust, paint spots and construction residue. Also available by the hour, see below.',
+  },
+  {
+    title: 'Airbnb turnover',
+    rows: sizes.map((size) => ({ label: SIZE_LABELS[size], price: FIXED.airbnbTurnover[size] })),
+    note: `Per turnover, with linen change and restocking. A deeper seasonal reset starts at €${FIXED.airbnbDeep['1bed']}.`,
+  },
+];
+
+const hourlyRows = [
+  {
+    label: 'Regular house cleaning',
+    value: HOURLY.regular.label,
+    note: `Minimum booking ${HOURLY.regular.minHours} hours`,
+  },
+  {
+    label: 'Deep cleaning',
+    value: HOURLY.deep.label,
+    note: 'Or the fixed price per property size above',
+  },
+  {
+    label: 'After builders cleaning',
+    value: HOURLY.afterBuilders.label,
+    note: 'Or the fixed price per property size above',
+  },
+  {
+    label: 'Office cleaning',
+    value: HOURLY.officeRegular.label,
+    note: 'Scheduled around your working hours',
+  },
+  {
+    label: 'Office deep cleaning',
+    value: HOURLY.officeDeep.label,
+    note: 'Once-off reset for a commercial space',
+  },
+];
+
+const pricingRules = [
+  {
+    title: 'Hourly or fixed',
+    text: `Regular house cleaning and office cleaning are charged by the hour. Deep cleaning, end of tenancy, after builders and Airbnb turnovers have a fixed price set by the number of bedrooms, so the figure does not move if the job runs long.`,
+  },
+  {
+    title: `Minimum ${HOURLY.regular.minHours} hours`,
+    text: `Hourly cleans start at ${HOURLY.regular.minHours} hours. That is the shortest visit in which a home can be finished properly rather than rushed.`,
+  },
+  {
+    title: 'Recurring saves you money',
+    text: `Book weekly and you save ${DISCOUNTS.weekly.pct}%. Every two weeks saves ${DISCOUNTS.biweekly.pct}%. Monthly is a ${DISCOUNTS.monthly.label.toLowerCase()}. The discount applies to the recurring clean itself.`,
+  },
+  {
+    title: 'Extras are priced separately',
+    text: 'Oven, fridge, interior windows and carpets are add-ons, so you only pay for the ones you actually ask for. Nothing is added to your bill without you agreeing to it first.',
+  },
+  {
+    title: 'Prices exclude VAT',
+    text: `${VAT_NOTE} The figures on this page are the cleaning price itself, with nothing folded in and nothing held back.`,
+  },
+  {
+    title: 'Nothing here is binding',
+    text: `${ESTIMATE_NOTE} If your property is unusual, very large or has not been cleaned in a long time, we say so on the call rather than at the door.`,
+  },
+];
+
+const askUs = [
+  {
+    title: 'Your property size',
+    text: 'The number of bedrooms, and roughly how many bathrooms. Bedrooms set every fixed price on this page.',
+  },
+  {
+    title: 'The service you want',
+    text: 'Regular, deep, end of tenancy, after builders, office or an Airbnb turnover. If you are not sure which one fits, describe the state of the place and we will tell you.',
+  },
+  {
+    title: 'Your preferred date',
+    text: `A date and a rough time of day. We work ${SITE.hours}, so evenings and weekends are normal bookings, not favours.`,
+  },
+  {
+    title: 'Where you are',
+    text: `Your area or Eircode. ${AREAS_SENTENCE}`,
+  },
+  {
+    title: 'Any extras',
+    text: 'Oven, fridge, interior windows or carpets, and roughly how many. We add them to the quote there and then.',
+  },
+  {
+    title: 'How we get in',
+    text: 'Whether you will be there, or we collect a key or use an entry code. Access is agreed in advance, never improvised on the day.',
+  },
+];
+
+const proof = [
+  'Over 7 years in business',
+  `${COUNTIES.length} counties covered`,
+  SITE.hours,
+  'Fully insured, eco-friendly products',
+];
+
+const jsonLd = graph(breadcrumbs([{ name: 'Get a Quote', path: PATHS.quote }], Astro.site));
+---
+<Base
+  title="Get a Cleaning Quote in Dublin | BPE Cleaning"
+  description="See our prices by property size and service, then call or WhatsApp to confirm yours. Homes, offices and Airbnb across Dublin."
+  jsonLd={jsonLd}
+>
+  <section class="bg-night pt-40 pb-20 text-cream md:pt-48 md:pb-24">
+    <div class="container-wide">
+      <p class="kicker !text-gold" data-reveal>Get A Quote</p>
+      <h1 class="display-caps mt-6 text-[clamp(2.6rem,7vw,5.5rem)]" data-reveal>
+        <span class="line-mask"><span>Your price,</span></span>
+        <span class="line-mask"><span style="--d: 0.1s">no <span class="accent-word text-gold-soft">guesswork</span></span></span>
+      </h1>
+      <p class="mt-8 max-w-xl text-base leading-relaxed text-cream/70" data-reveal style="--d: 0.2s">
+        Tell us your property size and the service you want, and we price it on the call. Homes,
+        offices and Airbnb across Dublin.
+      </p>
+      <div class="mt-10 flex flex-wrap items-center gap-4" data-reveal style="--d: 0.3s">
+        <a href={SITE.phoneHref} class="btn-gold">
+          <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3 5a2 2 0 0 1 2-2h2l2 5-2 1.5a12 12 0 0 0 5.5 5.5L14 13l5 2v2a2 2 0 0 1-2 2A16 16 0 0 1 3 5Z" />
+          </svg>
+          Call {SITE.phoneDisplay}
+        </a>
+        <a href={SITE.whatsappHref} class="btn-outline text-cream">
+          <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 0 1-13.4 7.8L3 21l1.2-4.6A9 9 0 1 1 21 12Z" />
+          </svg>
+          WhatsApp us
+        </a>
+      </div>
+    </div>
+  </section>
+
+  {/* The request form, first thing after the hero: leave your details and
+      they arrive as a structured WhatsApp message, no phone call needed. */}
+  <section class="section-pad bg-porcelain">
+    <div class="container-wide grid gap-14 lg:grid-cols-[1fr_1.4fr] lg:gap-20">
+      <div class="lg:sticky lg:top-32 lg:self-start">
+        <p class="kicker" data-reveal>Leave A Request</p>
+        <h2 class="display mt-6 text-[clamp(2.2rem,5vw,4rem)]" data-reveal>
+          <span class="line-mask"><span>Tell us what</span></span>
+          <span class="line-mask"><span style="--d: 0.1s">needs <span class="accent-word text-gold-deep">cleaning</span></span></span>
+        </h2>
+        <p class="mt-8 max-w-md text-base leading-relaxed text-ink/70" data-reveal style="--d: 0.2s">
+          Fill in the essentials and send them straight to us. We come back with your price and a
+          date. No obligation, no account, nothing to install.
+        </p>
+        <span class="mt-10 block h-px w-12 bg-gold/60" data-reveal="fade" style="--d: 0.3s" aria-hidden="true"></span>
+      </div>
+      <div data-reveal style="--d: 0.15s">
+        <QuoteForm />
+      </div>
+    </div>
+  </section>
+
+  <section class="section-pad bg-ivory">
+    <div class="container-wide">
+      <div class="flex flex-wrap items-end justify-between gap-6">
+        <div>
+          <p class="kicker" data-reveal>Price Guide</p>
+          <h2 class="display mt-6 max-w-2xl text-[clamp(2.2rem,5vw,4rem)] text-ink" data-reveal>
+            <span class="line-mask"><span>Work out your</span></span>
+            <span class="line-mask"><span style="--d: 0.1s">price right <span class="accent-word text-gold-deep">here</span></span></span>
+          </h2>
+        </div>
+        <p class="max-w-sm text-sm leading-relaxed text-ink/60" data-reveal style="--d: 0.2s">
+          Find the number of bedrooms, read across, and you have your figure. No form to fill in, no
+          waiting for someone to email you back.
+        </p>
+      </div>
+
+      {/* The centre table carries the sanctioned gold ring, echoing the
+          featured column of the homepage pricing band */}
+      <div class="mt-16 grid gap-x-12 gap-y-14 lg:grid-cols-3">
+        {fixedTables.map((table, i) => (
+          <div
+            class:list={[
+              'relative flex flex-col',
+              i === 1 && 'bg-porcelain p-8 shadow-[0_0_0_1px] shadow-gold/40 md:p-10 lg:-my-6 lg:py-14',
+            ]}
+            data-reveal
+            style={`--d: ${0.08 * i}s`}
+          >
+            <p class:list={['font-sans text-[0.66rem] font-semibold uppercase tracking-[0.24em]', i === 1 ? 'text-gold-deep' : 'text-stone']}>{table.title}</p>
+            <span class="mt-5 block h-px w-10 bg-gold/60" aria-hidden="true"></span>
+            <dl class="mt-7 border-t border-ink/15">
+              {table.rows.map((row) => (
+                <div class="flex items-baseline justify-between gap-6 border-b border-ink/15 py-4">
+                  <dt class="text-sm text-ink/70">{row.label}</dt>
+                  <dd class="font-sans font-medium tracking-[-0.01em] text-2xl leading-none text-ink [font-variant-numeric:tabular-nums] md:text-[1.7rem]">
+                    <span class="align-top text-[0.5em] text-gold-deep">€</span>{row.price}
+                  </dd>
+                </div>
+              ))}
+            </dl>
+            <p class="mt-5 text-sm leading-relaxed text-ink/55">{table.note}</p>
+          </div>
+        ))}
+      </div>
+
+      <p class="mt-12 max-w-2xl text-sm leading-relaxed text-ink/55" data-reveal>
+        Studios and properties larger than 4 bedrooms are not in the tables. Ring us with the room
+        count and we will price it on the call.
+      </p>
+
+      <div class="mt-20 grid gap-x-12 gap-y-16 border-t border-ink/15 pt-14 lg:grid-cols-[1.3fr_1fr]">
+        <div data-reveal>
+          <p class="font-sans text-[0.66rem] font-semibold uppercase tracking-[0.24em] text-stone">By the hour</p>
+          <span class="mt-5 block h-px w-10 bg-gold/60" aria-hidden="true"></span>
+          <dl class="mt-7 border-t border-ink/15">
+            {hourlyRows.map((row) => (
+              <div class="flex flex-wrap items-baseline justify-between gap-x-8 gap-y-1 border-b border-ink/15 py-5">
+                <dt class="text-sm text-ink/75">
+                  {row.label}
+                  <span class="mt-1 block text-sm text-ink/45">{row.note}</span>
+                </dt>
+                <dd class="font-sans font-medium tracking-[-0.01em] text-lg text-ink [font-variant-numeric:tabular-nums] md:text-xl">{row.value}</dd>
+              </div>
+            ))}
+          </dl>
+        </div>
+
+        <div data-reveal style="--d: 0.08s">
+          <p class="font-sans text-[0.66rem] font-semibold uppercase tracking-[0.24em] text-stone">Extras</p>
+          <span class="mt-5 block h-px w-10 bg-gold/60" aria-hidden="true"></span>
+          <dl class="mt-7 border-t border-ink/15">
+            {EXTRAS.map((extra) => (
+              <div class="flex flex-wrap items-baseline justify-between gap-x-8 gap-y-1 border-b border-ink/15 py-5">
+                <dt class="text-sm text-ink/75">{extra.name}</dt>
+                <dd class="font-sans font-medium tracking-[-0.01em] text-lg text-ink [font-variant-numeric:tabular-nums] md:text-xl">{extra.label}</dd>
+              </div>
+            ))}
+          </dl>
+          <p class="mt-5 text-sm leading-relaxed text-ink/55">
+            Added to any clean. Tell us which ones you want and they go into the quote before you book.
+          </p>
+        </div>
+      </div>
+
+      <div class="mt-14 border-t border-ink/15 pt-6" data-reveal>
+        <p class="font-sans text-[0.66rem] font-semibold uppercase tracking-[0.24em] text-stone">{VAT_NOTE}</p>
+        <p class="mt-3 text-sm text-ink/55">{ESTIMATE_NOTE}</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-pad bg-porcelain">
+    <div class="container-wide">
+      <div class="flex flex-wrap items-end justify-between gap-6">
+        <div>
+          <p class="kicker" data-reveal>How Pricing Works</p>
+          <h2 class="display mt-6 max-w-2xl text-[clamp(2.2rem,5vw,4rem)] text-ink" data-reveal>
+            <span class="line-mask"><span>The rules behind</span></span>
+            <span class="line-mask"><span style="--d: 0.1s">the <span class="accent-word text-gold-deep">numbers</span></span></span>
+          </h2>
+        </div>
+        <p class="max-w-sm text-sm leading-relaxed text-ink/60" data-reveal style="--d: 0.2s">
+          Six things worth knowing before you compare us with anyone else in Dublin. All of them
+          apply to every booking we take.
+        </p>
+      </div>
+
+      <div class="mt-14 grid gap-x-10 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
+        {pricingRules.map((rule, i) => (
+          <div class="border-t border-ink/15 pt-5" data-reveal style={`--d: ${0.08 * i}s`}>
+            <p class="font-sans text-[0.66rem] font-semibold uppercase tracking-[0.24em] text-stone">
+              {String(i + 1).padStart(2, '0')}
+            </p>
+            <h3 class="mt-4 font-display text-xl text-ink">{rule.title}</h3>
+            <p class="mt-3 text-sm leading-relaxed text-ink/60">{rule.text}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section-pad bg-ivory">
+    <div class="container-wide grid gap-14 lg:grid-cols-[1fr_1.6fr] lg:gap-20">
+      <div class="lg:sticky lg:top-32 lg:self-start">
+        <p class="kicker" data-reveal>Before You Call</p>
+        <h2 class="display mt-6 text-[clamp(2.2rem,5vw,4rem)] text-ink" data-reveal>
+          <span class="line-mask"><span>Six things to</span></span>
+          <span class="line-mask"><span style="--d: 0.1s">have <span class="accent-word text-gold-deep">ready</span></span></span>
+        </h2>
+        <p class="mt-8 max-w-sm text-sm leading-relaxed text-ink/60" data-reveal style="--d: 0.16s">
+          With these to hand we can price the job on the call and agree a date with you, instead of
+          chasing details afterwards.
+        </p>
+        <div class="mt-10 flex flex-wrap items-center gap-4" data-reveal style="--d: 0.24s">
+          <a href={SITE.phoneHref} class="btn-primary">Call {SITE.phoneDisplay}</a>
+          <a href={SITE.whatsappHref} class="btn-outline text-ink">WhatsApp us</a>
+        </div>
+      </div>
+
+      <div class="border-t border-ink/15">
+        {askUs.map((item, i) => (
+          <div class="flex gap-6 border-b border-ink/15 py-6 md:gap-10" data-reveal style={`--d: ${0.08 * i}s`}>
+            <p class="w-8 shrink-0 font-sans text-[0.66rem] font-semibold uppercase tracking-[0.24em] text-stone">
+              {String(i + 1).padStart(2, '0')}
+            </p>
+            <div>
+              <h3 class="font-display text-lg text-ink md:text-xl">{item.title}</h3>
+              <p class="mt-2 max-w-2xl text-sm leading-relaxed text-ink/65">{item.text}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section-pad relative overflow-hidden bg-night text-cream">
+    {/* Ghosted mark, the same back layer the homepage pricing band wears */}
+    <Diamond class="pointer-events-none absolute -right-40 -top-44 h-[38rem] w-[38rem] opacity-[0.05]" aria-hidden="true" />
+    <div class="container-wide relative">
+      <div class="flex flex-wrap items-end justify-between gap-6">
+        <div>
+          <p class="kicker !text-gold" data-reveal>Get Your Price</p>
+          <h2 class="display mt-6 max-w-2xl text-[clamp(2.2rem,5vw,4rem)]" data-reveal>
+            <span class="line-mask"><span>Tell us about</span></span>
+            <span class="line-mask"><span style="--d: 0.1s">your <span class="accent-word text-gold-soft">place</span></span></span>
+          </h2>
+        </div>
+        <p class="max-w-sm text-sm leading-relaxed text-cream/60" data-reveal style="--d: 0.2s">
+          A phone call or a WhatsApp message is all it takes. Send a photo of the room you are most
+          worried about and we will price it honestly.
+        </p>
+      </div>
+
+      <div class="mt-14 grid border-t border-cream/15 sm:grid-cols-3">
+        <a href={SITE.phoneHref} class="group border-b border-cream/15 py-8 sm:border-b-0 sm:py-10 sm:pr-8" data-reveal>
+          <p class="font-sans text-[0.66rem] font-semibold uppercase tracking-[0.24em] text-cream/50">Call us</p>
+          <p class="display mt-4 text-2xl text-cream transition-colors duration-300 group-hover:text-gold md:text-3xl">{SITE.phoneDisplay}</p>
+          <span class="mt-6 block h-px w-10 bg-gold/60" aria-hidden="true"></span>
+        </a>
+
+        <a href={SITE.whatsappHref} class="group border-b border-cream/15 py-8 sm:border-b-0 sm:border-l sm:border-cream/15 sm:px-8 sm:py-10" data-reveal style="--d: 0.08s">
+          <p class="font-sans text-[0.66rem] font-semibold uppercase tracking-[0.24em] text-cream/50">WhatsApp</p>
+          <p class="display mt-4 text-2xl text-cream transition-colors duration-300 group-hover:text-gold md:text-3xl">Message us</p>
+          <span class="mt-6 block h-px w-10 bg-gold/60" aria-hidden="true"></span>
+        </a>
+
+        <a href={`mailto:${SITE.email}`} class="group py-8 sm:border-l sm:border-cream/15 sm:px-8 sm:py-10" data-reveal style="--d: 0.16s">
+          <p class="font-sans text-[0.66rem] font-semibold uppercase tracking-[0.24em] text-cream/50">Email</p>
+          <p class="display mt-4 break-words text-xl text-cream transition-colors duration-300 group-hover:text-gold md:text-2xl">{SITE.email}</p>
+          <span class="mt-6 block h-px w-10 bg-gold/60" aria-hidden="true"></span>
+        </a>
+      </div>
+
+      <div class="mt-12 flex flex-wrap items-center gap-4" data-reveal>
+        <a href={SITE.phoneHref} class="btn-gold">Call {SITE.phoneDisplay}</a>
+        <a href="/prices/" class="btn-outline text-cream">Full price list</a>
+      </div>
+
+      <ul class="mt-14 grid gap-y-4 border-t border-cream/15 pt-6 sm:grid-cols-2 lg:grid-cols-4" data-reveal>
+        {proof.map((item) => (
+          <li class="font-sans text-[0.66rem] font-semibold uppercase tracking-[0.24em] text-cream/50">{item}</li>
+        ))}
+      </ul>
+    </div>
+  </section>
+</Base>

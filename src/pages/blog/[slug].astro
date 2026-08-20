@@ -1,0 +1,526 @@
+---
+export const prerender = false;
+
+import Base from '../../layouts/Base.astro';
+import Diamond from '../../components/Diamond.astro';
+import { SITE } from '../../data/site';
+import { businessRef } from '../../lib/schema';
+import {
+  getPostBySlug,
+  getPublishedPosts,
+  postDate,
+  postIso,
+  postSummary,
+  readingMinutes,
+  renderMarkdown,
+} from '../../lib/posts';
+import type { Post } from '../../lib/types';
+
+/**
+ * One article, server rendered on every request so a freshly published post
+ * is readable immediately and an unpublished one disappears immediately.
+ *
+ * A slug that does not match a published article answers a real 404, not a
+ * redirect: a wrong address should stay wrong for search engines, and the
+ * body below is only there so a person does not land on a blank page.
+ */
+
+const slug = (Astro.params.slug || '').trim();
+const post = slug ? await getPostBySlug(slug) : null;
+
+if (!post) {
+  const notFound = `<!doctype html><html lang="en-IE"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex"><title>Article not found | BPE Cleaning Services</title>
+<style>body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;
+background:#14110D;color:#EFEAE0;font:400 16px/1.7 system-ui,sans-serif;padding:2rem;text-align:center}
+p{max-width:30rem;color:rgba(239,234,224,0.7)}a{color:#E6DCC8}
+h1{font:400 1.6rem/1.2 Georgia,serif;letter-spacing:.02em;text-transform:uppercase}</style></head>
+<body><div><h1>Article not found</h1><p>This address does not match anything we have published.
+It may have been moved, or the link may have been mistyped.</p>
+<p><a href="/blog/">Back to all articles</a> &middot; <a href="/">BPE Cleaning Services</a></p>
+</div></body></html>`;
+  return new Response(notFound, {
+    status: 404,
+    headers: { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'no-store' },
+  });
+}
+
+const article: Post = post;
+
+/**
+ * marked renders `![alt](src "caption")` as an <img title="caption">, and the
+ * title is the only way a writer in the cabinet can caption a photograph, so
+ * it is lifted into a real figure. The second pass unwraps the paragraph
+ * markdown puts around a lone image, which would otherwise nest a figure
+ * inside a p. The third gives every table its own scroller, so a wide table
+ * scrolls inside the column instead of pushing the phone layout sideways.
+ */
+function prepareBody(html: string): string {
+  return html
+    .replace(
+      /<img([^>]*?)\stitle="([^"]*)"([^>]*)>/g,
+      (_match, before: string, caption: string, after: string) =>
+        `<figure><img${before}${after}><figcaption>${caption}</figcaption></figure>`
+    )
+    .replace(/<p>(\s*<figure>[\s\S]*?<\/figure>\s*)<\/p>/g, '$1')
+    .replace(/<table>/g, '<div class="post-scroll"><table>')
+    .replace(/<\/table>/g, '</table></div>');
+}
+
+const body = prepareBody(renderMarkdown(article.content));
+const minutes = readingMinutes(article);
+const summary = postSummary(article, 220);
+const canonical = new URL(`/blog/${article.slug}/`, Astro.site).href;
+const seoTitle = `${article.seo_title?.trim() || article.title} | ${SITE.name}`;
+const seoDescription = article.seo_description?.trim() || summary;
+const coverAbsolute = article.cover_url || new URL('/og-image.jpg', Astro.site).href;
+
+const tags = Array.isArray(article.tags) ? article.tags : [];
+
+// Up to three other articles. One extra is fetched so the current one can be
+// dropped without leaving a gap.
+const related = (await getPublishedPosts(8)).filter((other) => other.slug !== article.slug).slice(0, 3);
+
+const shareText = `${article.title} ${canonical}`;
+const shareLinks = [
+  { label: 'WhatsApp', href: `https://wa.me/?text=${encodeURIComponent(shareText)}` },
+  { label: 'Facebook', href: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(canonical)}` },
+  {
+    label: 'Email',
+    href: `mailto:?subject=${encodeURIComponent(article.title)}&body=${encodeURIComponent(canonical)}`,
+  },
+];
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'BlogPosting',
+  headline: article.title,
+  description: seoDescription,
+  datePublished: postIso(article),
+  dateModified: new Date(article.updated_at || article.published_at || article.created_at).toISOString(),
+  author: {
+    '@type': 'Organization',
+    name: article.author?.trim() || SITE.name,
+    url: new URL('/', Astro.site).href,
+  },
+  // The one business node the rest of the site publishes, by @id, so the company
+  // is a single entity in the graph rather than a nameless second copy of itself.
+  // The helper carries the logo this block used to spell out.
+  publisher: businessRef(Astro.site),
+  image: [coverAbsolute],
+  inLanguage: 'en-IE',
+  mainEntityOfPage: { '@type': 'WebPage', '@id': canonical },
+  ...(tags.length ? { keywords: tags.join(', ') } : {}),
+};
+---
+<Base
+  title={seoTitle}
+  description={seoDescription}
+  image={article.cover_url || undefined}
+  ogType="article"
+  jsonLd={jsonLd}
+>
+  <section class="bg-night pt-40 pb-16 text-cream md:pt-48 md:pb-20">
+    <div class="container-wide">
+      <a href="/blog/" class="link-caps text-cream/60 hover:text-cream" data-reveal>All articles</a>
+
+      <h1 class="display mt-8 max-w-4xl text-[clamp(2.2rem,5.4vw,4.2rem)]" data-reveal style="--d: 0.06s">
+        {article.title}
+      </h1>
+
+      <p class="mt-8 font-sans text-[0.66rem] font-semibold uppercase tracking-[0.24em] text-cream/50 [font-variant-numeric:tabular-nums]" data-reveal style="--d: 0.12s">
+        <time datetime={postIso(article)}>{postDate(article)}</time>
+        <span class="px-2 text-gold" aria-hidden="true">&middot;</span>
+        {minutes} min read
+        {article.author?.trim() && (
+          <Fragment>
+            <span class="px-2 text-gold" aria-hidden="true">&middot;</span>
+            {article.author}
+          </Fragment>
+        )}
+      </p>
+
+      {tags.length > 0 && (
+        <ul class="mt-7 flex flex-wrap gap-3" data-reveal style="--d: 0.18s">
+          {tags.map((tag) => (
+            <li class="border border-cream/25 px-3 py-1.5 font-sans text-[0.6rem] font-semibold uppercase tracking-[0.2em] text-cream/70">
+              {tag}
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  </section>
+
+  <section class="bg-porcelain pt-10 pb-20 md:pt-14 md:pb-28">
+    <div class="container-wide">
+      {article.cover_url && (
+        <figure class="media-zoom overflow-hidden border border-ink/10" data-reveal>
+          <img
+            src={article.cover_url}
+            alt={article.cover_alt}
+            class="aspect-[16/9] w-full scale-110 object-cover"
+            loading="eager"
+            decoding="async"
+            fetchpriority="high"
+          />
+        </figure>
+      )}
+
+      <div class="mx-auto mt-14 max-w-[46rem] md:mt-20">
+        <div class="post-body" set:html={body} />
+
+        <div class="mt-16 border-t border-ink/15 pt-8">
+          <div class="flex flex-wrap items-center justify-between gap-x-10 gap-y-6">
+            <div class="flex flex-wrap items-center gap-x-8 gap-y-4">
+              <span class="font-sans text-[0.62rem] font-semibold uppercase tracking-[0.26em] text-stone">
+                Share this
+              </span>
+              {shareLinks.map((link) => (
+                <a href={link.href} class="link-caps text-ink/70 hover:text-ink" rel="noopener" target="_blank">
+                  {link.label}
+                </a>
+              ))}
+              <button id="copy-link" type="button" class="link-caps text-ink/70 hover:text-ink" data-url={canonical}>
+                Copy link
+              </button>
+              <span id="copy-status" class="hidden font-sans text-[0.62rem] font-semibold uppercase tracking-[0.2em] text-gold-deep" role="status"></span>
+            </div>
+            <a href="/blog/" class="link-caps text-ink/70 hover:text-ink">Back to all articles</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {related.length > 0 && (
+    <section class="section-pad bg-ivory">
+      <div class="container-wide">
+        <div class="flex flex-wrap items-end justify-between gap-6">
+          <div>
+            <p class="kicker" data-reveal>Keep Reading</p>
+            <h2 class="display mt-6 text-[clamp(1.8rem,3.6vw,2.8rem)] text-ink" data-reveal>
+              <span class="line-mask"><span>More from the <span class="accent-word text-gold-deep">team</span></span></span>
+            </h2>
+          </div>
+          <a href="/blog/" class="link-caps text-ink/70 hover:text-ink" data-reveal style="--d: 0.1s">
+            All articles
+          </a>
+        </div>
+
+        <div class="mt-14 grid gap-x-12 gap-y-12 border-t border-ink/15 pt-10 md:grid-cols-3">
+          {related.map((other, i) => (
+            <article data-reveal style={`--d: ${0.06 * i}s`}>
+              <a href={`/blog/${other.slug}/`} class="media-zoom frame-hover block overflow-hidden border border-ink/10" aria-hidden="true" tabindex="-1">
+                {other.cover_url ? (
+                  <img
+                    src={other.cover_url}
+                    alt={other.cover_alt}
+                    class="aspect-[4/3] w-full scale-110 object-cover"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                ) : (
+                  <span class="flex aspect-[4/3] w-full items-center justify-center bg-porcelain">
+                    <Diamond class="h-14 w-14 opacity-20" />
+                  </span>
+                )}
+              </a>
+              <p class="mt-6 font-sans text-[0.62rem] font-semibold uppercase tracking-[0.24em] text-stone [font-variant-numeric:tabular-nums]">
+                <time datetime={postIso(other)}>{postDate(other)}</time>
+                <span class="px-2 text-gold" aria-hidden="true">&middot;</span>
+                {readingMinutes(other)} min read
+              </p>
+              <h3 class="display mt-3 text-xl text-ink md:text-2xl">
+                <a href={`/blog/${other.slug}/`} class="transition-colors duration-300 hover:text-gold-deep">
+                  {other.title}
+                </a>
+              </h3>
+              <p class="mt-3 text-sm leading-relaxed text-ink/60">{postSummary(other, 110)}</p>
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
+
+  <section class="relative overflow-hidden bg-night py-20 text-cream md:py-32">
+    <Diamond class="pointer-events-none absolute -right-40 -top-44 h-[38rem] w-[38rem] opacity-[0.05]" aria-hidden="true" />
+
+    <div class="container-wide relative">
+      <div class="grid gap-14 lg:grid-cols-[1.1fr_1fr] lg:gap-20">
+        <div>
+          <p class="kicker !text-gold" data-reveal>Book Your Clean</p>
+          <h2 class="display mt-6 text-[clamp(2.2rem,5vw,4rem)]" data-reveal>
+            <span class="line-mask"><span>Or hand the whole</span></span>
+            <span class="line-mask"><span style="--d: 0.1s">thing <span class="accent-word text-gold-soft">over</span></span></span>
+          </h2>
+          <p class="mt-8 max-w-xl text-base leading-relaxed text-cream/70" data-reveal style="--d: 0.2s">
+            Tell us the size of the property and what needs doing, and we will come back with a price
+            and a time. No obligation, and nothing is booked until you say so.
+          </p>
+        </div>
+
+        <div class="self-center border-b border-cream/15" data-reveal style="--d: 0.1s">
+          <div class="flex items-baseline justify-between gap-6 border-t border-cream/15 py-5">
+            <span class="font-sans text-[0.66rem] font-semibold uppercase tracking-[0.24em] text-cream/50">Phone</span>
+            <a href={SITE.phoneHref} class="font-sans text-sm font-medium text-cream transition-colors duration-300 hover:text-gold-soft">
+              {SITE.phoneDisplay}
+            </a>
+          </div>
+          <div class="flex items-baseline justify-between gap-6 border-t border-cream/15 py-5">
+            <span class="font-sans text-[0.66rem] font-semibold uppercase tracking-[0.24em] text-cream/50">WhatsApp</span>
+            <a href={SITE.whatsappHref} rel="noopener" class="font-sans text-sm font-medium text-cream transition-colors duration-300 hover:text-gold-soft">
+              Message us
+            </a>
+          </div>
+          <div class="flex items-baseline justify-between gap-6 border-t border-cream/15 py-5">
+            <span class="font-sans text-[0.66rem] font-semibold uppercase tracking-[0.24em] text-cream/50">Hours</span>
+            <span class="font-sans text-sm font-medium text-cream">{SITE.hours}</span>
+          </div>
+          <div class="border-t border-cream/15 py-6">
+            <a href="/quote/" class="btn-gold w-full sm:w-auto">Get my price</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<script>
+  // Copy link: no alert, no dialog. The button reports back in place and the
+  // message clears itself. If the clipboard is refused, the old selection
+  // trick is tried before anything is said to the reader.
+  const copyBtn = document.getElementById('copy-link') as HTMLButtonElement | null;
+  const copyStatus = document.getElementById('copy-status');
+
+  if (copyBtn) {
+    copyBtn.addEventListener('click', async () => {
+      const link = copyBtn.dataset.url || window.location.href;
+      let ok = false;
+
+      try {
+        await navigator.clipboard.writeText(link);
+        ok = true;
+      } catch {
+        try {
+          const holder = document.createElement('textarea');
+          holder.value = link;
+          holder.setAttribute('readonly', '');
+          holder.style.position = 'fixed';
+          holder.style.opacity = '0';
+          document.body.appendChild(holder);
+          holder.select();
+          ok = document.execCommand('copy');
+          document.body.removeChild(holder);
+        } catch {
+          ok = false;
+        }
+      }
+
+      if (copyStatus) {
+        copyStatus.textContent = ok ? 'Link copied' : 'Copy the address bar instead';
+        copyStatus.classList.remove('hidden');
+        window.setTimeout(() => copyStatus.classList.add('hidden'), 2600);
+      }
+    });
+  }
+</script>
+
+<style>
+  /*
+   * Article typography. The markup comes from markdown, so every rule below
+   * reaches into set:html output with :global and stays anchored to
+   * .post-body, which keeps it out of the rest of the site.
+   */
+  .post-body {
+    max-width: 68ch;
+    margin-inline: auto;
+    font-family: var(--font-sans);
+    font-size: 1.05rem;
+    line-height: 1.75;
+    color: color-mix(in srgb, var(--color-ink) 82%, transparent);
+  }
+
+  .post-body > :global(:first-child) {
+    margin-top: 0;
+  }
+
+  .post-body :global(h2),
+  .post-body :global(h3) {
+    font-family: var(--font-display);
+    font-optical-sizing: auto;
+    font-variation-settings: 'SOFT' 0, 'WONK' 0;
+    text-transform: none;
+    color: var(--color-ink);
+    text-wrap: balance;
+  }
+
+  .post-body :global(h2) {
+    margin: 3.25rem 0 1rem;
+    font-size: clamp(1.6rem, 3vw, 2.15rem);
+    font-weight: 380;
+    line-height: 1.14;
+    letter-spacing: -0.015em;
+  }
+
+  .post-body :global(h3) {
+    margin: 2.5rem 0 0.75rem;
+    font-size: clamp(1.25rem, 2.2vw, 1.5rem);
+    font-weight: 420;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+  }
+
+  .post-body :global(p) {
+    margin: 1.15rem 0;
+  }
+
+  .post-body :global(strong) {
+    font-weight: 600;
+    color: var(--color-ink);
+  }
+
+  .post-body :global(em) {
+    font-style: italic;
+  }
+
+  .post-body :global(a) {
+    color: var(--color-gold-deep);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 4px;
+    text-decoration-color: color-mix(in srgb, var(--color-gold-deep) 45%, transparent);
+    transition: text-decoration-color 0.3s var(--ease-out-soft);
+  }
+
+  .post-body :global(a:hover) {
+    text-decoration-color: currentColor;
+  }
+
+  .post-body :global(ul),
+  .post-body :global(ol) {
+    margin: 1.4rem 0;
+    padding-left: 1.35rem;
+  }
+
+  .post-body :global(ul) {
+    list-style: disc;
+  }
+
+  .post-body :global(ol) {
+    list-style: decimal;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .post-body :global(li) {
+    margin: 0.55rem 0;
+    padding-left: 0.35rem;
+  }
+
+  .post-body :global(li::marker) {
+    color: var(--color-gold);
+  }
+
+  .post-body :global(li > ul),
+  .post-body :global(li > ol) {
+    margin: 0.55rem 0;
+  }
+
+  .post-body :global(blockquote) {
+    margin: 2.25rem 0;
+    border-left: 1px solid var(--color-gold);
+    padding-left: 1.6rem;
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: 1.2rem;
+    line-height: 1.5;
+    color: color-mix(in srgb, var(--color-ink) 78%, transparent);
+  }
+
+  .post-body :global(blockquote p) {
+    margin: 0.6rem 0;
+  }
+
+  .post-body :global(figure) {
+    margin: 2.75rem 0;
+  }
+
+  .post-body :global(img) {
+    display: block;
+    width: 100%;
+    height: auto;
+    margin: 2.75rem 0;
+    border: 1px solid color-mix(in srgb, var(--color-ink) 10%, transparent);
+  }
+
+  .post-body :global(figure img) {
+    margin: 0;
+  }
+
+  .post-body :global(figcaption) {
+    margin-top: 0.85rem;
+    font-family: var(--font-sans);
+    font-size: 0.8rem;
+    line-height: 1.6;
+    color: var(--color-stone);
+  }
+
+  .post-body :global(hr) {
+    margin: 3rem 0;
+    border: 0;
+    border-top: 1px solid color-mix(in srgb, var(--color-ink) 12%, transparent);
+  }
+
+  .post-body :global(code) {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.9em;
+    background: var(--color-ivory);
+    border: 1px solid color-mix(in srgb, var(--color-ink) 10%, transparent);
+    padding: 0.1rem 0.35rem;
+  }
+
+  .post-body :global(pre) {
+    margin: 2rem 0;
+    overflow-x: auto;
+    background: var(--color-ivory);
+    border: 1px solid color-mix(in srgb, var(--color-ink) 10%, transparent);
+    padding: 1.1rem 1.25rem;
+  }
+
+  .post-body :global(pre code) {
+    border: 0;
+    padding: 0;
+    background: none;
+  }
+
+  .post-body :global(.post-scroll) {
+    margin: 2rem 0;
+    overflow-x: auto;
+  }
+
+  .post-body :global(table) {
+    width: 100%;
+    margin: 0;
+    border-collapse: collapse;
+    font-size: 0.95rem;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .post-body :global(th),
+  .post-body :global(td) {
+    border-bottom: 1px solid color-mix(in srgb, var(--color-ink) 12%, transparent);
+    padding: 0.7rem 0.9rem 0.7rem 0;
+    text-align: left;
+    vertical-align: top;
+  }
+
+  .post-body :global(th) {
+    font-size: 0.66rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--color-stone);
+  }
+</style>

@@ -1,0 +1,436 @@
+---
+import { Image } from 'astro:assets';
+import Base from '../layouts/Base.astro';
+import { PATHS, breadcrumbs, graph } from '../lib/schema';
+import Diamond from '../components/Diamond.astro';
+import { SITE } from '../data/site';
+import { COUNTIES } from '../data/areas';
+import { TESTIMONIALS } from '../data/testimonials';
+import { AIRBNB, END_OF_TENANCY_ROOMS } from '../data/work';
+
+/**
+ * About page. This is the trust page, so it is held to a stricter standard than
+ * the rest of the site: it may only state things we can point at.
+ *
+ * NOT ANSWERED BY THE CLIENT YET, so deliberately absent from this page:
+ *   - team size, and whether cleaners are employed or subcontracted
+ *   - the exact insurance policy type and cover level
+ *   - which eco-friendly product range she actually buys
+ *   - any founding story, founding year or personal background
+ * Do not fill these gaps with plausible-sounding copy. Ask her, then add.
+ *
+ * What IS verifiable and therefore what this page is built from:
+ *   - 7+ years of cleaning work in Dublin (EEM reference letter)
+ *   - 80+ properties cared for (City Stays reference)
+ *   - 8 counties served (areas.ts, confirmed 5 Aug 2026)
+ *   - Mon to Sun, 8:00 to 20:00 (site.ts, from the flyer)
+ *   - fully insured, eco-friendly products (flyer)
+ *   - the four client references themselves, which are the real evidence here
+ *
+ * PRESENTATION (9 Aug pass): magazine-profile treatment, content untouched.
+ * Oversized drift frames for the two photos, principles as a numbered index
+ * beside a sticky headline, the coverage band inverts County Dublin onto a
+ * porcelain panel, and the EEM letter leads the references as a scroll-scrubbed
+ * quote. City Stays stays rendered in full below it, because the 80+ note
+ * points at it.
+ */
+
+const facts = [
+  { figure: '7+', label: 'Years cleaning in Dublin' },
+  { figure: '80+', label: 'Properties cared for' },
+  { figure: String(COUNTIES.length), label: 'Counties covered' },
+  { figure: '7', label: 'Days a week, 8:00 to 20:00' },
+];
+
+// Two frames only. The Airbnb bedroom is the one daylight shot in the whole set,
+// and the end of tenancy living room shows a finished room rather than a detail.
+const photos = [AIRBNB[0], END_OF_TENANCY_ROOMS[0]];
+
+// The closing card's backdrop: the daylight living area, not yet used on this page.
+const backdrop = AIRBNB[1];
+
+const principles = [
+  {
+    title: 'One price, agreed first',
+    body: 'We work from a published price list, and your final price is confirmed before we book you in. The list is on the site, so you can read it before you ever speak to us.',
+  },
+  {
+    title: 'Fully insured',
+    body: 'BPE Cleaning Services is fully insured. If you need the details of our cover for a landlord or a managing agent, ask us and we will send them on.',
+  },
+  {
+    title: 'Eco-friendly products',
+    body: 'We clean with eco-friendly products. That matters most in homes with small children, with pets, and with anyone who reacts to strong cleaning smells.',
+  },
+  {
+    title: 'Seven days a week',
+    body: `We work ${SITE.hours}. Weekends are ordinary working days here, which helps when a handover date or a guest changeover lands on a Sunday.`,
+  },
+  {
+    title: 'Our own photographs',
+    body: 'Every photo of our work on this website is a photograph of a real BPE job, taken by our own team at handover. Not one of them is staged.',
+  },
+  {
+    title: 'Only what we can back up',
+    body: 'Every price here comes from our own list. Every review is quoted from the client who wrote it. Where we cannot prove something, we leave it off the page instead of rounding it up.',
+  },
+];
+
+const dublin = COUNTIES.find((c) => c.primary);
+const restOfCounties = COUNTIES.filter((c) => !c.primary);
+
+// The EEM letter leads: it is the most detailed of the four and reads best
+// word by word. The rest render in full below, in the clients' own words.
+const leadTestimonial = TESTIMONIALS[2] ?? TESTIMONIALS[0];
+const otherTestimonials = TESTIMONIALS.filter((t) => t !== leadTestimonial);
+const leadWords = leadTestimonial ? leadTestimonial.quote.split(' ') : [];
+
+/**
+ * Monogram for the review cards. Deliberately NOT a profile photo: these are
+ * real, named people and companies, and pairing their words with a stock
+ * face would be a fabrication. Initials in the brand's own square keep the
+ * card personal without inventing anyone.
+ */
+const initials = (name: string) =>
+  name
+    .split(/\s+/)
+    .map((word) => word[0] ?? '')
+    .join('')
+    .slice(0, 2)
+    .toUpperCase();
+
+const channels = [
+  { label: 'Phone', value: SITE.phoneDisplay, href: SITE.phoneHref, external: false },
+  { label: 'WhatsApp', value: 'Message us', href: SITE.whatsappHref, external: true },
+  { label: 'Hours', value: SITE.hours, href: null, external: false },
+  { label: 'Based in', value: SITE.area, href: null, external: false },
+];
+
+const jsonLd = graph(breadcrumbs([{ name: 'About', path: PATHS.about }], Astro.site));
+---
+<Base
+  title="About BPE Cleaning Services | Dublin Cleaning Company"
+  description="BPE Cleaning Services is a Dublin cleaning company for homes, offices and Airbnb properties. Fully insured, eco-friendly, detail-obsessed."
+  jsonLd={jsonLd}
+>
+  <section class="bg-night pt-40 pb-20 text-cream md:pt-48 md:pb-24">
+    <div class="container-wide">
+      <p class="kicker !text-gold" data-reveal>Our Story</p>
+      <h1 class="display-caps mt-6 text-[clamp(2.6rem,7vw,5.5rem)]" data-reveal>
+        <span class="line-mask"><span>About BPE</span></span>
+        <span class="line-mask"><span style="--d: 0.1s">Cleaning <span class="accent-word text-gold-soft">services</span></span></span>
+      </h1>
+      <p class="mt-8 max-w-xl text-base leading-relaxed text-cream/70" data-reveal style="--d: 0.2s">
+        A Dublin cleaning company for homes, offices and Airbnb properties. {SITE.tagline}.
+      </p>
+      <div class="mt-10 flex flex-wrap items-center gap-4" data-reveal style="--d: 0.3s">
+        <a href="/quote/" class="btn-gold">Get my price</a>
+        <a href={SITE.phoneHref} class="btn-outline text-cream">Call {SITE.phoneDisplay}</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Who we are -->
+  <section class="section-pad bg-porcelain">
+    <div class="container-wide">
+      <div class="grid gap-10 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1fr)] lg:gap-20">
+        <div>
+          <p class="kicker" data-reveal>Who We Are</p>
+          <h2 class="display mt-6 text-[clamp(2.2rem,5vw,4rem)] text-ink" data-reveal>
+            <span class="line-mask"><span>A Dublin company,</span></span>
+            <span class="line-mask"><span style="--d: 0.1s">kept on for <span class="accent-word text-gold-deep">years</span></span></span>
+          </h2>
+          <span class="mt-10 hidden h-px w-12 bg-gold/60 lg:block" data-reveal="fade" style="--d: 0.25s" aria-hidden="true"></span>
+        </div>
+        <div class="lg:pt-4">
+          <p class="text-base leading-relaxed text-ink/70 md:text-lg" data-reveal style="--d: 0.1s">
+            BPE Cleaning Services is a Dublin cleaning company. Most of what we do is plain and
+            specific work: an apartment handed back to a letting agent, a house full of builders dust,
+            a short let reset between guests, a family home kept on top of every week.
+          </p>
+          <p class="mt-6 text-base leading-relaxed text-ink/70" data-reveal style="--d: 0.18s">
+            We have been doing that work in Dublin for more than seven years. The one thing we cannot
+            honestly tell you ourselves is whether we are any good at it, so most of this page is other
+            people speaking. Four clients sent us reviews and references, and they are further down the
+            page, shortened for length and otherwise left in their own words.
+          </p>
+          <p class="mt-6 text-base leading-relaxed text-ink/70" data-reveal style="--d: 0.26s">
+            Fully insured. Eco-friendly products. Prices published before anyone asks for them.
+            Seven days a week.
+          </p>
+          <a href="/prices/" class="link-caps mt-8 text-ink/70 hover:text-ink" data-reveal style="--d: 0.32s">
+            See the full price list
+          </a>
+        </div>
+      </div>
+
+      {/* The two photographs, oversized, drifting slowly, alternating sides */}
+      <div class="mt-20 space-y-16 md:mt-28 md:space-y-24">
+        {photos.map((photo, i) => (
+          <figure class:list={['md:w-[74%]', i % 2 === 1 && 'md:ml-auto']} data-reveal>
+            <div class="media-zoom frame-hover overflow-hidden border border-ink/10">
+              <div data-drift>
+                <Image
+                  src={photo.src}
+                  alt={photo.alt}
+                  widths={[768, 1080, 1440]}
+                  sizes="(min-width: 768px) 74vw, 100vw"
+                  format="webp"
+                  quality={78}
+                  class="aspect-[16/10] w-full scale-110 object-cover"
+                />
+              </div>
+            </div>
+            <figcaption class="mt-5 flex items-center gap-4">
+              <span class="h-px w-10 shrink-0 bg-gold/60" aria-hidden="true"></span>
+              <span class="font-sans text-xs leading-relaxed text-ink/55">{photo.caption}</span>
+            </figcaption>
+          </figure>
+        ))}
+      </div>
+
+      {/* The verifiable numbers, in one hairline strip */}
+      <div class="mt-20 grid border-t border-ink/15 sm:grid-cols-2 lg:grid-cols-4 md:mt-28">
+        {facts.map((fact, i) => (
+          <div
+            class:list={[
+              'border-b border-ink/15 py-8 sm:px-7 lg:border-b-0 lg:py-10',
+              i > 0 && 'lg:border-l lg:border-ink/15',
+              i === 0 && 'sm:pl-0',
+            ]}
+            data-reveal
+            style={`--d: ${0.08 * i}s`}
+          >
+            <p class="font-sans font-medium tracking-[-0.01em] text-[3rem] leading-none text-ink [font-variant-numeric:tabular-nums] md:text-[3.4rem]">{fact.figure}</p>
+            <p class="mt-5 font-sans text-[0.66rem] font-semibold uppercase tracking-[0.24em] text-stone">
+              {fact.label}
+            </p>
+            <span class="mt-6 block h-px w-10 bg-gold/60" aria-hidden="true"></span>
+          </div>
+        ))}
+      </div>
+      <p class="mt-8 max-w-2xl text-sm leading-relaxed text-ink/55" data-reveal>
+        The 80+ figure is not ours. It is City Stays&rsquo; own count of the properties we look after
+        for them, taken from the reference quoted further down this page.
+      </p>
+    </div>
+  </section>
+
+  <!-- How we work -->
+  <section class="section-pad bg-ivory">
+    <div class="container-wide grid gap-14 lg:grid-cols-[1fr_1.5fr] lg:gap-20">
+      <div class="lg:sticky lg:top-32 lg:self-start">
+        <p class="kicker" data-reveal>How We Work</p>
+        <h2 class="display mt-6 text-[clamp(2.2rem,5vw,4rem)] text-ink" data-reveal>
+          <span class="line-mask"><span>How we work,</span></span>
+          <span class="line-mask"><span style="--d: 0.1s">in <span class="accent-word text-gold-deep">plain</span> terms</span></span>
+        </h2>
+        <p class="mt-8 max-w-sm text-base leading-relaxed text-ink/70" data-reveal style="--d: 0.2s">
+          No long list of promises. Just the things you can hold us to, and nothing we could not
+          stand over if you asked.
+        </p>
+        <span class="mt-10 block h-px w-12 bg-gold/60" data-reveal="fade" style="--d: 0.3s" aria-hidden="true"></span>
+      </div>
+
+      <div class="border-t border-ink/15">
+        {principles.map((principle, i) => (
+          <div
+            class="grid grid-cols-[2.6rem_1fr] items-baseline gap-x-6 border-b border-ink/15 py-8 md:grid-cols-[3.2rem_1fr_1.4fr] md:gap-x-10"
+            data-reveal
+            style={`--d: ${0.06 * i}s`}
+          >
+            <span class="font-sans text-[0.66rem] font-semibold tracking-[0.2em] text-stone">{String(i + 1).padStart(2, '0')}</span>
+            <h3 class="display text-xl text-ink md:text-2xl">{principle.title}</h3>
+            <p class="col-start-2 mt-3 text-sm leading-relaxed text-ink/60 md:col-start-3 md:mt-0">{principle.body}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Where we work -->
+  <section class="relative overflow-hidden bg-night py-20 text-cream md:py-32">
+    {/* Ghosted mark, barely there, gives the band a back layer */}
+    <Diamond class="pointer-events-none absolute -right-40 -top-44 h-[38rem] w-[38rem] opacity-[0.05]" aria-hidden="true" />
+
+    <div class="container-wide relative">
+      <div class="flex flex-wrap items-end justify-between gap-6">
+        <div>
+          <p class="kicker !text-gold" data-reveal>Where We Work</p>
+          <h2 class="display mt-6 max-w-2xl text-[clamp(2.2rem,5vw,4rem)]" data-reveal>
+            <span class="line-mask"><span>Where you will</span></span>
+            <span class="line-mask"><span style="--d: 0.1s">actually <span class="accent-word text-gold-soft">find</span> us</span></span>
+          </h2>
+        </div>
+        <p class="max-w-sm text-sm leading-relaxed text-cream/60" data-reveal style="--d: 0.2s">
+          County Dublin is our primary area. We also travel to the seven other counties listed here.
+        </p>
+      </div>
+
+      {/* County Dublin inverts onto porcelain and overhangs the band's grid */}
+      <div class="mt-14 grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)] lg:gap-0">
+        <div class="bg-porcelain p-8 text-ink shadow-[0_0_0_1px] shadow-gold/40 md:p-10 lg:-my-6 lg:py-16" data-reveal>
+          <p class="font-sans text-[0.66rem] font-semibold uppercase tracking-[0.24em] text-gold-deep">
+            Primary area
+          </p>
+          <p class="display mt-6 text-4xl text-ink md:text-5xl">{dublin?.name}</p>
+          <p class="mt-5 max-w-sm text-sm leading-relaxed text-ink/60">
+            The city centre and the suburbs, Northside and Southside, out as far as the county
+            boundary.
+          </p>
+          <span class="mt-10 block h-px w-10 bg-gold/60" aria-hidden="true"></span>
+        </div>
+
+        <div class="border border-cream/12 p-8 md:p-10 lg:border-l-0">
+          <p class="font-sans text-[0.66rem] font-semibold uppercase tracking-[0.24em] text-gold" data-reveal>
+            Also covering
+          </p>
+          <ul class="mt-4 grid grid-cols-1 gap-x-10 sm:grid-cols-2">
+            {restOfCounties.map((county, i) => (
+              <li
+                class="flex items-center gap-3 border-b border-cream/15 py-3.5 font-sans text-[0.7rem] font-semibold uppercase tracking-[0.22em] text-cream"
+                data-reveal
+                style={`--d: ${0.08 + 0.05 * i}s`}
+              >
+                <span class="block h-px w-4 shrink-0 bg-gold" aria-hidden="true"></span>
+                {county.name}
+              </li>
+            ))}
+          </ul>
+          <p class="mt-6 text-sm leading-relaxed text-cream/60" data-reveal style="--d: 0.2s">
+            Not sure whether we reach you? Send us the address or the Eircode and we will tell you,
+            one way or the other.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- What clients say -->
+  {TESTIMONIALS.length > 0 && (
+    <section class="section-pad bg-porcelain">
+      <div class="container-wide">
+        <div class="flex flex-wrap items-end justify-between gap-6">
+          <div>
+            <p class="kicker" data-reveal>In Their Own Words</p>
+            <h2 class="display mt-6 max-w-2xl text-[clamp(2.2rem,5vw,4rem)] text-ink" data-reveal>
+              <span class="line-mask"><span>Their words,</span></span>
+              <span class="line-mask"><span style="--d: 0.1s">not <span class="accent-word text-gold-deep">ours</span></span></span>
+            </h2>
+          </div>
+          <p class="max-w-sm text-sm leading-relaxed text-ink/60" data-reveal style="--d: 0.2s">
+            Every one of these was sent to us by the client. Longer letters have been trimmed to the
+            part that matters and personal contact details removed. Nothing below was written by us.
+          </p>
+        </div>
+
+        {leadTestimonial && (
+          <figure class="mt-16 grid gap-6 md:mt-20 md:grid-cols-[auto_1fr] md:gap-10">
+            <span class="display block select-none text-[6rem] leading-[0.6] text-gold md:text-[9rem]" aria-hidden="true">&ldquo;</span>
+            <div class="max-w-3xl">
+              <blockquote data-quote-scrub>
+                <p class="display text-[clamp(1.4rem,2.6vw,2.2rem)] leading-[1.32] text-ink">
+                  {leadWords.map((word) => (
+                    <span class="q-word">{word}{' '}</span>
+                  ))}
+                </p>
+              </blockquote>
+              <figcaption class="mt-8 flex items-center gap-4">
+                <span class="h-px w-10 bg-gold" aria-hidden="true"></span>
+                <span class="font-sans text-[0.66rem] font-semibold uppercase tracking-[0.24em] text-ink/70">
+                  {leadTestimonial.author} &middot; {leadTestimonial.area}
+                </span>
+              </figcaption>
+            </div>
+          </figure>
+        )}
+
+        <div class="mt-20 border-t border-ink/15">
+          {otherTestimonials.map((testimonial, i) => (
+            <figure
+              class="grid gap-6 border-b border-ink/15 py-10 lg:grid-cols-[minmax(0,15rem)_minmax(0,1fr)] lg:gap-16 lg:py-12"
+              data-reveal
+              style={`--d: ${0.06 * i}s`}
+            >
+              <figcaption class="lg:pt-2">
+                <span
+                  class="flex h-14 w-14 items-center justify-center border border-gold/50 bg-ivory"
+                  aria-hidden="true"
+                >
+                  <span class="font-display text-lg tracking-[0.08em] text-gold-deep">{initials(testimonial.author)}</span>
+                </span>
+                <span class="mt-5 block font-sans text-[0.7rem] font-semibold uppercase tracking-[0.22em] text-ink">
+                  {testimonial.author}
+                </span>
+                <span class="mt-2 block font-sans text-[0.62rem] font-semibold uppercase tracking-[0.22em] text-stone">
+                  {testimonial.area}
+                </span>
+              </figcaption>
+              <blockquote>
+                <p class="font-display text-lg leading-relaxed text-ink/85 md:text-xl">
+                  &ldquo;{testimonial.quote}&rdquo;
+                </p>
+              </blockquote>
+            </figure>
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
+
+  <!-- Contact -->
+  <section class="relative flex min-h-[92svh] items-center overflow-hidden bg-night py-24">
+    <div class="absolute inset-[-6%]" data-parallax="0.06" aria-hidden="true">
+      <Image
+        src={backdrop.src}
+        alt=""
+        class="h-full w-full object-cover"
+        widths={[1080, 1600]}
+        sizes="100vw"
+        format="webp"
+        quality={72}
+      />
+      <div class="absolute inset-0 bg-night/50"></div>
+    </div>
+
+    <div class="container-wide relative">
+      <div class="max-w-xl bg-porcelain px-8 py-12 md:px-14 md:py-16" data-reveal>
+        <p class="kicker">Get In Touch</p>
+        <h2 class="display mt-6 text-[clamp(2rem,4vw,3.2rem)] text-ink">
+          <span class="line-mask"><span>Tell us what</span></span>
+          <span class="line-mask"><span style="--d: 0.1s">you <span class="accent-word text-gold-deep">need</span></span></span>
+        </h2>
+        <p class="mt-6 text-base leading-relaxed text-ink/70" data-reveal style="--d: 0.15s">
+          A few quick questions about your property and you have a price, with no obligation. If you
+          would rather talk it through, call or message us any day between 8:00 and 20:00.
+        </p>
+
+        <div class="mt-10 border-b border-ink/15" data-reveal style="--d: 0.2s">
+          {channels.map((channel) => (
+            <div class="flex items-baseline justify-between gap-6 border-t border-ink/15 py-4">
+              <span class="font-sans text-[0.66rem] font-semibold uppercase tracking-[0.24em] text-stone">
+                {channel.label}
+              </span>
+              {channel.href ? (
+                <a
+                  href={channel.href}
+                  class="font-sans text-sm font-medium text-ink transition-colors duration-300 hover:text-gold-deep"
+                  rel={channel.external ? 'noopener' : undefined}
+                >
+                  {channel.value}
+                </a>
+              ) : (
+                <span class="font-sans text-sm font-medium text-ink">{channel.value}</span>
+              )}
+            </div>
+          ))}
+        </div>
+
+        <div class="mt-10 flex flex-wrap items-center gap-x-6 gap-y-4" data-reveal style="--d: 0.25s">
+          <a href="/quote/" class="btn-primary">Get my price</a>
+          <a href="/contact/" class="link-caps text-ink/70 hover:text-ink">All the ways to reach us</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</Base>

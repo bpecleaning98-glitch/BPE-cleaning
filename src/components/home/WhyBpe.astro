@@ -1,0 +1,45 @@
+---
+/**
+ * Why BPE, restyled to the site's editorial language: no icon chips, the six
+ * reasons run as a numbered index (like the services rows), serif titles,
+ * hairline separations, staggered reveals. Copy unchanged, clothes only.
+ */
+const features = [
+  { title: 'Fully insured', text: 'Your home and our work are completely covered.' },
+  { title: 'Eco-friendly products', text: 'Effective cleaning that is safe for family, pets and planet.' },
+  { title: 'Transparent pricing', text: 'Every price published. No hidden extras, ever.' },
+  { title: 'Professional team', text: 'Trained, vetted and reliable people you can trust at home.' },
+  { title: 'Flexible scheduling', text: 'Seven days a week, 8:00 to 20:00, around your life.' },
+  { title: 'Attention to detail', text: 'High standards checked on every visit, satisfaction guaranteed.' },
+];
+---
+<section class="section-pad bg-ivory">
+  <div class="container-wide grid gap-14 lg:grid-cols-[1fr_1.5fr] lg:gap-20">
+    <div class="lg:sticky lg:top-32 lg:self-start">
+      <p class="kicker" data-reveal>Why BPE</p>
+      <h2 class="display mt-6 text-[clamp(2.2rem,5vw,4rem)]" data-reveal>
+        <span class="line-mask"><span>The standard your</span></span>
+        <span class="line-mask"><span style="--d: 0.1s">space <span class="accent-word text-gold-deep">deserves</span></span></span>
+      </h2>
+      <p class="mt-8 max-w-sm text-base leading-relaxed text-ink/70" data-reveal style="--d: 0.2s">
+        We are a Dublin team that takes pride in the detail. Every room, every visit, finished
+        properly.
+      </p>
+      <span class="mt-10 block h-px w-12 bg-gold/60" data-reveal="fade" style="--d: 0.3s" aria-hidden="true"></span>
+    </div>
+
+    <div class="border-t border-ink/15">
+      {features.map((feature, i) => (
+        <div
+          class="grid grid-cols-[2.6rem_1fr] items-baseline gap-x-6 border-b border-ink/15 py-7 md:grid-cols-[3.2rem_1fr_1.2fr] md:gap-x-10"
+          data-reveal
+          style={`--d: ${0.06 * i}s`}
+        >
+          <span class="font-sans text-[0.66rem] font-semibold tracking-[0.2em] text-stone">{String(i + 1).padStart(2, '0')}</span>
+          <h3 class="display text-xl text-ink md:text-2xl">{feature.title}</h3>
+          <p class="col-start-2 mt-2 text-sm leading-relaxed text-ink/60 md:col-start-3 md:mt-0">{feature.text}</p>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>

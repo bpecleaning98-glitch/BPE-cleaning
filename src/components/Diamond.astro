@@ -1,0 +1,32 @@
+---
+import { MARKS } from '../data/marks';
+
+// The diamond mark from the designer's brand pack. This used to be a drawn
+// placeholder; the artwork is now the real symbol, so every watermark, step
+// marker and section ghost on the site carries the actual identity.
+//
+// The API is unchanged on purpose: callers set both width and height (the
+// symbol is square), and `flat` renders it in currentColor for the places
+// that sit under mix-blend-mode, where a fixed colour turns alien.
+interface Props {
+  class?: string;
+  flat?: boolean;
+  /** Two-tone, exactly as delivered. Off by default: at watermark opacity a
+      single colour reads as one shape instead of two faint ones. */
+  duotone?: boolean;
+}
+const { class: className = 'h-8 w-8', flat = false, duotone = false } = Astro.props;
+
+const tone = flat
+  ? '--bpe-ink: currentColor; --bpe-gold: currentColor'
+  : duotone
+    ? '--bpe-ink: var(--color-ink); --bpe-gold: var(--color-gold)'
+    : '--bpe-ink: var(--color-gold); --bpe-gold: var(--color-gold)';
+---
+<svg
+  class={className}
+  viewBox={MARKS.symbol.viewBox}
+  style={tone}
+  xmlns="http://www.w3.org/2000/svg"
+  aria-hidden="true"
+><Fragment set:html={MARKS.symbol.body} /></svg>

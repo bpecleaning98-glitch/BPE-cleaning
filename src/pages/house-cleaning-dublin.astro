@@ -1,0 +1,497 @@
+---
+import { Image } from 'astro:assets';
+import Base from '../layouts/Base.astro';
+import { serviceGraph } from '../lib/schema';
+import Gallery from '../components/Gallery.astro';
+import Diamond from '../components/Diamond.astro';
+import { SITE, SERVICES } from '../data/site';
+import { HOURLY, FIXED, END_OF_TENANCY, EXTRAS, DISCOUNTS, VAT_NOTE, ESTIMATE_NOTE } from '../data/pricing';
+import { COUNTIES, AREAS_SENTENCE } from '../data/areas';
+import { END_OF_TENANCY_ROOMS, AIRBNB } from '../data/work';
+import { TESTIMONIALS } from '../data/testimonials';
+
+/**
+ * Regular domestic cleaning. Hourly, minimum 3 hours, with the recurring
+ * discounts as the commercial argument.
+ *
+ * Every figure on this page is read from data/pricing.ts. Nothing is typed as a
+ * literal, because the client revised the rates once already on 5 Aug 2026 and
+ * will do it again.
+ */
+
+// What a regular visit covers. This is the client's own scope of work for a
+// regular clean, nothing added.
+const included = [
+  {
+    title: 'Dusting throughout',
+    text: 'All accessible surfaces dusted: shelves, sills, skirting boards, picture frames, radiators and the tops of furniture.',
+  },
+  {
+    title: 'Floors hoovered and mopped',
+    text: 'Carpets and rugs hoovered, hard floors swept and mopped, including under furniture we can reach safely.',
+  },
+  {
+    title: 'Kitchen surfaces',
+    text: 'Worktops, sink, hob, splashback and the outside of appliances cleaned down and left dry.',
+  },
+  {
+    title: 'Bathrooms cleaned and sanitised',
+    text: 'Toilet, basin, bath, shower, tiling, taps and mirrors cleaned and sanitised.',
+  },
+  {
+    title: 'Bins emptied',
+    text: 'Kitchen and bathroom bins emptied and relined, so nothing is left sitting in the house after we go.',
+  },
+  {
+    title: 'General tidying',
+    text: 'Cushions straightened, surfaces cleared and rooms put back in order before we lock up behind us.',
+  },
+];
+
+// The four ways people book us, priced from DISCOUNTS and HOURLY only.
+const schedules = [
+  {
+    name: 'Weekly',
+    headline: DISCOUNTS.weekly.label,
+    text: 'Our best rate. The discount applies to the recurring clean itself.',
+  },
+  {
+    name: 'Bi-weekly',
+    headline: DISCOUNTS.biweekly.label,
+    text: 'A clean every second week, reduced on each visit. Enough to keep a busy house in order.',
+  },
+  {
+    name: 'Monthly',
+    headline: DISCOUNTS.monthly.label,
+    text: 'Monthly cleaning is arranged as a contract, so tell us the property and we price it for you.',
+  },
+  {
+    name: 'Once-off',
+    headline: HOURLY.regular.label,
+    text: `A single visit at the standard hourly rate, with a minimum booking of ${HOURLY.regular.minHours} hours.`,
+  },
+];
+
+const faqs = [
+  {
+    q: 'Do I need to be at home while you clean?',
+    a: 'No. You can hand over keys or an entry code and come home to a finished house. Access arrangements are agreed in advance and always treated with care. If you would rather be there for the first visit so you can walk us through the house, that suits us just as well.',
+  },
+  {
+    q: 'Do you bring your own products and equipment?',
+    a: 'Yes. We arrive with professional, eco-friendly products, so there is nothing for you to buy or store. If you prefer we use something of your own, on a stone worktop or a delicate floor for example, leave it out and tell us.',
+  },
+  {
+    q: `Why is there a minimum of ${HOURLY.regular.minHours} hours?`,
+    a: `Regular cleaning is charged by the hour, ${HOURLY.regular.label}, with a minimum booking of ${HOURLY.regular.minHours} hours. A shorter visit does not leave enough time to finish a kitchen, a bathroom and the floors to the standard we put our name to, so we do not offer one.`,
+  },
+  {
+    q: 'How do the weekly and bi-weekly discounts work?',
+    a: `Choose a weekly visit and you save ${DISCOUNTS.weekly.pct}% on the clean. Choose bi-weekly and you save ${DISCOUNTS.biweekly.pct}%. The discount applies to the recurring clean itself, not to one-off extras such as an oven or a carpet, which are charged at the prices listed above.`,
+  },
+  {
+    q: 'Do you cover my area?',
+    a: `${AREAS_SENTENCE} If you are not sure, send us your Eircode and we will confirm straight away.`,
+  },
+];
+
+// One residential reference, in the client's own words. Nothing is paraphrased.
+// The quote is split into words in the frontmatter so the scroll scrub in
+// motion.ts can brighten it word by word over the parallax backdrop.
+const review = TESTIMONIALS.find((t) => t.tags.includes('residential'));
+const reviewWords = review ? review.quote.split(' ') : [];
+
+// Photo moments, both real BPE jobs already curated in data/work.ts. The
+// daylight living area carries the editorial drift frame; the made-up bedroom
+// sits behind the client's words as the parallax backdrop.
+const introPhoto = AIRBNB[1];
+const quoteBackdrop = AIRBNB[0];
+
+// Sibling pages a regular cleaning customer actually asks about next. Names and
+// slugs come from SERVICES, the "from" figure is recomputed from pricing.ts so
+// no price on this page can ever drift from the source of truth.
+const relatedFrom: Record<string, number> = {
+  '/deep-cleaning-dublin/': FIXED.deep['1bed'],
+  '/end-of-tenancy-cleaning-dublin/': END_OF_TENANCY['1bed'],
+  '/after-builders-cleaning-dublin/': FIXED.afterBuilders['1bed'],
+};
+const related = SERVICES.filter((s) => s.slug in relatedFrom).map((s) => ({
+  slug: s.slug,
+  name: s.name,
+  from: `from €${relatedFrom[s.slug]}`,
+}));
+
+const facts = [
+  { value: '7+', label: 'Years trading' },
+  { value: String(COUNTIES.length), label: 'Counties served' },
+  { value: '7', label: 'Days a week, 8:00 to 20:00' },
+];
+
+/**
+ * Service, FAQPage and BreadcrumbList for this page. `faqs` is handed over as it
+ * stands, so the questions and answers in the markup are literally the ones
+ * rendered below. The price in the offer is read from data/pricing.ts by
+ * lib/schema.ts, never typed here.
+ */
+const jsonLd = serviceGraph('/house-cleaning-dublin/', faqs, Astro.site);
+---
+<Base
+  title={`House Cleaning Dublin ${HOURLY.regular.label} | BPE Cleaning`}
+  description={`Regular house cleaning across Dublin ${HOURLY.regular.label}, minimum ${HOURLY.regular.minHours} hours. Weekly and bi-weekly discounts. Fully insured, eco-friendly products.`}
+  jsonLd={jsonLd}
+>
+  <section class="bg-night pt-40 pb-20 text-cream md:pt-48 md:pb-24">
+    <div class="container-wide">
+      <p class="kicker !text-gold" data-reveal>Residential</p>
+      <h1 class="display-caps mt-6 text-[clamp(2.6rem,7vw,5.5rem)]" data-reveal>
+        <span class="line-mask"><span>House Cleaning</span></span>
+        <span class="line-mask"><span style="--d: 0.1s"><span class="accent-word text-[0.62em] text-gold-soft">in</span> Dublin</span></span>
+      </h1>
+      <p class="mt-8 max-w-xl text-base leading-relaxed text-cream/70" data-reveal style="--d: 0.2s">
+        Regular home cleaning on your schedule, weekly, bi-weekly or once-off, {HOURLY.regular.label}.
+      </p>
+      <div class="mt-10 flex flex-wrap items-center gap-4" data-reveal style="--d: 0.3s">
+        <a href="/quote/" class="btn-gold">Get my price</a>
+        <a href={SITE.phoneHref} class="btn-outline text-cream">Call {SITE.phoneDisplay}</a>
+      </div>
+    </div>
+  </section>
+
+  {/* Intro: sticky headline beside the argument, then the big drift frame */}
+  <section class="section-pad bg-porcelain">
+    <div class="container-wide">
+      <div class="grid gap-14 lg:grid-cols-[1fr_1.1fr] lg:gap-20">
+        <div class="lg:sticky lg:top-32 lg:self-start">
+          <p class="kicker" data-reveal>Regular Home Cleaning</p>
+          <h2 class="display mt-6 text-[clamp(2.2rem,5vw,4rem)] text-ink" data-reveal>
+            <span class="line-mask"><span>A house that stays</span></span>
+            <span class="line-mask"><span style="--d: 0.1s">on <span class="accent-word text-gold-deep">top</span> of itself</span></span>
+          </h2>
+          <span class="mt-10 block h-px w-12 bg-gold/60" data-reveal="fade" style="--d: 0.2s" aria-hidden="true"></span>
+        </div>
+
+        <div class="max-w-2xl">
+          <p class="text-base leading-relaxed text-ink/70 md:text-lg" data-reveal>
+            A regular clean is not a once-off rescue. It is a professional team coming back on a schedule
+            you set, keeping the kitchen, the bathrooms and the floors at a level that never gets away
+            from you. Book weekly or bi-weekly, pick a day that suits the house, and stop thinking about
+            it after that.
+          </p>
+          <p class="mt-6 text-base leading-relaxed text-ink/70" data-reveal style="--d: 0.08s">
+            We work by the hour, {HOURLY.regular.label}, with a minimum booking of {HOURLY.regular.minHours} hours
+            so there is time to finish a home properly. Tell us how many bedrooms and bathrooms you have
+            and roughly what state the house is in, and we will tell you how long it usually takes.
+            Nothing is booked until the price is agreed.
+          </p>
+          <p class="mt-6 text-base leading-relaxed text-ink/70" data-reveal style="--d: 0.16s">
+            Every visit is done with professional, eco-friendly products, and BPE Cleaning Services is
+            fully insured, so your home is covered while we are in it.
+          </p>
+
+          <div class="mt-12 grid gap-x-8 gap-y-8 sm:grid-cols-3">
+            {facts.map((fact, i) => (
+              <div class="border-t border-ink/15 pt-5" data-reveal style={`--d: ${0.08 * i}s`}>
+                <p class="display text-[2.6rem] leading-none text-ink">{fact.value}</p>
+                <p class="mt-3 font-sans text-[0.66rem] font-semibold uppercase tracking-[0.24em] text-stone">{fact.label}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Oversized drift frame, the Projects treatment: image bleeds and
+          travels slowly while the page scrolls past it */}
+      <figure class="mt-20 md:mt-28 md:ml-auto md:w-[74%]" data-reveal>
+        <span class="media-zoom frame-hover block overflow-hidden border border-ink/10">
+          <span class="block" data-drift>
+            <Image
+              src={introPhoto.src}
+              alt={introPhoto.alt}
+              class="aspect-[16/10] w-full scale-110 object-cover"
+              widths={[768, 1080, 1440]}
+              sizes="(min-width: 768px) 74vw, 100vw"
+              format="webp"
+              quality={78}
+            />
+          </span>
+        </span>
+        <figcaption class="mt-5 flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2">
+          <span class="font-sans text-[0.66rem] font-semibold uppercase tracking-[0.24em] text-stone">Real photo from a BPE job</span>
+          <span class="text-sm text-ink/60">{introPhoto.caption}</span>
+        </figcaption>
+      </figure>
+    </div>
+  </section>
+
+  {/* What is included: the scope as a numbered editorial index */}
+  <section class="section-pad bg-ivory">
+    <div class="container-wide grid gap-14 lg:grid-cols-[1fr_1.5fr] lg:gap-20">
+      <div class="lg:sticky lg:top-32 lg:self-start">
+        <p class="kicker" data-reveal>What Is Included</p>
+        <h2 class="display mt-6 text-[clamp(2.2rem,5vw,4rem)] text-ink" data-reveal>
+          <span class="line-mask"><span>Every visit,</span></span>
+          <span class="line-mask"><span style="--d: 0.1s">the same <span class="accent-word text-gold-deep">standard</span></span></span>
+        </h2>
+        <p class="mt-8 max-w-sm text-sm leading-relaxed text-ink/60" data-reveal style="--d: 0.2s">
+          This is the scope of a regular clean. If your home needs something outside it, add it on and
+          we will build the time into the visit.
+        </p>
+        <span class="mt-10 block h-px w-12 bg-gold/60" data-reveal="fade" style="--d: 0.3s" aria-hidden="true"></span>
+      </div>
+
+      <div>
+        <div class="border-t border-ink/15">
+          {included.map((item, i) => (
+            <div
+              class="grid grid-cols-[2.6rem_1fr] items-baseline gap-x-6 border-b border-ink/15 py-7 md:grid-cols-[3.2rem_1fr_1.2fr] md:gap-x-10"
+              data-reveal
+              style={`--d: ${0.06 * i}s`}
+            >
+              <span class="font-sans text-[0.66rem] font-semibold tracking-[0.2em] text-stone">{String(i + 1).padStart(2, '0')}</span>
+              <h3 class="display text-xl text-ink md:text-2xl">{item.title}</h3>
+              <p class="col-start-2 mt-2 text-sm leading-relaxed text-ink/60 md:col-start-3 md:mt-0">{item.text}</p>
+            </div>
+          ))}
+        </div>
+
+        <p class="mt-10 max-w-2xl text-sm leading-relaxed text-ink/60" data-reveal>
+          Inside the oven, inside the fridge, windows and carpets are deeper jobs than a regular visit
+          allows, so they are priced separately as add-ons. Everything else above is part of the clean.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  {/* Prices: night band, ghosted mark, the four schedules as tier columns
+      with Weekly inverted onto porcelain, the PricingBand treatment */}
+  <section class="relative overflow-hidden bg-night py-20 text-cream md:py-32">
+    <Diamond class="pointer-events-none absolute -left-40 -bottom-44 h-[38rem] w-[38rem] opacity-[0.05]" aria-hidden="true" />
+
+    <div class="container-wide relative">
+      <div class="flex flex-wrap items-end justify-between gap-6">
+        <div>
+          <p class="kicker !text-gold" data-reveal>Prices</p>
+          <h2 class="display mt-6 max-w-2xl text-[clamp(2.2rem,5vw,4rem)]" data-reveal>
+            <span class="line-mask"><span>Hourly, and the</span></span>
+            <span class="line-mask"><span style="--d: 0.1s">more often the <span class="accent-word text-gold-soft">cheaper</span></span></span>
+          </h2>
+        </div>
+        <p class="max-w-sm text-sm leading-relaxed text-cream/60" data-reveal style="--d: 0.2s">
+          Regular cleaning is charged by the hour, not by the room, so you only pay for the time your
+          home actually takes.
+        </p>
+      </div>
+
+      {/* The rate itself, one oversized figure */}
+      <div class="mt-14 flex flex-wrap items-end justify-between gap-x-16 gap-y-8 border-t border-cream/15 pt-10" data-reveal>
+        <div>
+          <p class="font-sans text-[0.66rem] font-semibold uppercase tracking-[0.24em] text-cream/60">Regular house cleaning</p>
+          <p class="display mt-5 text-[3.6rem] leading-none text-cream md:text-[4.4rem]">
+            <span class="align-top text-[0.42em] text-gold">€</span>{HOURLY.regular.from}<span class="text-[0.36em] text-cream/70">/h</span>
+          </p>
+        </div>
+        <p class="max-w-md text-sm leading-relaxed text-cream/60">
+          Starting rate, minimum booking {HOURLY.regular.minHours} hours per visit. The rate is confirmed
+          once we know the size and condition of your home.
+        </p>
+      </div>
+
+      {/* Schedule columns; Weekly, the best rate, inverts onto porcelain */}
+      <div class="mt-16 grid gap-6 lg:grid-cols-4 lg:gap-0">
+        {schedules.map((plan, i) => (
+          <div
+            class:list={[
+              'relative flex flex-col p-8 md:p-10',
+              i === 0 && 'bg-porcelain text-ink lg:-my-6 lg:py-16 shadow-[0_0_0_1px] shadow-gold/40',
+              i === 1 && 'border border-cream/12 lg:border-x-0',
+              i === 2 && 'border border-cream/12 lg:border-r-0',
+              i === 3 && 'border border-cream/12',
+            ]}
+            data-reveal
+            style={`--d: ${0.1 * i}s`}
+          >
+            <p class:list={['font-sans text-[0.66rem] font-semibold uppercase tracking-[0.24em]', i === 0 ? 'text-gold-deep' : 'text-gold']}>
+              {plan.name}
+            </p>
+            <p class:list={['display mt-6 text-[2rem] leading-tight', i === 0 ? 'text-ink' : 'text-cream']}>{plan.headline}</p>
+            <p class:list={['mt-4 text-sm leading-relaxed', i === 0 ? 'text-ink/60' : 'text-cream/55']}>{plan.text}</p>
+          </div>
+        ))}
+      </div>
+
+      {/* Add-ons as one slim strip */}
+      <div class="mt-16 border-t border-cream/15 pt-8" data-reveal>
+        <p class="font-sans text-[0.62rem] font-semibold uppercase tracking-[0.26em] text-cream/50">Add-ons, charged per job</p>
+        <div class="mt-6 grid gap-x-8 gap-y-5 sm:grid-cols-2 lg:grid-cols-4">
+          {EXTRAS.map((extra) => (
+            <div>
+              <p class="font-sans text-[0.6rem] font-semibold uppercase tracking-[0.22em] text-cream/50">{extra.name}</p>
+              <p class="display mt-1.5 text-2xl leading-tight text-cream">{extra.label}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div class="mt-12 flex flex-col justify-between gap-8 border-t border-cream/15 pt-8 md:flex-row md:items-center" data-reveal>
+        <p class="max-w-2xl text-sm leading-relaxed text-cream/60">
+          Weekly and bi-weekly discounts apply to the recurring clean itself. Add-ons are charged at the
+          prices above on the visit you request them.
+        </p>
+        <a href="/quote/" class="btn-gold shrink-0">Get my price</a>
+      </div>
+      <p class="mt-6 text-xs text-cream/40">{VAT_NOTE} {ESTIMATE_NOTE}</p>
+    </div>
+  </section>
+
+  {/* Our work */}
+  <section class="section-pad bg-porcelain">
+    <div class="container-wide">
+      <div class="flex flex-wrap items-end justify-between gap-6">
+        <div>
+          <p class="kicker" data-reveal>Our Work</p>
+          <h2 class="display mt-6 max-w-2xl text-[clamp(2.2rem,5vw,4rem)] text-ink" data-reveal>
+            <span class="line-mask"><span>Rooms we</span></span>
+            <span class="line-mask"><span style="--d: 0.1s">have <span class="accent-word text-gold-deep">finished</span></span></span>
+          </h2>
+        </div>
+        <p class="max-w-sm text-sm leading-relaxed text-ink/60" data-reveal style="--d: 0.2s">
+          Real photos from BPE jobs, taken at handover. Every work photo on this site is our own.
+        </p>
+      </div>
+
+      <div class="mt-14" data-reveal>
+        <Gallery items={END_OF_TENANCY_ROOMS} cols={4} aspect="landscape" />
+      </div>
+    </div>
+  </section>
+
+  {/* The residential reference, word by word over a parallax backdrop */}
+  {review && (
+    <section class="relative flex min-h-[72svh] items-center overflow-hidden bg-night py-24 text-cream">
+      <div class="absolute inset-[-6%]" data-parallax="0.06" aria-hidden="true">
+        <Image
+          src={quoteBackdrop.src}
+          alt=""
+          class="h-full w-full object-cover"
+          widths={[1080, 1600]}
+          sizes="100vw"
+          format="webp"
+          quality={72}
+        />
+        <div class="absolute inset-0 bg-night/60"></div>
+      </div>
+
+      <div class="container-wide relative">
+        <p class="kicker !text-gold" data-reveal>What Clients Say</p>
+        <figure class="mt-12 grid gap-6 md:grid-cols-[auto_1fr] md:gap-10">
+          <span class="display block select-none text-[6rem] leading-[0.6] text-gold md:text-[9rem]" aria-hidden="true">&ldquo;</span>
+          <div class="max-w-3xl">
+            <blockquote data-quote-scrub>
+              <p class="display text-[clamp(1.5rem,2.9vw,2.4rem)] leading-[1.3] text-cream">
+                {reviewWords.map((word) => (
+                  <span class="q-word">{word}{' '}</span>
+                ))}
+              </p>
+            </blockquote>
+            <figcaption class="mt-8 flex items-center gap-4">
+              <span class="h-px w-10 bg-gold" aria-hidden="true"></span>
+              <span class="font-sans text-[0.66rem] font-semibold uppercase tracking-[0.24em] text-cream/70">
+                {review.author} &middot; {review.area}
+              </span>
+            </figcaption>
+          </div>
+        </figure>
+      </div>
+    </section>
+  )}
+
+  {/* FAQ */}
+  <section class="section-pad bg-ivory">
+    <div class="container-wide grid gap-14 lg:grid-cols-[1fr_1.6fr] lg:gap-20">
+      <div class="lg:sticky lg:top-32 lg:self-start">
+        <p class="kicker" data-reveal>Questions</p>
+        <h2 class="display mt-6 text-[clamp(2.2rem,5vw,4rem)] text-ink" data-reveal>
+          <span class="line-mask"><span>Before you</span></span>
+          <span class="line-mask"><span style="--d: 0.1s">hand over the <span class="accent-word text-gold-deep">keys</span></span></span>
+        </h2>
+        <span class="mt-10 block h-px w-12 bg-gold/60" data-reveal="fade" style="--d: 0.2s" aria-hidden="true"></span>
+      </div>
+
+      <div class="border-t border-ink/15">
+        {faqs.map((item, i) => (
+          <details class="group border-b border-ink/15" data-reveal style={`--d: ${0.08 * i}s`}>
+            <summary class="flex cursor-pointer list-none items-center justify-between gap-6 py-6 [&::-webkit-details-marker]:hidden">
+              <span class="font-display text-lg text-ink md:text-xl">{item.q}</span>
+              <svg
+                class="h-4 w-4 shrink-0 text-gold-deep transition-transform duration-300 group-open:rotate-45"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.5"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+              >
+                <path stroke-linecap="round" d="M12 5v14M5 12h14" />
+              </svg>
+            </summary>
+            <p class="max-w-2xl pb-6 text-sm leading-relaxed text-ink/65 md:text-base">{item.a}</p>
+          </details>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  {/* Closing CTA */}
+  <section class="relative overflow-hidden bg-night py-20 text-cream md:py-32">
+    <Diamond class="pointer-events-none absolute -right-40 -top-44 h-[38rem] w-[38rem] opacity-[0.05]" aria-hidden="true" />
+
+    <div class="container-wide relative">
+      <div class="grid gap-14 lg:grid-cols-[1.1fr_1fr] lg:gap-20">
+        <div>
+          <p class="kicker !text-gold" data-reveal>Book Your Clean</p>
+          <h2 class="display mt-6 text-[clamp(2.2rem,5vw,4rem)]" data-reveal>
+            <span class="line-mask"><span>Pick a day that</span></span>
+            <span class="line-mask"><span style="--d: 0.1s">actually <span class="accent-word text-gold-soft">suits</span> you</span></span>
+          </h2>
+          <p class="mt-8 max-w-xl text-base leading-relaxed text-cream/70" data-reveal style="--d: 0.2s">
+            Tell us the size of your home and how often you would like us, and we will come back with a
+            price and a time. No obligation, and nothing is booked until you say so.
+          </p>
+        </div>
+
+        <div class="self-center border-b border-cream/15" data-reveal style="--d: 0.1s">
+          <div class="flex items-baseline justify-between gap-6 border-t border-cream/15 py-5">
+            <span class="font-sans text-[0.66rem] font-semibold uppercase tracking-[0.24em] text-cream/50">Phone</span>
+            <a href={SITE.phoneHref} class="py-5 -my-5 font-sans text-sm font-medium text-cream transition-colors duration-300 hover:text-gold-soft">
+              {SITE.phoneDisplay}
+            </a>
+          </div>
+          <div class="flex items-baseline justify-between gap-6 border-t border-cream/15 py-5">
+            <span class="font-sans text-[0.66rem] font-semibold uppercase tracking-[0.24em] text-cream/50">WhatsApp</span>
+            <a href={SITE.whatsappHref} rel="noopener" class="py-5 -my-5 font-sans text-sm font-medium text-cream transition-colors duration-300 hover:text-gold-soft">
+              Message us
+            </a>
+          </div>
+          <div class="flex items-baseline justify-between gap-6 border-t border-cream/15 py-5">
+            <span class="font-sans text-[0.66rem] font-semibold uppercase tracking-[0.24em] text-cream/50">Hours</span>
+            <span class="font-sans text-sm font-medium text-cream">{SITE.hours}</span>
+          </div>
+          <div class="border-t border-cream/15 py-6">
+            <a href="/quote/" class="btn-gold w-full sm:w-auto">Get my price</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-16 border-t border-cream/15 pt-8" data-reveal>
+        <p class="font-sans text-[0.62rem] font-semibold uppercase tracking-[0.26em] text-cream/50">Also for your home</p>
+        <div class="mt-6 flex flex-wrap gap-x-10 gap-y-5">
+          {related.map((service) => (
+            <a href={service.slug} class="link-caps text-cream/70 hover:text-cream">
+              {service.name}
+              <span class="text-gold">{service.from}</span>
+            </a>
+          ))}
+        </div>
+      </div>
+    </div>
+  </section>
+</Base>

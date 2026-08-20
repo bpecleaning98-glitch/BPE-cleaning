@@ -1,0 +1,25 @@
+---
+import '@fontsource-variable/fraunces/opsz.css';
+import '@fontsource-variable/manrope';
+import '../../styles/global.css';
+import AdminApp from '../../components/admin/AdminApp.tsx';
+
+// The cabinet is a single React island on an otherwise bare page: it never
+// uses the site's Base layout, so none of the scroll choreography, the
+// custom cursor or the intro overlay follows the client in here. It is also
+// deliberately excluded from tracking and from search engines.
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Cabinet | BPE Cleaning Services</title>
+    <meta name="robots" content="noindex, nofollow" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <meta name="theme-color" content="#F5F2EC" />
+  </head>
+  <body class="min-h-screen bg-porcelain font-sans text-ink antialiased">
+    <AdminApp client:only="react" />
+  </body>
+</html>

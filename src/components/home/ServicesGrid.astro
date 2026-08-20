@@ -1,0 +1,226 @@
+---
+import { Image } from 'astro:assets';
+import { SERVICES } from '../../data/site';
+// Thumbnails deliberately distinct from the hero, manifesto and Projects
+// photos, so scrolling the homepage never shows the same job twice.
+import houseImg from '../../assets/work/eot-after-23.jpg';
+import deepImg from '../../assets/work/eot-after-14.jpg';
+import eotImg from '../../assets/work/eot-after-11.jpg';
+import buildersImg from '../../assets/work/builders-hall-after.jpg';
+import officeImg from '../../assets/work/eot-after-04.jpg';
+import airbnbImg from '../../assets/work/airbnb-04.jpg';
+
+/**
+ * Services as the Elicyon "Objects of Desire" carousel: the centred card is
+ * large, neighbours shrink toward the edges, and the two invisible half-zones
+ * turn the cursor into their left/right chevron; clicking a zone moves the
+ * row that way. The caption under the row always describes the centred card.
+ *
+ * Accessibility and no-JS: the cards are real links in DOM order, prev/next
+ * also exist as visually-hidden buttons, and without JavaScript the row
+ * degrades to a horizontal scroll of equal cards (CSS default transforms).
+ * On touch screens the zones are hidden and the row scroll-snaps natively.
+ */
+const photos = [houseImg, deepImg, eotImg, buildersImg, officeImg, airbnbImg];
+const cards = SERVICES.map((service, i) => ({ ...service, photo: photos[i], nr: String(i + 1).padStart(2, '0') }));
+---
+<section id="services" class="section-pad overflow-hidden bg-porcelain">
+  <div class="container-wide">
+    <div class="flex flex-wrap items-end justify-between gap-6">
+      <div>
+        <p class="kicker" data-reveal>Our Services</p>
+        <h2 class="display mt-6 text-[clamp(2.2rem,5vw,4rem)]" data-reveal>
+          <span class="line-mask"><span>What we <span class="accent-word text-gold-deep">take care</span> of</span></span>
+        </h2>
+      </div>
+      <a href="/prices/" class="link-caps text-ink/70 hover:text-ink" data-reveal>View all prices</a>
+    </div>
+  </div>
+
+  <div class="relative mt-14" data-svc-carousel data-reveal>
+    {/* Desktop stage: transforms driven by JS. Portrait cards like the
+        reference, wide gaps, the active one carrying an offset outline. */}
+    <div class="svc-track relative mx-auto hidden h-[62vh] min-h-[500px] max-w-[110rem] md:block">
+      {cards.map((card, i) => (
+        <a
+          href={card.slug}
+          class="svc-card absolute left-1/2 top-1/2 block w-[21.5vw] min-w-[235px] max-w-[390px] -translate-x-1/2 -translate-y-1/2"
+          data-idx={i}
+          aria-label={`${card.name}, ${card.from}`}
+        >
+          <span class="svc-frame frame-hover block border border-ink/10">
+            <Image
+              src={card.photo}
+              alt=""
+              class="aspect-[3/4] w-full object-cover"
+              widths={[470, 780]}
+              sizes="(min-width: 768px) 21.5vw, 80vw"
+              format="webp"
+              quality={74}
+            />
+          </span>
+        </a>
+      ))}
+
+      {/* Directional zones flanking the centred card: the cursor becomes the
+          chevron over them. The centre belt stays free so the active card is
+          clickable through to its service page. */}
+      <button type="button" class="absolute inset-y-0 left-0 z-20 w-[calc(50%-16vw)] opacity-0" data-svc-prev data-cursor-arrow="left" tabindex="-1" aria-hidden="true"></button>
+      <button type="button" class="absolute inset-y-0 right-0 z-20 w-[calc(50%-16vw)] opacity-0" data-svc-next data-cursor-arrow="right" tabindex="-1" aria-hidden="true"></button>
+    </div>
+
+    {/* Caption of the centred card. Every row is its own mask: the incoming
+        caption's lines slide up one AFTER another from behind their masks,
+        never all at once. */}
+    <div class="container-wide relative mt-12 hidden h-36 text-center md:block">
+      {cards.map((card, i) => (
+        <div class="svc-caption absolute inset-x-0 top-0" class:list={[i === 0 && 'active']} data-caption={i}>
+          <span class="cap-row block overflow-hidden"><span class="cap-inner block">
+            <span class="font-sans text-[0.62rem] font-semibold uppercase tracking-[0.26em] text-stone">{card.nr} &middot; {card.from}</span>
+          </span></span>
+          <span class="cap-row mt-2 block overflow-hidden"><span class="cap-inner block">
+            <span class="display text-2xl text-ink md:text-3xl">{card.name}</span>
+          </span></span>
+          <span class="cap-row mt-2 block overflow-hidden"><span class="cap-inner mx-auto block max-w-md">
+            <span class="text-sm leading-relaxed text-ink/60">{card.blurb}</span>
+          </span></span>
+          <span class="cap-row mt-3 block overflow-hidden"><span class="cap-inner block">
+            <a href={card.slug} class="link-caps inline-flex text-gold-deep">View service</a>
+          </span></span>
+        </div>
+      ))}
+    </div>
+
+    {/* Keyboard access without fighting the zones */}
+    <div class="sr-only">
+      <button type="button" data-svc-prev>Previous service</button>
+      <button type="button" data-svc-next>Next service</button>
+    </div>
+
+    {/* Mobile: plain snap scroller, captions attached to each card */}
+    <div class="flex snap-x snap-mandatory gap-4 overflow-x-auto px-5 pb-4 md:hidden">
+      {cards.map((card) => (
+        <a href={card.slug} class="w-[78vw] shrink-0 snap-center">
+          <span class="block border border-ink/10">
+            <Image
+              src={card.photo}
+              alt=""
+              class="aspect-[4/3] w-full object-cover"
+              widths={[480, 720]}
+              sizes="78vw"
+              format="webp"
+              quality={74}
+            />
+          </span>
+          <span class="mt-3 block font-sans text-[0.6rem] font-semibold uppercase tracking-[0.24em] text-stone">{card.nr} &middot; {card.from}</span>
+          <span class="display mt-1 block text-xl text-ink">{card.name}</span>
+        </a>
+      ))}
+    </div>
+  </div>
+</section>
+
+<script>
+  // Centre-mode carousel. Index 0..n-1, wraps. Transforms via CSS vars so the
+  // transition lives in the stylesheet, not inline JS springs.
+  const root = document.querySelector<HTMLElement>('[data-svc-carousel]');
+  if (root) {
+    const cards = [...root.querySelectorAll<HTMLElement>('.svc-card')];
+    const captions = [...root.querySelectorAll<HTMLElement>('[data-caption]')];
+    const n = cards.length;
+    let active = 0;
+
+    // Card-widths between neighbouring centres. Tight, per the Figma
+    // reference: bigger photographs, only slim air between them.
+    const SPREAD = 1.12;
+
+    const EASE = 'cubic-bezier(0.22, 1, 0.36, 1)';
+    const wrapTimers = new Map<HTMLElement, ReturnType<typeof setTimeout>>();
+
+    const applyState = (card: HTMLElement, d: number, w: number) => {
+      const scale = d === 0 ? 1 : Math.abs(d) === 1 ? 0.85 : 0.7;
+      card.style.setProperty('--tx', `${d * w * SPREAD}px`);
+      card.style.setProperty('--sc', String(scale));
+      card.style.zIndex = String(10 - Math.abs(d));
+      card.style.opacity = Math.abs(d) > 2 ? '0' : '1';
+      card.style.pointerEvents = d === 0 ? 'auto' : 'none';
+      card.classList.toggle('is-active', d === 0);
+    };
+
+    // Restores the stylesheet transition after a one-frame override.
+    const restoreSoon = (card: HTMLElement) =>
+      requestAnimationFrame(() => requestAnimationFrame(() => (card.style.transition = '')));
+
+    const render = () => {
+      cards.forEach((card, i) => {
+        // Shortest signed distance on the ring, so wrapping feels continuous.
+        let d = i - active;
+        if (d > n / 2) d -= n;
+        if (d < -n / 2) d += n;
+
+        // dataset.d is only committed when a position is actually APPLIED,
+        // so an interrupted wrap can never desync the maths from what the
+        // visitor sees on screen.
+        const prev = card.dataset.d === undefined ? d : Number(card.dataset.d);
+        const w = card.offsetWidth;
+
+        const pending = wrapTimers.get(card);
+        if (pending) {
+          clearTimeout(pending);
+          wrapTimers.delete(card);
+        }
+
+        // Wrap-around handling. A card never streaks across the stage and
+        // never pops: leaving the visible row it FADES OUT where it stands
+        // and only then snaps; arriving from the other side it snaps while
+        // still invisible and FADES IN at its new place.
+        const wrapped = Math.abs(d - prev) > 2;
+        if (wrapped && Math.abs(prev) <= 2) {
+          card.style.transition = `opacity 0.5s ${EASE}`;
+          card.style.opacity = '0';
+          card.classList.remove('is-active');
+          card.style.pointerEvents = 'none';
+          wrapTimers.set(
+            card,
+            setTimeout(() => {
+              card.style.transition = 'none';
+              applyState(card, d, w);
+              card.dataset.d = String(d);
+              restoreSoon(card);
+              wrapTimers.delete(card);
+            }, 520)
+          );
+          return;
+        }
+        if (wrapped) {
+          card.style.transition = `opacity 0.7s ${EASE}`;
+          restoreSoon(card);
+        }
+        applyState(card, d, w);
+        card.dataset.d = String(d);
+      });
+      captions.forEach((cap, i) => cap.classList.toggle('active', i === active));
+    };
+
+    // A step is ignored while the previous one is still settling: rapid
+    // clicking can never overlap two moves into a glitchy in-between state.
+    let lastStep = 0;
+    const step = (dir: number) => {
+      const now = performance.now();
+      if (now - lastStep < 420) return;
+      lastStep = now;
+      active = (active + dir + n) % n;
+      render();
+    };
+
+    root.querySelectorAll('[data-svc-prev]').forEach((b) => b.addEventListener('click', () => step(-1)));
+    root.querySelectorAll('[data-svc-next]').forEach((b) => b.addEventListener('click', () => step(1)));
+    addEventListener('resize', render, { passive: true });
+
+    // First layout is instant: the row must simply BE in place on load, not
+    // splay outward from a stack.
+    cards.forEach((c) => (c.style.transition = 'none'));
+    render();
+    requestAnimationFrame(() => requestAnimationFrame(() => cards.forEach((c) => (c.style.transition = ''))));
+  }
+</script>

@@ -1,0 +1,32 @@
+# dependencies
+node_modules/
+
+# build output
+dist/
+.astro/
+.vercel/
+.output/
+.netlify/
+
+# secrets: .env holds the Supabase keys, .env.example is the empty template and stays in
+.env
+.env.*
+!.env.example
+
+# os, editors and local agent tooling
+.DS_Store
+*.log
+.claude/
+.cursor/
+.vscode/
+.idea/
+*.local
+
+# Internal working files. These live on the developer's machine and are
+# deliberately NOT in the client's repository: the project plan carries the
+# commercial terms and the competitor research, and the two message drafts
+# each end in a "notes, do not send" block. None of it is source, and none of
+# it is something the client should find in a repo they own.
+PLAN.md
+mesaj-clienta.md
+mesaj-clienta-2.md

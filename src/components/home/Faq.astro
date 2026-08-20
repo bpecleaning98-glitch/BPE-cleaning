@@ -1,0 +1,60 @@
+---
+const faqs = [
+  {
+    q: 'Are you insured?',
+    a: 'Yes. BPE Cleaning Services is fully insured, so your home and belongings are covered while our team works.',
+  },
+  {
+    q: 'What is included in a regular clean?',
+    a: 'Dusting of all accessible surfaces, vacuuming and mopping of floors, kitchen surfaces, bathroom cleaning and sanitising, emptying bins and general tidying. Extras such as oven or fridge cleaning can be added on request.',
+  },
+  {
+    q: 'Do I need to be at home?',
+    a: 'No. Many of our clients hand over keys or entry codes. Access arrangements are agreed in advance and always treated with care.',
+  },
+  {
+    q: 'How is the price calculated?',
+    a: 'We work from a published price list. Regular cleaning is charged hourly, from €25 per hour with a minimum of 3 hours. Deep cleans, after builders cleans and Airbnb cleans have fixed prices based on the size of the property. The final price is always confirmed before you book.',
+  },
+  {
+    q: 'Do you bring products and equipment?',
+    a: 'Yes. Our team arrives with professional, eco-friendly products and all the equipment needed for the job.',
+  },
+  {
+    q: 'Which areas do you cover?',
+    a: 'We cover Dublin and the surrounding County Dublin areas. If you are not sure, send us your Eircode and we will confirm straight away.',
+  },
+];
+---
+<section class="section-pad bg-porcelain">
+  <div class="container-wide grid gap-14 lg:grid-cols-[1fr_1.6fr] lg:gap-20">
+    <div>
+      <p class="kicker" data-reveal>Questions</p>
+      <h2 class="display mt-6 text-[clamp(2.2rem,5vw,4rem)] text-ink" data-reveal>
+        <span class="line-mask"><span>Good to know</span></span>
+        <span class="line-mask"><span style="--d: 0.1s">before you <span class="accent-word text-gold-deep">book</span></span></span>
+      </h2>
+    </div>
+
+    <div class="border-t border-ink/15">
+      {faqs.map((item, i) => (
+        <details class="group border-b border-ink/15" data-reveal style={`--d: ${0.08 * i}s`}>
+          <summary class="flex cursor-pointer list-none items-center justify-between gap-6 py-6 [&::-webkit-details-marker]:hidden">
+            <span class="font-display text-lg text-ink md:text-xl">{item.q}</span>
+            <svg
+              class="h-4 w-4 shrink-0 text-gold-deep transition-transform duration-300 group-open:rotate-45"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.5"
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+            >
+              <path stroke-linecap="round" d="M12 5v14M5 12h14" />
+            </svg>
+          </summary>
+          <p class="max-w-2xl pb-6 text-sm leading-relaxed text-ink/65 md:text-base">{item.a}</p>
+        </details>
+      ))}
+    </div>
+  </div>
+</section>

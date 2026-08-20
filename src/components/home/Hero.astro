@@ -1,0 +1,113 @@
+---
+import { Image } from 'astro:assets';
+import BpeLogo from '../brand/BpeLogo.astro';
+import { SITE } from '../../data/site';
+// Stock, not a BPE job. Source and licence status: src/assets/stock/README.md
+import heroPhoto from '../../assets/stock/hero-living-room.jpg';
+
+// Full-bleed photographic hero. The client's own tagline is the headline,
+// set the Elicyon way: uppercase serif with one lowercase italic word.
+// motion.ts opens .hero-clip from a letterboxed strip and drifts
+// .hero-content on scroll; the text delays below start after that opening.
+const marks = ['Fully insured', '7 days a week', 'Satisfaction guaranteed'];
+---
+{/* Intro overlay. Refresh or fresh arrival only (marker gate in motion.ts):
+    dark screen, the lockup wipes itself on, rises into the header slot, and
+    the site is revealed through a rectangle growing from dead centre. The
+    window is four night panels SLIDING APART, transforms only: the old
+    version animated their width and height, which forces layout on every
+    frame and is exactly why the opening stuttered.
+    Hidden without html.js / with reduced motion. */}
+<div id="bpe-intro" class="fixed inset-0 z-[100] flex items-center justify-center" aria-hidden="true">
+  {/* 51% sizes overlap 2% at the centre, so fractional viewport heights can
+      never show a hairline seam through the closed screen. */}
+  <span class="absolute inset-x-0 top-0 h-[51%] bg-night" data-panel="t"></span>
+  <span class="absolute inset-x-0 bottom-0 h-[51%] bg-night" data-panel="b"></span>
+  <span class="absolute inset-y-0 left-0 w-[51%] bg-night" data-panel="l"></span>
+  <span class="absolute inset-y-0 right-0 w-[51%] bg-night" data-panel="r"></span>
+  {/* Identical markup, sizes and breakpoints to the header logo, so the
+      landing swap has zero visible shift. The lockup wipes itself on before
+      it travels, left to right, starting at the symbol and ending on the
+      name, the way it would be drawn by hand. motion.ts repaints it in the
+      exact colour the blended header shows over night, so the handover has
+      no colour step either. */}
+  <div class="intro-logo relative z-10 flex origin-center items-center text-gold-soft">
+    <span class="intro-wipe block" data-wipe="h">
+      <BpeLogo variant="horizontal" tone="mono" class="h-9 md:h-10" />
+    </span>
+  </div>
+</div>
+
+<section class="relative min-h-[100svh] overflow-hidden bg-night text-cream" data-hero>
+  <div class="hero-clip absolute inset-0" style="clip-path: inset(0% 0% 0% 0%)">
+    <div class="absolute inset-[-8%]">
+      {/* Focal point pushed right of centre. On a phone the frame is a narrow
+          vertical slice of a wide room, and dead centre lands on bare wall:
+          the hero reads as a plain gradient with no photograph in it at all.
+          At 74 percent that slice picks up the lamp, the grasses and the end
+          of the sofa. On a desktop the full width of the picture is used, so
+          the horizontal value costs nothing there. */}
+      <Image
+        src={heroPhoto}
+        alt="A calm living room in warm neutral tones, spotless and freshly finished"
+        class="h-full w-full object-cover object-[74%_50%]"
+        widths={[480, 768, 1280, 1600]}
+        sizes="100vw"
+        format="webp"
+        quality={78}
+        loading="eager"
+      />
+    </div>
+    {/* Three ink veils, not one, because a pale interior asks for different
+        weights in different places and a single flat scrim just greys the
+        whole photograph out.
+
+        base     heavy at the foot, where the copy and the CTAs sit, and held
+                 near half through the middle so cream display type keeps
+                 roughly a 3:1 ratio over the pale wall
+        left     the headline's own shadow, so the serif never has to fight
+                 the lit part of the room
+        top      a short scrim for the header alone. The header renders under
+                 mix-blend-difference, which needs a decidedly dark or a
+                 decidedly light backdrop: over a mid grey it comes out mid
+                 grey too and the nav goes to mush. Keeping only the top
+                 160px dark buys that without draining the rest. */}
+    <div class="absolute inset-0 bg-gradient-to-b from-night/45 via-night/48 to-night/88" aria-hidden="true"></div>
+    <div class="absolute inset-0 bg-gradient-to-r from-night/58 via-night/12 to-transparent" aria-hidden="true"></div>
+    <div class="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-night/75 to-transparent" aria-hidden="true"></div>
+  </div>
+
+  <div class="hero-content container-wide relative flex min-h-[100svh] flex-col justify-end pb-16 pt-36 md:pb-20">
+    {/* Choreographed entirely by motion.ts (heroTextIn): line one arrives
+        from the left, "meets" breathes in through a blur, "perfection"
+        arrives from the right, everything else slides up. No CSS delays, so
+        internal navigation shows it instantly with the fast variant. */}
+    <p class="hw-kicker kicker !text-cream/75">BPE Cleaning Services &middot; Dublin</p>
+
+    <h1 class="display-caps mt-6 text-[clamp(2.1rem,10.5vw,8.5rem)]">
+      <span class="hw-l1 block">Where clean</span>
+      <span class="block">
+        <span class="hw-meets accent-word inline-block text-[0.62em] text-gold-soft">meets</span>
+        <span class="hw-perf inline-block">perfection</span>
+      </span>
+    </h1>
+
+    <div class="mt-10 flex flex-col gap-8 md:flex-row md:items-end md:justify-between">
+      <p class="hw-up max-w-md text-base leading-relaxed text-cream/80 md:text-lg">
+        Premium cleaning for homes, offices and Airbnb properties across Dublin and seven neighbouring counties.
+      </p>
+      <div class="hw-up flex flex-wrap items-center gap-4">
+        <a href="/quote/" class="btn-gold">Get my price</a>
+        <a href={SITE.phoneHref} class="btn-outline text-cream">Call {SITE.phoneDisplay}</a>
+      </div>
+    </div>
+
+    <div class="hw-up mt-14 border-t border-cream/20 pt-6">
+      <ul class="flex flex-wrap gap-x-10 gap-y-3">
+        {marks.map((mark) => (
+          <li class="font-sans text-[0.66rem] font-semibold uppercase tracking-[0.26em] text-cream/70">{mark}</li>
+        ))}
+      </ul>
+    </div>
+  </div>
+</section>

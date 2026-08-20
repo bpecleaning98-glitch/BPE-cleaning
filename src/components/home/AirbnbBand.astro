@@ -1,0 +1,76 @@
+---
+import { Image } from 'astro:assets';
+import { FIXED } from '../../data/pricing';
+import airbnbPhoto from '../../assets/work/airbnb-07.jpg';
+
+// Dark host band. The 80+ properties figure is City Stays' own wording in
+// data/testimonials ("more than 80 City Stays properties"), kept unnamed here
+// until the client confirms company names may appear. Prices come from
+// data/pricing, never typed by hand.
+const checklist = [
+  'Full property cleaning',
+  'Bed making and linen change',
+  'Towel replacement',
+  'Restocking essentials',
+  'Guest-ready presentation',
+  'Property inspection report on request',
+];
+---
+
+<section class="section-pad bg-night text-cream">
+  <div class="container-wide grid items-center gap-14 lg:grid-cols-2 lg:gap-20">
+    {/* Left: copy */}
+    <div>
+      <p class="kicker !text-gold" data-reveal>For Airbnb Hosts</p>
+      <h2 class="display mt-6 text-[clamp(2.2rem,5vw,4rem)]" data-reveal>
+        <span class="line-mask"><span>Guest-ready,</span></span>
+        <span class="line-mask"><span style="--d: 0.1s">every <span class="accent-word text-gold-soft">turnover</span></span></span>
+      </h2>
+      <p class="mt-8 max-w-xl text-base leading-relaxed text-cream/70" data-reveal style="--d: 0.16s">
+        Turnovers from &euro;{FIXED.airbnbTurnover['1bed']} for a studio or 1 bedroom, fixed per
+        property size, so you know your cost before we arrive. Hosting more than one listing?
+        Ask about our volume pricing.
+      </p>
+
+      <div class="mt-10 flex items-baseline gap-5 border-t border-cream/15 pt-6" data-reveal style="--d: 0.24s">
+        <p class="display text-5xl text-cream">80+</p>
+        <p class="max-w-[16rem] font-sans text-[0.62rem] font-semibold uppercase tracking-[0.22em] leading-relaxed text-cream/50">
+          Dublin rental properties cleaned for a single host operator
+        </p>
+      </div>
+
+      <div class="mt-10 border-t border-cream/15 pt-6" data-reveal style="--d: 0.32s">
+        <p class="font-sans text-[0.66rem] font-semibold uppercase tracking-[0.24em] text-cream/50">Every turnover includes</p>
+        <ul class="mt-5 grid gap-x-8 gap-y-3 sm:grid-cols-2">
+          {checklist.map((item) => (
+            <li class="flex items-center gap-3 text-sm leading-relaxed text-cream/80">
+              <span class="h-px w-5 shrink-0 bg-gold/60" aria-hidden="true"></span>
+              {item}
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <div class="mt-10 flex flex-wrap items-center gap-x-8 gap-y-4" data-reveal style="--d: 0.4s">
+        <a href="/airbnb-cleaning-dublin/" class="btn-gold">Airbnb cleaning details</a>
+        <p class="text-sm text-cream/60">Airbnb deep cleans also available, from &euro;{FIXED.airbnbDeep['1bed']}.</p>
+      </div>
+    </div>
+
+    {/* Right: real turnover photo */}
+    <div class="media-zoom frame-hover" data-reveal style="--d: 0.12s">
+      {/* data-drift: slow GSAP scrub drift inside the frame; scale gives bleed */}
+      <div data-drift class="scale-110">
+      <Image
+        src={airbnbPhoto}
+        alt="A BPE cleaned Airbnb property in Dublin, ready for the next guest"
+        class="aspect-[4/3] w-full object-cover"
+        widths={[420, 640, 960, 1280]}
+        sizes="(min-width: 1024px) 44vw, 100vw"
+        format="webp"
+        quality={78}
+      />
+      </div>
+    </div>
+  </div>
+</section>

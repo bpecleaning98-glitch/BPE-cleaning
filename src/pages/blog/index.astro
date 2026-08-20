@@ -1,0 +1,217 @@
+---
+export const prerender = false;
+
+import Base from '../../layouts/Base.astro';
+import Diamond from '../../components/Diamond.astro';
+import { SITE } from '../../data/site';
+import { businessRef } from '../../lib/schema';
+import { getPublishedPosts, postDate, postIso, postSummary, readingMinutes } from '../../lib/posts';
+import type { Post } from '../../lib/types';
+
+/**
+ * The blog index, server rendered on every request.
+ *
+ * Nothing here is built ahead of time: the client writes an article in the
+ * cabinet, hits publish, and this page has it on the next load. That is the
+ * whole reason for `prerender = false`.
+ *
+ * Layout follows the rest of the site rather than a card grid: a dark band,
+ * one lead article given real space, then a staggered two column list held
+ * together by hairlines.
+ */
+
+const posts = await getPublishedPosts(60);
+const [lead, ...rest] = posts;
+
+/**
+ * The Elicyon move, one lowercase italic word inside an uppercase headline.
+ * Only a word the writer typed in lowercase can be chosen, so a proper noun
+ * like Dublin or Airbnb is never turned into an italic lowercase word.
+ */
+function accentTitle(title: string): { before: string; accent: string; after: string } {
+  const words = (title || '').trim().split(/\s+/);
+  for (let i = words.length - 1; i >= 0; i--) {
+    const bare = words[i].replace(/[^A-Za-z]/g, '');
+    if (bare.length >= 4 && bare === bare.toLowerCase()) {
+      return {
+        before: words.slice(0, i).join(' '),
+        accent: words[i],
+        after: words.slice(i + 1).join(' '),
+      };
+    }
+  }
+  return { before: title || '', accent: '', after: '' };
+}
+
+const leadTitle = lead ? accentTitle(lead.title) : null;
+const href = (post: Post) => `/blog/${post.slug}/`;
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Blog',
+  name: 'Cleaning advice from BPE Cleaning Services',
+  description:
+    'Practical cleaning advice for homes, offices and Airbnb properties in Dublin, written by the team that does the work.',
+  url: new URL('/blog/', Astro.site).href,
+  inLanguage: 'en-IE',
+  // The one business node the rest of the site publishes, by @id, so the company
+  // is a single entity in the graph rather than a nameless second copy of itself.
+  publisher: businessRef(Astro.site),
+  ...(posts.length
+    ? {
+        blogPost: posts.slice(0, 10).map((post) => ({
+          '@type': 'BlogPosting',
+          headline: post.title,
+          datePublished: postIso(post),
+          url: new URL(href(post), Astro.site).href,
+        })),
+      }
+    : {}),
+};
+---
+<Base
+  title="Cleaning Advice from a Dublin Team | BPE Cleaning Services"
+  description="Practical cleaning advice from BPE Cleaning Services: homes, offices and Airbnb properties across Dublin and seven neighbouring counties."
+  jsonLd={jsonLd}
+>
+  <section class="bg-night pt-40 pb-20 text-cream md:pt-48 md:pb-24">
+    <div class="container-wide">
+      <p class="kicker !text-gold" data-reveal>Cleaning Advice</p>
+      <h1 class="display-caps mt-6 text-[clamp(2.6rem,7vw,5.5rem)]" data-reveal>
+        <span class="line-mask"><span>Cleaning <span class="accent-word text-gold-soft">advice</span></span></span>
+        <span class="line-mask"><span style="--d: 0.1s">from a Dublin team</span></span>
+      </h1>
+      <p class="mt-8 max-w-xl text-base leading-relaxed text-cream/70" data-reveal style="--d: 0.2s">
+        What we have picked up cleaning homes, offices and Airbnb properties around Dublin, written
+        down plainly. Most of it you can do yourself, and that is the point.
+      </p>
+      <div class="mt-10 flex flex-wrap items-center gap-4" data-reveal style="--d: 0.3s">
+        <a href="/quote/" class="btn-gold">Get my price</a>
+        <a href={SITE.phoneHref} class="btn-outline text-cream">Call {SITE.phoneDisplay}</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-pad bg-porcelain">
+    <div class="container-wide">
+      {!lead && (
+        <div class="border border-ink/12 bg-ivory p-8 md:p-14" data-reveal>
+          <p class="kicker">Nothing published yet</p>
+          <h2 class="display mt-6 max-w-2xl text-[clamp(1.8rem,3.6vw,2.8rem)] text-ink">
+            The first articles are still being written
+          </h2>
+          <p class="mt-6 max-w-xl text-base leading-relaxed text-ink/70">
+            We would rather leave this page empty than fill it with advice we do not stand over.
+            Until the first pieces go up, the price list and the service pages answer most of what
+            people ask us on the phone.
+          </p>
+          <div class="mt-10 flex flex-wrap items-center gap-x-10 gap-y-5">
+            <a href="/prices/" class="link-caps text-ink/70 hover:text-ink">See the price list</a>
+            <a href="/services/" class="link-caps text-ink/70 hover:text-ink">All our services</a>
+          </div>
+        </div>
+      )}
+
+      {lead && leadTitle && (
+        <article class="grid gap-8 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] lg:items-center lg:gap-16" data-reveal>
+          <a href={href(lead)} class="media-zoom frame-hover block overflow-hidden border border-ink/10" aria-hidden="true" tabindex="-1">
+            {lead.cover_url ? (
+              <img
+                src={lead.cover_url}
+                alt={lead.cover_alt}
+                class="aspect-[4/3] w-full scale-110 object-cover"
+                loading="eager"
+                decoding="async"
+                fetchpriority="high"
+              />
+            ) : (
+              <span class="flex aspect-[4/3] w-full items-center justify-center bg-ivory">
+                <Diamond class="h-20 w-20 opacity-20" />
+              </span>
+            )}
+          </a>
+
+          <div>
+            <p class="kicker">Latest</p>
+            <h2 class="display-caps mt-5 text-[clamp(1.9rem,3.8vw,3.1rem)] text-ink">
+              <a href={href(lead)} class="transition-colors duration-300 hover:text-gold-deep">
+                {leadTitle.accent ? (
+                  <Fragment>
+                    {leadTitle.before && <Fragment>{leadTitle.before} </Fragment>}
+                    <span class="accent-word text-gold-deep">{leadTitle.accent}</span>
+                    {leadTitle.after && <Fragment> {leadTitle.after}</Fragment>}
+                  </Fragment>
+                ) : (
+                  lead.title
+                )}
+              </a>
+            </h2>
+            <p class="mt-6 max-w-xl text-base leading-relaxed text-ink/70">{postSummary(lead, 220)}</p>
+            <p class="mt-7 font-sans text-[0.66rem] font-semibold uppercase tracking-[0.24em] text-stone [font-variant-numeric:tabular-nums]">
+              <time datetime={postIso(lead)}>{postDate(lead)}</time>
+              <span class="px-2 text-gold" aria-hidden="true">&middot;</span>
+              {readingMinutes(lead)} min read
+            </p>
+            <a href={href(lead)} class="link-caps mt-9 text-ink/70 hover:text-ink">Read this</a>
+          </div>
+        </article>
+      )}
+
+      {rest.length > 0 && (
+        <div class="mt-24 grid gap-x-16 gap-y-14 md:mt-32 md:grid-cols-2 md:gap-y-20">
+          {rest.map((post, i) => (
+            <article
+              class:list={['border-t border-ink/15 pt-8', i % 2 === 1 && 'md:mt-24']}
+              data-reveal
+              style={`--d: ${0.06 * (i % 2)}s`}
+            >
+              <a href={href(post)} class="media-zoom frame-hover block overflow-hidden border border-ink/10" aria-hidden="true" tabindex="-1">
+                {post.cover_url ? (
+                  <img
+                    src={post.cover_url}
+                    alt={post.cover_alt}
+                    class="aspect-[4/5] w-full scale-110 object-cover"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                ) : (
+                  <span class="flex aspect-[4/5] w-full items-center justify-center bg-ivory">
+                    <Diamond class="h-16 w-16 opacity-20" />
+                  </span>
+                )}
+              </a>
+
+              <p class="mt-7 font-sans text-[0.62rem] font-semibold uppercase tracking-[0.24em] text-stone [font-variant-numeric:tabular-nums]">
+                <time datetime={postIso(post)}>{postDate(post)}</time>
+                <span class="px-2 text-gold" aria-hidden="true">&middot;</span>
+                {readingMinutes(post)} min read
+              </p>
+              <h2 class="display mt-4 text-2xl text-ink md:text-[1.9rem]">
+                <a href={href(post)} class="transition-colors duration-300 hover:text-gold-deep">{post.title}</a>
+              </h2>
+              <p class="mt-4 max-w-md text-sm leading-relaxed text-ink/60">{postSummary(post, 150)}</p>
+              <a href={href(post)} class="link-caps mt-7 text-ink/70 hover:text-ink">Read this</a>
+            </article>
+          ))}
+        </div>
+      )}
+    </div>
+  </section>
+
+  <section class="relative overflow-hidden bg-night py-20 text-cream md:py-28">
+    <Diamond class="pointer-events-none absolute -left-32 -bottom-36 h-[26rem] w-[26rem] opacity-[0.05]" aria-hidden="true" />
+    <div class="container-wide relative flex flex-wrap items-end justify-between gap-8">
+      <div>
+        <p class="kicker !text-gold" data-reveal>Rather not do it yourself?</p>
+        <h2 class="display mt-6 max-w-xl text-[clamp(2rem,4.4vw,3.4rem)]" data-reveal>
+          <span class="line-mask"><span>Tell us about</span></span>
+          <span class="line-mask"><span style="--d: 0.1s">the <span class="accent-word text-gold-soft">place</span></span></span>
+        </h2>
+      </div>
+      <div class="flex flex-wrap items-center gap-4" data-reveal style="--d: 0.2s">
+        <a href="/quote/" class="btn-gold">Get my price</a>
+        <a href={SITE.whatsappHref} class="btn-outline text-cream" rel="noopener">WhatsApp us</a>
+      </div>
+    </div>
+  </section>
+</Base>
