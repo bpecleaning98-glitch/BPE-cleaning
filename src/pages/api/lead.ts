@@ -71,14 +71,13 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
     if (!dbAdmin) return answer({ skipped: 'not-configured' });
     if (isBot(ua)) return answer({ skipped: 'bot' });
     // Honeypot: a hidden field only an automated filler would ever complete.
-    if (clip(body.company, 100)) return answer({ skipped: 'trap' });
+    if (clip(body.hp, 100)) return answer({ skipped: 'trap' });
 
     const ip = clientIp(request, clientAddress);
     if (!(await rateLimit('lead', ip, LIMIT, WINDOW_MS))) return answer({ skipped: 'rate' });
 
     const name = clip(body.name, 120);
     const phone = clip(body.phone, 40);
-    const email = clip(body.email, 160);
     const service = clip(body.service, 120);
     const size = clip(body.size, 120);
     const date = clip(body.date, 40);
@@ -97,7 +96,7 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
     // person's name, a town or a date. Nobody types that by accident. The
     // note is judged more gently, because a customer might paste one link to
     // a listing, but three is an advert.
-    const shortFields = [name, phone, email, service, size, date, area];
+    const shortFields = [name, phone, service, size, date, area];
     if (shortFields.some(looksInjected)) return answer({ skipped: 'junk' });
     if ((notes?.match(/https?:\/\//gi) || []).length >= 3) return answer({ skipped: 'junk' });
 
@@ -106,7 +105,6 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
       phone: phone || '',
       // An address that is not an address is dropped rather than stored, so
       // the cabinet never offers a mailto that goes nowhere.
-      email: email && /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email) ? email : null,
       service,
       size,
       preferred_date: date,

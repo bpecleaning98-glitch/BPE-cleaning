@@ -77,13 +77,17 @@ const label = dark
     tree, and never autofilled. The API discards any submission that fills it.
   */}
   <div class="absolute left-[-9999px] top-0 h-px w-px overflow-hidden" aria-hidden="true">
-    <label for="qf-company">Company</label>
-    <input id="qf-company" name="company" type="text" tabindex="-1" autocomplete="off" aria-hidden="true" />
+    <label for="qf-hp">Leave this field empty</label>
+    <input id="qf-hp" name="hp_reference" type="text" tabindex="-1" autocomplete="off" aria-hidden="true" />
   </div>
   <div class="flex flex-wrap items-center gap-6 sm:col-span-2">
     <button type="submit" class={dark ? 'btn-gold' : 'btn-primary'}>Send my request</button>
     <p class={`text-xs ${dark ? 'text-cream/45' : 'text-ink/45'}`}>
-      Opens WhatsApp with your details filled in, ready to send to {SITE.phoneDisplay}.
+      Opens WhatsApp with your details filled in, ready to send to {SITE.phoneDisplay}. A copy of
+      the request is kept so we can price it. <a
+        href="/privacy/"
+        class={`underline underline-offset-2 transition-colors ${dark ? 'hover:text-gold-soft' : 'hover:text-gold-deep'}`}
+      >What we do with it</a>.
     </p>
     {/*
       Shown by the submit handler when a request carries neither a name nor a
@@ -234,7 +238,7 @@ const label = dark
         date: val('date'),
         area: val('area'),
         notes: val('notes'),
-        company: val('company'),
+        hp: val('hp_reference'),
         us: attr.us ?? null,
         um: attr.um ?? null,
         uc: attr.uc ?? null,

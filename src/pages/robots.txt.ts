@@ -20,7 +20,6 @@ export const GET: APIRoute = ({ site }) => {
 
   const body = `User-agent: *
 Allow: /
-Disallow: /admin
 Disallow: /api
 Disallow: /go
 

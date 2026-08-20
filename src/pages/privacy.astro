@@ -7,47 +7,78 @@ import { SITE } from '../data/site';
 /**
  * Written to describe what this site ACTUALLY does, line by line, not a
  * generic template. Every claim here is checkable against the code:
- *   src/scripts/track.ts     what the browser sends
+ *   src/scripts/track.ts     what the browser sends, and what it keeps in the tab
  *   src/pages/api/track.ts   what the server writes down
  *   src/pages/api/lead.ts    what a quote request stores
- *   src/lib/request.ts       the daily visitor hash, and the absence of IPs
+ *   src/pages/go/[code].ts   what a campaign link records before it forwards
+ *   src/lib/request.ts       the daily visitor hash, geolocation, rate limiting
+ *   src/lib/db.ts            the two Supabase clients
+ *   supabase/schema.sql      purge_old_data(), which enforces the two periods below
  *
- * If any of those change, this page changes with them.
+ * It also carries what GDPR Article 13 makes mandatory and a plain-English
+ * page can still say kindly: who the controller is, the lawful basis for each
+ * purpose, the processors, how long things are kept, the full list of rights
+ * and the route to the Data Protection Commission.
+ *
+ * If any of those files change, this page changes with them. A privacy page
+ * that drifts from the code is worse than none, because it is a promise the
+ * software is quietly breaking.
  */
 const sections = [
   {
-    title: 'No cookies, and nothing sent to anyone else',
+    title: 'No cookies, and no trackers belonging to anyone else',
     body: [
-      'This site sets no cookies and carries no advertising or tracking code from anybody else. There is no Google Analytics, no Facebook pixel, no third party fonts loaded from another company, and no share buttons that watch you.',
-      'Because of that there is no consent banner to click through. There is nothing to consent to.',
+      'This site sets no cookies. It carries no advertising, no Google Analytics, no Facebook pixel, no fonts fetched from another company and no share buttons that watch you. Nothing here follows you to any other website.',
+      'Two things are kept inside the tab you are reading this in: a random session number, so that ten pages opened by one person are not counted as ten people, and a note of how the visit arrived, so that clicking through the menu does not overwrite the fact that you came from a flyer. A third marker remembers that you have already seen the opening animation. All three live in the tab, are erased the moment you close it, and are never written to your disk or sent to anybody.',
+      'There is no consent banner because there is nothing here worth following you for. If you would rather none of it happened, read on: your browser can switch it off, and the site obeys.',
     ],
   },
   {
     title: 'What is counted when you visit',
     body: [
       'The site counts its own visits, on its own server, so the owner can see whether the website is doing its job. For each page opened it records the page address, the website or campaign link you arrived from, whether you are on a phone, a tablet or a computer, which browser you use, your approximate country and city, your browser language, and how long the page was actually on screen.',
-      'Your IP address is not stored. It is used once, in memory, to produce a one way code that cannot be turned back into an address, and that code is regenerated from scratch every day. It exists only so that ten pages opened by one person are not counted as ten people.',
-      'If your browser sends the Global Privacy Control signal, none of the above is recorded at all.',
+      'A tap on one of the short campaign links, the kind printed on a flyer or posted online, is recorded in the same spirit before it forwards you: the code that was used, the device, the approximate country and city, and the site the tap came from.',
+      'Your IP address is never stored. It is used in memory for three things and then discarded: to work out the approximate country and city, to slow down scripts hammering the server, and to produce a one way daily code so repeat pages are not counted as repeat people. Nobody who obtained a copy of this data could turn that code back into an address, and it is thrown away and regenerated from scratch every day.',
+      'The law calls the reason for this a legitimate interest. In plain terms, the owner is entitled to know whether the money spent on this website comes back, and this is the least invasive way to find out: nothing here identifies you, and nothing leaves this site.',
+      'If your browser sends the Global Privacy Control signal, none of the above is recorded at all. Not the page views, not the campaign clicks. The site checks for it both in the browser and again on the server, so the promise does not depend on one script loading.',
     ],
   },
   {
     title: 'When you ask for a price',
     body: [
-      'The quote form stores what you type into it: your name, your phone number, the service and property size, your preferred date, your area and any note you add. It also stores which link or channel brought you to the site, so the owner knows which advert is worth paying for.',
-      'The form then opens WhatsApp with the same details written out, because that is where bookings are actually arranged. Nothing is sent anywhere else.',
+      'The quote form stores what you type into it: your name, your phone number, the service and property size, your preferred date, your area and any note you add. It also stores which link or channel brought you to the site, and the session number described above, which means the request is saved alongside the pages that visit looked at. That is how the owner knows which advert is worth paying for.',
+      'This is not consent and there is no box to tick, because consent is not what makes it lawful. You asked for a price, and the law allows a business to handle your details for the steps that come before a contract. That is the whole basis, and it ends where your request ends.',
+      'The form then opens WhatsApp with the same details written out, because that is where bookings are actually arranged. WhatsApp belongs to Meta, so from the moment that chat opens, Meta\'s own privacy policy applies to the message as well as ours.',
     ],
   },
   {
-    title: 'Who can see it',
+    title: 'Who can see it, and who keeps it for us',
     body: [
-      'Only BPE Cleaning Services and the person who maintains this website. The data lives in a database that requires a named account to open, and the list of accounts allowed in is short and fixed.',
-      'It is never sold, never shared with advertisers, and never used to contact you about anything other than the request you sent.',
+      'Only BPE Cleaning Services and the person who maintains this website. The data lives in a database that requires a named account to open, and the list of accounts allowed in is short and fixed. It is never sold, never shared with advertisers, and never used to contact you about anything other than the request you sent.',
+      'Two companies hold the data on our behalf and do nothing else with it: Supabase runs the database and Vercel serves the website. Both act only on our instructions, and both are set up to keep this site\'s data on servers inside the European Union.',
+      'There are exactly two places where something from outside can load, and both are visible when they happen. The map on the contact page comes from Google and stays switched off until you press it; pressing it hands Google your IP address and lets it set its own cookies. An article on the blog may carry a video, which is loaded from YouTube in its no cookie mode or from Vimeo. If you never press the map and never open an article with a video in it, nothing of yours reaches either company.',
     ],
   },
   {
-    title: 'Your requests',
+    title: 'How long it is kept',
     body: [
-      'Write or ring and ask for a copy of what is held about you, or ask for it to be deleted. It will be done, and it does not need a reason.',
+      'Visit statistics and campaign clicks are deleted after 13 months. That is a full year of comparison plus a month, and then they are gone.',
+      'A quote request is deleted 24 months after the last time anyone touched it. A request being worked on is never lost, and one that was dealt with two years ago does not sit in a database forever.',
+      'Both are enforced by the database itself, on a job that runs every night, not by somebody remembering to do it.',
+    ],
+  },
+  {
+    title: 'Your rights over all of this',
+    body: [
+      'Ask for a copy of what is held about you and it will be sent. Ask for it to be deleted and it will be deleted. Neither needs a reason.',
+      'You can also ask for anything wrong to be corrected, ask us to pause using your details while a question is sorted out, object to the counting described above, and ask for your details in a file you can take elsewhere. Any of these can be asked for by phone, by WhatsApp or in writing, and there is no charge.',
+      'If you think your information has been handled badly, you can complain to the Data Protection Commission, the Irish supervisory authority, at dataprotection.ie. It is free, and you do not need to speak to us first.',
+    ],
+  },
+  {
+    title: 'Who is responsible for this',
+    body: [
+      `The data described on this page is held by ${SITE.name}, ${SITE.area}. Anything on this page, including any of the requests above, can be sent to ${SITE.email} or rung through on ${SITE.phoneDisplay}, ${SITE.hours}.`,
     ],
   },
 ];
@@ -56,7 +87,7 @@ const jsonLd = graph(breadcrumbs([{ name: 'Privacy', path: PATHS.privacy }], Ast
 ---
 <Base
   title="Privacy | BPE Cleaning Services"
-  description="What this website records, what it does not, and why it needs no cookie banner. Written in plain English."
+  description="What this website records, what it does not, how long it keeps it and what you can ask for. Written in plain English, and checked against the code."
   jsonLd={jsonLd}
 >
   <section class="bg-night pt-40 pb-20 text-cream md:pt-48 md:pb-24">
@@ -68,7 +99,8 @@ const jsonLd = graph(breadcrumbs([{ name: 'Privacy', path: PATHS.privacy }], Ast
       </h1>
       <p class="mt-8 max-w-xl text-base leading-relaxed text-cream/70" data-reveal style="--d: 0.2s">
         Short version: no cookies, no advertising trackers, no IP addresses kept,
-        and nothing handed to anybody else. The long version is below.
+        and nothing about you sold or handed to an advertiser. The long version,
+        including the two places something can load from outside, is below.
       </p>
     </div>
   </section>
@@ -95,6 +127,7 @@ const jsonLd = graph(breadcrumbs([{ name: 'Privacy', path: PATHS.privacy }], Ast
         <div class="mt-5 flex flex-wrap items-center gap-4">
           <a href={SITE.phoneHref} class="btn-primary">Call {SITE.phoneDisplay}</a>
           <a href={SITE.whatsappHref} class="btn-outline text-ink" rel="noopener">WhatsApp</a>
+          <a href={`mailto:${SITE.email}`} class="link-caps text-gold-deep">{SITE.email}</a>
         </div>
       </div>
     </div>

@@ -307,6 +307,35 @@ datele, iar pagina nu spune nimic despre asta. Stabilește un termen cu clienta,
 
 ---
 
+## 6b. Protecția datelor, ce trebuie să știi ca să nu strici promisiunea
+
+Pagina `/privacy` nu e un text de umplutură. Fiecare frază de acolo descrie ce
+face codul, iar două dintre ele sunt promisiuni cu termen: statistica de vizite
+se șterge la 13 luni, cererile de ofertă la 24 de luni de la ultima atingere.
+Nu depind de memoria nimănui, le execută funcția `purge_old_data()` din
+`schema.sql`, programată prin pg_cron în fiecare noapte la 03:10. Dacă schimbi
+termenele în bază, schimbă și pagina. Dacă schimbi pagina, schimbă și baza.
+
+**Ștergerea la cerere.** Cineva poate cere ștergerea datelor lui. Ștergi cererea
+din tab-ul Requests și gata: `session_id` de pe cerere era singura legătură
+dintre un om cu nume și rândurile de trafic, iar fără ea rândurile acelea nu mai
+identifică pe nimeni. Dacă vrei totuși curățenie completă, rulează în SQL Editor,
+cu rol de service, `delete from public.page_views where session_id = '<id-ul de
+pe cerere>';` înainte să ștergi cererea, altfel pierzi id-ul.
+
+**Exportul CSV e o copie care iese din regulă.** Fișierul descărcat din Requests
+ajunge pe telefonul sau laptopul de pe care ai deschis cabinetul, iar de acolo
+nici ștergerea automată din bază, nici butonul de ștergere nu îl mai ating.
+Tratează-l ca pe o copie de lucru: îl ștergi când ai terminat treaba pentru care
+l-ai descărcat și nu îl trimiți în afara firmei.
+
+**Regiunea contează.** Proiectul Supabase se creează în EU (Ireland), iar pagina
+de privacy spune clientelor că datele stau pe servere din Uniunea Europeană.
+Dacă proiectul ajunge din greșeală într-o regiune din SUA, afirmația devine
+falsă și trebuie fie mutat proiectul, fie rescrisă pagina.
+
+---
+
 ## 7. Ce a rămas de făcut
 
 Lista sinceră, verificată în cod pe 18 august 2026:

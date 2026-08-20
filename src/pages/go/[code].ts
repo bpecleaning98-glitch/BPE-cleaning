@@ -42,7 +42,12 @@ export const GET: APIRoute = async ({ params, request, url, redirect }) => {
   }
 
   const ua = request.headers.get('user-agent') || '';
-  if (!isBot(ua)) {
+  // Global Privacy Control reaches the server as a header, and the privacy
+  // page promises that with it set NOTHING is recorded. The page-view side
+  // honours it in the browser; this is the same promise kept for the click
+  // log. The redirect itself still works, only the counting stops.
+  const gpc = request.headers.get('sec-gpc') === '1';
+  if (!isBot(ua) && !gpc) {
     const { country, city } = placeOf(request.headers);
     await dbAdmin.from('link_clicks').insert({
       link_id: link?.id ?? null,

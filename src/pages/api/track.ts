@@ -64,6 +64,11 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
   const ua = request.headers.get('user-agent') || '';
   if (isBot(ua)) return ok({ skipped: 'bot' });
 
+  // The browser script already refuses to send anything when Global Privacy
+  // Control is on. This is the same refusal, server side, so the promise on
+  // the privacy page does not depend on one script running correctly.
+  if (request.headers.get('sec-gpc') === '1') return ok({ skipped: 'gpc' });
+
   const ip = clientIp(request, clientAddress);
   if (!(await rateLimit('track', ip, LIMIT, WINDOW_MS))) return ok({ skipped: 'rate' });
 

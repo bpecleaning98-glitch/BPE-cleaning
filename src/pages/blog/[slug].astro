@@ -65,7 +65,13 @@ function prepareBody(html: string): string {
     )
     .replace(/<p>(\s*<figure>[\s\S]*?<\/figure>\s*)<\/p>/g, '$1')
     .replace(/<table>/g, '<div class="post-scroll"><table>')
-    .replace(/<\/table>/g, '</table></div>');
+    .replace(/<\/table>/g, '</table></div>')
+    // A pasted YouTube embed is corrected to the privacy-enhanced host, the
+    // one YouTube itself offers behind its "privacy-enhanced mode" tick: no
+    // cookies land until the reader presses play. The CSP only allows that
+    // host, so without this rewrite a plain youtube.com embed would not be
+    // blocked half-visibly at the browser, it would simply never render.
+    .replace(/(<iframe[^>]+src="https?:\/\/)(?:www\.)?youtube\.com\//g, '$1www.youtube-nocookie.com/');
 }
 
 const body = prepareBody(renderMarkdown(article.content));

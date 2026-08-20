@@ -133,7 +133,6 @@ create table if not exists public.link_clicks (
   created_at timestamptz not null default now(),
   link_id uuid references public.link_campaigns (id) on delete cascade,
   code text not null,
-  session_id uuid,
   referrer_host text,
   country text,
   city text,
@@ -170,6 +169,9 @@ create table if not exists public.leads (
   area text,
   notes text,
   status text not null default 'new' check (status in ('new', 'contacted', 'booked', 'closed')),
+  -- Touched by trigger on every change (a status move, an admin note), so
+  -- retention can count from the last contact rather than from creation.
+  updated_at timestamptz not null default now(),
   admin_note text not null default '',
   utm_source text,
   utm_medium text,
@@ -245,6 +247,11 @@ begin
   return new;
 end;
 $$;
+
+drop trigger if exists leads_touch_updated_at on public.leads;
+create trigger leads_touch_updated_at
+  before update on public.leads
+  for each row execute function public.touch_updated_at();
 
 drop trigger if exists posts_touch_updated_at on public.posts;
 create trigger posts_touch_updated_at
@@ -467,6 +474,49 @@ as $$
   from public.link_campaigns c
   order by 3 desc;
 $$;
+
+-- ============================================================================
+-- Retentia datelor. Pagina /privacy promite doua termene, iar promisiunea
+-- e tinuta AICI, nu intr-un obicei: statistica de vizite se sterge dupa
+-- 13 luni, cererile de oferta dupa 24 de luni de la ultima modificare.
+--
+--   * 13 luni la vizite: un an intreg de comparatie an-la-an, plus o luna.
+--     Randurile sunt pseudonime (fara IP, cod zilnic de vizitator), dar tot
+--     se sterg: "pastram totul pentru totdeauna" nu e o politica.
+--   * 24 de luni la cereri, masurate de la updated_at, nu de la creare: o
+--     cerere in lucru nu dispare, dar una inchisa si uitata da. Numele si
+--     telefonul unui om nu raman intr-o baza de date pe termen nelimitat.
+--
+-- pg_cron vine preinstalat pe Supabase; job-ul ruleaza noaptea, la 03:10.
+-- Daca extensia lipseste (alt hosting), functia purge_old_data() ramane si
+-- poate fi chemata manual sau dintr-un scheduler extern, promisiunea e in
+-- functie, nu in scheduler.
+-- ============================================================================
+
+create or replace function public.purge_old_data()
+returns void
+language sql
+security definer
+set search_path = public
+as $$
+  delete from public.page_views where created_at < now() - interval '13 months';
+  delete from public.link_clicks where created_at < now() - interval '13 months';
+  delete from public.leads where updated_at < now() - interval '24 months';
+$$;
+
+do $$
+begin
+  if exists (select 1 from pg_extension where extname = 'pg_cron') then
+    perform cron.schedule('bpe-purge-old-data', '10 3 * * *', 'select public.purge_old_data()');
+  else
+    begin
+      create extension if not exists pg_cron;
+      perform cron.schedule('bpe-purge-old-data', '10 3 * * *', 'select public.purge_old_data()');
+    exception when others then
+      raise notice 'pg_cron indisponibil: programeaza extern select public.purge_old_data();';
+    end;
+  end if;
+end $$;
 
 -- ============================================================================
 -- Ultimul pas, o singura data: adauga adresa clientei si pe a ta.
