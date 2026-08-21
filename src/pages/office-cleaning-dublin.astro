@@ -172,7 +172,6 @@ const jsonLd = serviceGraph('/office-cleaning-dublin/', faqs, Astro.site);
             </div>
           ))}
         </div>
-        <span class="mt-8 block h-px w-12 bg-gold/60" data-reveal="fade" style="--d: 0.4s" aria-hidden="true"></span>
       </div>
     </div>
   </section>
@@ -191,7 +190,6 @@ const jsonLd = serviceGraph('/office-cleaning-dublin/', faqs, Astro.site);
           Five areas cover almost every commercial premises we clean. Yours is written up at the
           walkthrough so nothing is left to memory.
         </p>
-        <span class="mt-10 block h-px w-12 bg-gold/60" data-reveal="fade" style="--d: 0.3s" aria-hidden="true"></span>
       </div>
 
       <div>
@@ -257,7 +255,6 @@ const jsonLd = serviceGraph('/office-cleaning-dublin/', faqs, Astro.site);
                 to €{rate.to} per hour
               </span>
             </p>
-            <span class="mt-6 block h-px w-10 bg-gold/60" aria-hidden="true"></span>
             <p class="mt-6 max-w-sm text-sm leading-relaxed text-cream/60">{rate.text}</p>
           </div>
         ))}
@@ -297,7 +294,6 @@ const jsonLd = serviceGraph('/office-cleaning-dublin/', faqs, Astro.site);
           </span>
         </span>
         <figcaption class="mt-4 flex items-center gap-4">
-          <span class="h-px w-8 shrink-0 bg-gold/60" aria-hidden="true"></span>
           <span class="font-sans text-xs text-ink/55">{shot.caption}</span>
         </figcaption>
       </figure>
@@ -355,7 +351,6 @@ const jsonLd = serviceGraph('/office-cleaning-dublin/', faqs, Astro.site);
               </p>
             </blockquote>
             <figcaption class="mt-8 flex items-center gap-4">
-              <span class="h-px w-10 bg-gold" aria-hidden="true"></span>
               <span>
                 <span class="block font-sans text-[0.66rem] font-semibold uppercase tracking-[0.24em] text-ink/70">{leadRef.author}</span>
                 <span class="mt-1.5 block font-sans text-[0.62rem] font-semibold uppercase tracking-[0.22em] text-stone">{leadRef.area}</span>
@@ -368,7 +363,6 @@ const jsonLd = serviceGraph('/office-cleaning-dublin/', faqs, Astro.site);
           <div class="mt-20 grid gap-12 border-t border-ink/15 pt-12 md:grid-cols-2 md:gap-16">
             {restRefs.map((t, i) => (
               <figure data-reveal style={`--d: ${0.08 * i}s`}>
-                <span class="block h-px w-8 bg-gold/60" aria-hidden="true"></span>
                 <blockquote class="mt-5">
                   <p class="font-display text-lg leading-relaxed text-ink/85 md:text-xl">&ldquo;{t.quote}&rdquo;</p>
                 </blockquote>
@@ -395,7 +389,6 @@ const jsonLd = serviceGraph('/office-cleaning-dublin/', faqs, Astro.site);
         <p class="mt-8 max-w-sm text-sm leading-relaxed text-ink/60" data-reveal style="--d: 0.2s">
           Anything not answered here, ask on the phone. {SITE.hours}.
         </p>
-        <span class="mt-10 block h-px w-12 bg-gold/60" data-reveal="fade" style="--d: 0.3s" aria-hidden="true"></span>
       </div>
 
       <div class="border-t border-ink/15">
@@ -439,10 +432,9 @@ const jsonLd = serviceGraph('/office-cleaning-dublin/', faqs, Astro.site);
             walkthrough, agree the checklist and confirm your price before anything is booked.
           </p>
         </div>
-        <div class="flex flex-wrap items-center gap-4" data-reveal style="--d: 0.28s">
+        <div class="flex flex-wrap items-center gap-x-8 gap-y-4" data-reveal style="--d: 0.28s">
           <a href="/quote/" class="btn-gold">Get my price</a>
-          <a href={SITE.phoneHref} class="btn-outline text-cream">Call {SITE.phoneDisplay}</a>
-          <a href={SITE.whatsappHref} class="link-caps text-cream" rel="noopener">WhatsApp</a>
+          <a href={SITE.whatsappHref} class="link-caps text-gold-soft" rel="noopener">Or message us on WhatsApp</a>
         </div>
       </div>
 

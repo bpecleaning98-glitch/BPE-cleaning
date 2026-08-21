@@ -204,7 +204,6 @@ const jsonLd = serviceGraph('/airbnb-cleaning-dublin/', faqs, Astro.site);
             style={`--d: ${0.08 * i}s`}
           >
             <p class="display text-[2.6rem] leading-none text-ink">{item.figure}</p>
-            <span class="mt-5 block h-px w-10 bg-gold/60" aria-hidden="true"></span>
             <p class="mt-5 max-w-[15rem] font-sans text-[0.66rem] font-semibold uppercase leading-relaxed tracking-[0.24em] text-stone">
               {item.label}
             </p>
@@ -232,7 +231,6 @@ const jsonLd = serviceGraph('/airbnb-cleaning-dublin/', faqs, Astro.site);
               </p>
             </blockquote>
             <figcaption class="mt-10 flex items-center gap-4 border-t border-cream/15 pt-6">
-              <span class="h-px w-10 bg-gold/60" aria-hidden="true"></span>
               <span class="font-sans text-[0.66rem] font-semibold uppercase tracking-[0.24em] text-cream/70">
                 {cityStays.author} &middot; {cityStays.area}
               </span>
@@ -255,7 +253,6 @@ const jsonLd = serviceGraph('/airbnb-cleaning-dublin/', faqs, Astro.site);
         <p class="mt-8 max-w-sm text-sm leading-relaxed text-ink/60" data-reveal style="--d: 0.2s">
           One fixed price covers the whole list, and we clean with eco-friendly products.
         </p>
-        <span class="mt-10 block h-px w-12 bg-gold/60" data-reveal="fade" style="--d: 0.3s" aria-hidden="true"></span>
       </div>
 
       <div>
@@ -317,7 +314,6 @@ const jsonLd = serviceGraph('/airbnb-cleaning-dublin/', faqs, Astro.site);
             <p class="font-sans font-medium tracking-[-0.01em] mt-5 text-[3.4rem] leading-none text-cream [font-variant-numeric:tabular-nums] md:text-[4rem]">
               <span class="text-gold">&euro;</span>{tier.price}
             </p>
-            <span class="mt-6 block h-px w-10 bg-gold/60" aria-hidden="true"></span>
           </div>
         ))}
       </div>
@@ -442,43 +438,20 @@ const jsonLd = serviceGraph('/airbnb-cleaning-dublin/', faqs, Astro.site);
 
   {/* Close: book it */}
   <section class="section-pad bg-porcelain">
-    <div class="container-wide grid gap-14 lg:grid-cols-[1.1fr_1fr] lg:gap-20">
-      <div>
+    <div class="container-wide">
+      <div class="max-w-2xl">
         <p class="kicker" data-reveal>Book A Turnover</p>
         <h2 class="display mt-6 text-[clamp(2.2rem,5vw,4rem)] text-ink" data-reveal>
           <span class="line-mask"><span>Tell us the address</span></span>
           <span class="line-mask"><span style="--d: 0.1s">and the <span class="accent-word text-gold-deep">changeover</span></span></span>
         </h2>
-        <p class="mt-8 max-w-xl text-base leading-relaxed text-ink/70" data-reveal style="--d: 0.2s">
+        <p class="mt-8 text-base leading-relaxed text-ink/70" data-reveal style="--d: 0.2s">
           Property size, checkout and check in times, how often it turns over. That is all we need to give
           you a price and a slot. {AREAS_SENTENCE}
         </p>
-        <div class="mt-10 flex flex-wrap items-center gap-4" data-reveal style="--d: 0.28s">
+        <div class="mt-10 flex flex-wrap items-center gap-x-8 gap-y-5" data-reveal style="--d: 0.28s">
           <a href="/quote/" class="btn-primary">Get my price</a>
-          <a href={SITE.whatsappHref} class="btn-outline text-ink" rel="noopener">WhatsApp</a>
-        </div>
-      </div>
-
-      <div class="self-center border-b border-ink/15">
-        <div class="flex items-baseline justify-between gap-6 border-t border-ink/15 py-5" data-reveal>
-          <span class="font-sans text-[0.66rem] font-semibold uppercase tracking-[0.24em] text-stone">Phone</span>
-          <a href={SITE.phoneHref} class="py-5 -my-5 font-sans text-sm font-medium text-ink transition-colors duration-300 hover:text-gold-deep">
-            {SITE.phoneDisplay}
-          </a>
-        </div>
-        <div class="flex items-baseline justify-between gap-6 border-t border-ink/15 py-5" data-reveal style="--d: 0.08s">
-          <span class="font-sans text-[0.66rem] font-semibold uppercase tracking-[0.24em] text-stone">WhatsApp</span>
-          <a href={SITE.whatsappHref} class="py-5 -my-5 font-sans text-sm font-medium text-ink transition-colors duration-300 hover:text-gold-deep" rel="noopener">
-            Message us
-          </a>
-        </div>
-        <div class="flex items-baseline justify-between gap-6 border-t border-ink/15 py-5" data-reveal style="--d: 0.16s">
-          <span class="font-sans text-[0.66rem] font-semibold uppercase tracking-[0.24em] text-stone">Hours</span>
-          <span class="font-sans text-sm font-medium text-ink">{SITE.hours}</span>
-        </div>
-        <div class="flex items-baseline justify-between gap-6 border-t border-ink/15 py-5" data-reveal style="--d: 0.24s">
-          <span class="font-sans text-[0.66rem] font-semibold uppercase tracking-[0.24em] text-stone">Cover</span>
-          <span class="font-sans text-sm font-medium text-ink">Fully insured</span>
+          <a href={SITE.whatsappHref} class="link-caps text-gold-deep" rel="noopener">Or message us on WhatsApp</a>
         </div>
       </div>
     </div>

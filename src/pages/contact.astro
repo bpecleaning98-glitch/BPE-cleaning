@@ -118,39 +118,25 @@ const jsonLd = graph(
         confirm we reach you.
       </p>
 
-      {/* The map is Google's, and loading it hands Google the visitor's IP and
-          sets its cookies. Nothing else on this site does that, and the
-          privacy page says so, so the frame stays empty until the visitor
-          asks for it. One tap, and only then. */}
-      <div id="map-frame" class="relative mt-14 border border-ink/15 bg-night" data-map={mapSrc}>
-        <div class="flex aspect-[4/3] flex-col items-center justify-center gap-5 px-6 text-center md:aspect-[21/9]">
-          <Diamond class="h-12 w-12 opacity-60" />
-          <p class="max-w-sm text-sm leading-relaxed text-cream/70">
-            The map comes from Google, which sets its own cookies. Nothing else on this
-            site does, so it stays off until you ask for it.
-          </p>
-          <button id="map-load" type="button" class="btn-outline text-cream">Show the map</button>
-        </div>
+      {/* The live Google map, loaded with the page on Artiom's decision after
+          the click-to-load gate was offered twice: he wants the map simply
+          there, like every other business site. The privacy page names this
+          as the site's one always-on third party, so the promise and the
+          page still agree. loading="lazy" means Google is only contacted
+          when the visitor actually scrolls down to it, and no-referrer keeps
+          the page address out of the request. */}
+      <div class="mt-14 border border-ink/15">
+        <iframe
+          src={mapSrc}
+          title="Map of Dublin, Ireland, the main service area of BPE Cleaning Services"
+          class="block aspect-[4/3] w-full md:aspect-[21/9]"
+          style="border: 0"
+          loading="lazy"
+          referrerpolicy="no-referrer"
+          allowfullscreen
+        ></iframe>
       </div>
     </div>
   </section>
 
-<script>
-  // Click to load: the iframe is built only when the visitor presses the
-  // button, so no request reaches Google on a normal visit.
-  const frame = document.getElementById('map-frame');
-  document.getElementById('map-load')?.addEventListener('click', () => {
-    if (!(frame instanceof HTMLElement)) return;
-    const src = frame.dataset.map;
-    if (!src) return;
-    const iframe = document.createElement('iframe');
-    iframe.src = src;
-    iframe.title = 'Map of Dublin, Ireland, the main service area of BPE Cleaning Services';
-    iframe.className = 'block aspect-[4/3] w-full md:aspect-[21/9]';
-    iframe.style.border = '0';
-    iframe.loading = 'lazy';
-    iframe.referrerPolicy = 'no-referrer';
-    frame.replaceChildren(iframe);
-  });
-</script>
 </Base>

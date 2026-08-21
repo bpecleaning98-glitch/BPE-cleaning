@@ -215,6 +215,205 @@ const label = dark
     });
   };
 
+  /* Replace the native date input for the same reason the selects went: it
+   * hands the visitor a blue system calendar belonging to Apple or Google,
+   * dropped into the middle of a porcelain page set in Fraunces. The native
+   * input stays in the DOM, hidden, still holding the value the submit
+   * handler reads, so nothing downstream changes and no-JS keeps the real
+   * control. Everything below is only what the visitor sees.
+   */
+  const enhanceDates = (form: HTMLFormElement) => {
+    const isDark = form.dataset.dark === 'true';
+    const pad = (n: number) => String(n).padStart(2, '0');
+    const iso = (d: Date) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+    // Midnight today. Every comparison below is against this, so a clean can
+    // be booked for today but never for yesterday.
+    const floor = new Date();
+    floor.setHours(0, 0, 0, 0);
+
+    form.querySelectorAll<HTMLInputElement>('input[type="date"]').forEach((input) => {
+      const wrap = document.createElement('div');
+      wrap.className = 'qfd';
+      if (isDark) wrap.dataset.dark = 'true';
+      input.parentElement?.insertBefore(wrap, input);
+      wrap.appendChild(input);
+      input.classList.add('hidden');
+      input.setAttribute('tabindex', '-1');
+      input.min = iso(floor);
+
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'qfs-btn';
+      btn.setAttribute('aria-haspopup', 'dialog');
+      btn.setAttribute('aria-expanded', 'false');
+      const label = document.createElement('span');
+      btn.appendChild(label);
+      btn.insertAdjacentHTML(
+        'beforeend',
+        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16"/><path d="M8 3v4M16 3v4M3 10h18"/></svg>'
+      );
+      wrap.appendChild(btn);
+
+      const pop = document.createElement('div');
+      pop.className = 'qfd-pop';
+      pop.setAttribute('role', 'dialog');
+      pop.setAttribute('aria-label', 'Choose a date');
+      wrap.appendChild(pop);
+
+      // The label the field itself carries becomes the button's, so tapping
+      // the words opens the calendar like any other field.
+      const lbl = input.id ? document.querySelector<HTMLLabelElement>(`label[for="${input.id}"]`) : null;
+      lbl?.addEventListener('click', (e) => {
+        e.preventDefault();
+        setOpen(!wrap.classList.contains('open'));
+      });
+
+      let selected: Date | null = null;
+      // Which month the grid is showing. Separate from the selection, so
+      // paging through months never changes the answer.
+      let view = new Date(floor.getFullYear(), floor.getMonth(), 1);
+
+      const sameDay = (a: Date, b: Date) =>
+        a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
+
+      const paint = () => {
+        label.textContent = selected
+          ? selected.toLocaleDateString('en-IE', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })
+          : 'Choose a date';
+        wrap.toggleAttribute('data-empty', !selected);
+      };
+
+      const build = () => {
+        const first = new Date(view.getFullYear(), view.getMonth(), 1);
+        // Monday first, the Irish convention: getDay() is Sunday-based, so
+        // Sunday's 0 becomes 6 and everything else shifts down one.
+        const lead = (first.getDay() + 6) % 7;
+        const days = new Date(view.getFullYear(), view.getMonth() + 1, 0).getDate();
+        const canGoBack = view > new Date(floor.getFullYear(), floor.getMonth(), 1);
+
+        pop.replaceChildren();
+        const head = document.createElement('div');
+        head.className = 'qfd-head';
+        const month = document.createElement('p');
+        month.className = 'qfd-month';
+        month.textContent = view.toLocaleDateString('en-IE', { month: 'long', year: 'numeric' });
+        const nav = document.createElement('div');
+        nav.className = 'qfd-nav';
+        ([['prev', -1, 'm15 18-6-6 6-6'], ['next', 1, 'm9 18 6-6-6-6']] as const).forEach(([name, step, d]) => {
+          const a = document.createElement('button');
+          a.type = 'button';
+          a.className = 'qfd-arrow';
+          a.setAttribute('aria-label', name === 'prev' ? 'Previous month' : 'Next month');
+          // Nothing to go back to before this month: the past is not bookable.
+          if (name === 'prev' && !canGoBack) a.disabled = true;
+          a.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="${d}"/></svg>`;
+          a.addEventListener('click', () => {
+            view = new Date(view.getFullYear(), view.getMonth() + step, 1);
+            build();
+          });
+          nav.appendChild(a);
+        });
+        head.append(month, nav);
+
+        const grid = document.createElement('div');
+        grid.className = 'qfd-grid';
+        ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'].forEach((d) => {
+          const c = document.createElement('span');
+          c.className = 'qfd-dow';
+          c.textContent = d;
+          grid.appendChild(c);
+        });
+        // Leading blanks keep the first of the month under its weekday.
+        for (let i = 0; i < lead; i += 1) grid.appendChild(document.createElement('span'));
+
+        for (let day = 1; day <= days; day += 1) {
+          const date = new Date(view.getFullYear(), view.getMonth(), day);
+          const cell = document.createElement('button');
+          cell.type = 'button';
+          cell.className = 'qfd-day';
+          cell.textContent = String(day);
+          cell.setAttribute(
+            'aria-label',
+            date.toLocaleDateString('en-IE', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
+          );
+          if (date < floor) cell.disabled = true;
+          if (sameDay(date, floor)) cell.classList.add('is-today');
+          if (selected && sameDay(date, selected)) {
+            cell.classList.add('is-sel');
+            cell.setAttribute('aria-current', 'date');
+          }
+          cell.addEventListener('click', () => {
+            selected = date;
+            input.value = iso(date);
+            // Anything watching the real field, validation included, has to
+            // hear about a change made through the replacement control.
+            input.dispatchEvent(new Event('change', { bubbles: true }));
+            paint();
+            setOpen(false);
+            btn.focus();
+          });
+          grid.appendChild(cell);
+        }
+
+        const foot = document.createElement('div');
+        foot.className = 'qfd-foot';
+        const clear = document.createElement('button');
+        clear.type = 'button';
+        clear.className = 'qfd-txt';
+        clear.textContent = 'Clear';
+        clear.addEventListener('click', () => {
+          selected = null;
+          input.value = '';
+          input.dispatchEvent(new Event('change', { bubbles: true }));
+          paint();
+          build();
+        });
+        const today = document.createElement('button');
+        today.type = 'button';
+        today.className = 'qfd-txt';
+        today.textContent = 'Today';
+        today.addEventListener('click', () => {
+          selected = new Date(floor);
+          view = new Date(floor.getFullYear(), floor.getMonth(), 1);
+          input.value = iso(floor);
+          input.dispatchEvent(new Event('change', { bubbles: true }));
+          paint();
+          setOpen(false);
+          btn.focus();
+        });
+        foot.append(clear, today);
+
+        pop.append(head, grid, foot);
+      };
+
+      function setOpen(open: boolean) {
+        wrap.classList.toggle('open', open);
+        btn.setAttribute('aria-expanded', String(open));
+        if (open) {
+          // Always reopen on the month that holds the answer, or on this one.
+          view = selected
+            ? new Date(selected.getFullYear(), selected.getMonth(), 1)
+            : new Date(floor.getFullYear(), floor.getMonth(), 1);
+          build();
+        }
+      }
+
+      btn.addEventListener('click', () => setOpen(!wrap.classList.contains('open')));
+      wrap.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && wrap.classList.contains('open')) {
+          setOpen(false);
+          btn.focus();
+        }
+      });
+      document.addEventListener('click', (e) => {
+        const target = e.target as Node;
+        if (!wrap.contains(target) && !lbl?.contains(target)) setOpen(false);
+      });
+
+      paint();
+    });
+  };
+
   // Write the request down before handing it to WhatsApp, together with the
   // campaign the visit came from. It has to happen here: once WhatsApp takes
   // over there is no page left to report from, and the attribution the
@@ -256,7 +455,10 @@ const label = dark
   // is where bookings are actually handled, so the request lands exactly
   // where the work gets scheduled.
   const form = document.getElementById('quote-form') as HTMLFormElement | null;
-  if (form) enhanceSelects(form);
+  if (form) {
+    enhanceSelects(form);
+    enhanceDates(form);
+  }
   form?.addEventListener('submit', async (e) => {
     e.preventDefault();
     const data = new FormData(form);

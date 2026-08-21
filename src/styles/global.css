@@ -360,7 +360,6 @@ html:not(.js) #bpe-intro {
 .qfs-opt {
   display: flex;
   align-items: center;
-  gap: 0.65rem;
   padding: 0.62rem 1.1rem;
   font-size: 0.875rem;
   color: color-mix(in srgb, var(--color-ink) 80%, transparent);
@@ -377,16 +376,193 @@ html:not(.js) #bpe-intro {
   color: var(--color-gold-deep);
   font-weight: 600;
 }
-.qfs-opt.selected::before {
-  content: '';
-  display: inline-block;
-  width: 0.9rem;
-  height: 1px;
-  background: var(--color-gold);
-}
 /* Nothing chosen yet: the button reads as quietly as a field placeholder. */
 .qfs[data-empty] .qfs-btn > span {
   color: color-mix(in srgb, var(--color-ink) 35%, transparent);
+}
+
+/*
+ * THE DATE PICKER, built for the same reason the listbox above was: the
+ * native control hands the visitor a blue system calendar that belongs to
+ * Apple or Google, and it lands in the middle of a porcelain page set in
+ * Fraunces. The native input stays in the DOM holding the value, exactly as
+ * the selects do; this is what the visitor actually sees.
+ *
+ * Shares .qfs-btn for the closed state, so the field is identical to the two
+ * selects beside it and can never drift from them.
+ */
+.qfd {
+  position: relative;
+}
+.qfd-pop {
+  position: absolute;
+  inset-inline-start: 0;
+  top: calc(100% + 0.4rem);
+  z-index: 30;
+  width: min(20.5rem, calc(100vw - 2.5rem));
+  border: 1px solid color-mix(in srgb, var(--color-ink) 15%, transparent);
+  background: var(--color-ivory);
+  padding: 1rem 1.1rem 0.9rem;
+  opacity: 0;
+  transform: translateY(-6px);
+  pointer-events: none;
+  transition:
+    opacity 0.25s var(--ease-out-soft),
+    transform 0.25s var(--ease-out-soft);
+}
+.qfd.open .qfd-pop {
+  opacity: 1;
+  transform: none;
+  pointer-events: auto;
+}
+/* Month, then the two arrows. Tracked caps, like every other micro label. */
+.qfd-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding-bottom: 0.9rem;
+}
+.qfd-month {
+  font-family: var(--font-sans);
+  font-size: 0.66rem;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--color-ink);
+}
+.qfd-nav {
+  display: flex;
+  gap: 0.15rem;
+}
+.qfd-arrow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  color: var(--color-gold-deep);
+  transition:
+    background-color 0.2s,
+    opacity 0.2s;
+}
+.qfd-arrow svg {
+  width: 0.8rem;
+  height: 0.8rem;
+}
+.qfd-arrow:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--color-gold) 12%, transparent);
+}
+.qfd-arrow:disabled {
+  opacity: 0.25;
+  cursor: not-allowed;
+}
+.qfd-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 1px;
+}
+.qfd-dow {
+  padding-bottom: 0.55rem;
+  font-family: var(--font-sans);
+  font-size: 0.56rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  text-align: center;
+  color: var(--color-stone);
+}
+/* Square cells, sharp corners, tabular figures: the site's rule that numbers
+ * are set in the sans, never the display serif. */
+.qfd-day {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 1;
+  font-family: var(--font-sans);
+  font-size: 0.82rem;
+  font-variant-numeric: tabular-nums;
+  color: color-mix(in srgb, var(--color-ink) 80%, transparent);
+  transition:
+    background-color 0.2s,
+    color 0.2s,
+    box-shadow 0.2s;
+}
+.qfd-day:hover:not(:disabled):not(.is-sel) {
+  background: color-mix(in srgb, var(--color-gold) 14%, transparent);
+  color: var(--color-ink);
+}
+.qfd-day:focus-visible {
+  outline: none;
+  box-shadow: inset 0 0 0 1px var(--color-gold-deep);
+}
+/* A day already gone. Not hidden, because a month with holes reads broken,
+ * just plainly unavailable. */
+.qfd-day:disabled {
+  color: color-mix(in srgb, var(--color-ink) 22%, transparent);
+  cursor: not-allowed;
+}
+.qfd-day.is-today:not(.is-sel) {
+  box-shadow: inset 0 -1px 0 0 var(--color-gold);
+}
+.qfd-day.is-sel {
+  background: var(--color-ink);
+  color: var(--color-cream);
+}
+.qfd-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 0.9rem;
+  padding-top: 0.8rem;
+  border-top: 1px solid color-mix(in srgb, var(--color-ink) 12%, transparent);
+}
+.qfd-txt {
+  font-family: var(--font-sans);
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--color-stone);
+  transition: color 0.2s;
+}
+.qfd-txt:hover {
+  color: var(--color-gold-deep);
+}
+
+/* Dark sections, same treatment as the listbox. */
+.qfd[data-dark] .qfd-pop {
+  border-color: color-mix(in srgb, var(--color-cream) 18%, transparent);
+  background: var(--color-night);
+}
+.qfd[data-dark] .qfd-month {
+  color: var(--color-cream);
+}
+.qfd[data-dark] .qfd-arrow,
+.qfd[data-dark] .qfd-txt:hover {
+  color: var(--color-gold);
+}
+.qfd[data-dark] .qfd-dow,
+.qfd[data-dark] .qfd-txt {
+  color: color-mix(in srgb, var(--color-cream) 45%, transparent);
+}
+.qfd[data-dark] .qfd-day {
+  color: color-mix(in srgb, var(--color-cream) 75%, transparent);
+}
+.qfd[data-dark] .qfd-day:hover:not(:disabled):not(.is-sel) {
+  background: color-mix(in srgb, var(--color-cream) 10%, transparent);
+  color: var(--color-gold);
+}
+.qfd[data-dark] .qfd-day:disabled {
+  color: color-mix(in srgb, var(--color-cream) 22%, transparent);
+}
+.qfd[data-dark] .qfd-day.is-sel {
+  background: var(--color-gold);
+  color: var(--color-night);
+}
+.qfd[data-dark] .qfd-foot {
+  border-top-color: color-mix(in srgb, var(--color-cream) 14%, transparent);
 }
 
 /*

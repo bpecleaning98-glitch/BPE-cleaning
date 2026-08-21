@@ -63,6 +63,16 @@ const tokenClass = (token: Token) =>
 
 const label =
   'We clean homes, offices and Airbnb stays across Dublin. Seven years of trusted hands, every detail clean and checked twice.';
+
+/**
+ * The sentence the hero used to carry, kept ON the homepage for search
+ * engines and for anyone the animation skips: premium cleaning, the service
+ * nouns and the coverage all in one crawlable line. It renders as the quiet
+ * paragraph under the stats, where the section already speaks about the
+ * company, rather than as a second thought floating in the hero.
+ */
+const seoLine =
+  'Premium cleaning for homes, offices and Airbnb properties across Dublin and seven neighbouring counties, seven days a week.';
 ---
 <section class="relative overflow-hidden bg-porcelain" data-manifesto>
   {/* Floating frames in the margins. The text column is CENTRED, so on wide
@@ -97,11 +107,13 @@ const label =
     </div>
   </div>
 
-    {/* min-h only from md up. On a phone the section is not pinned, so a full
-      viewport of height with the copy centred in it left a screen of empty
-      porcelain above and below the words. Here it is simply as tall as what
-      is in it. */}
-  <div class="container-wide relative z-10 flex flex-col justify-center py-20 md:min-h-[100svh] md:py-24">
+    {/* Full viewport height again at every width, and this time it is
+      earned: the section now PINS on the phone as well, so this is a held
+      stage while the phrases morph under the reader's thumb, not empty
+      porcelain being scrolled past. The earlier content-height version
+      existed only because the mobile morph ran unpinned and raced the
+      reader, which is the exact complaint that brought the pin back. */}
+  <div class="container-wide relative z-10 flex min-h-[100svh] flex-col justify-center py-24">
     <div class="mx-auto w-full max-w-4xl">
     <p class="kicker" data-reveal>The Company</p>
 
@@ -128,6 +140,8 @@ const label =
         </div>
       ))}
     </div>
+
+    <p class="mt-12 max-w-xl text-sm leading-relaxed text-ink/60" data-reveal>{seoLine}</p>
     </div>
   </div>
 </section>

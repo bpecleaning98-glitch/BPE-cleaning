@@ -207,7 +207,6 @@ const jsonLd = serviceGraph('/after-builders-cleaning-dublin/', faqs, Astro.site
           A full property clean after construction or renovation work, done in the order that keeps
           the dust from coming back.
         </p>
-        <span class="mt-10 block h-px w-12 bg-gold/60" data-reveal="fade" style="--d: 0.3s" aria-hidden="true"></span>
       </div>
 
       <div>
@@ -362,7 +361,6 @@ const jsonLd = serviceGraph('/after-builders-cleaning-dublin/', faqs, Astro.site
             <p class="font-sans font-medium tracking-[-0.01em] mt-5 text-[3.4rem] leading-none text-cream [font-variant-numeric:tabular-nums] md:text-[4rem]">
               <span class="text-gold">€</span>{tier.price}
             </p>
-            <span class="mt-6 block h-px w-10 bg-gold/60" aria-hidden="true"></span>
           </div>
         ))}
       </div>
@@ -438,7 +436,6 @@ const jsonLd = serviceGraph('/after-builders-cleaning-dublin/', faqs, Astro.site
                 </p>
               </blockquote>
               <figcaption class="mt-8 flex items-center gap-4">
-                <span class="h-px w-10 bg-gold" aria-hidden="true"></span>
                 <span class="font-sans text-[0.66rem] font-semibold uppercase tracking-[0.24em] text-ink/70">
                   {leadRef.author} &middot; {leadRef.area}
                 </span>
@@ -450,7 +447,6 @@ const jsonLd = serviceGraph('/after-builders-cleaning-dublin/', faqs, Astro.site
         {otherRefs.map((t) => (
           <figure class="mt-20 grid gap-8 border-t border-ink/15 pt-10 md:grid-cols-[1fr_1.6fr] md:gap-12" data-reveal>
             <figcaption class="order-2 md:order-1">
-              <span class="block h-px w-10 bg-gold/60" aria-hidden="true"></span>
               <span class="mt-5 block font-sans text-[0.66rem] font-semibold uppercase tracking-[0.24em] text-ink/70">{t.author}</span>
               <span class="mt-1.5 block font-sans text-[0.62rem] font-semibold uppercase tracking-[0.22em] text-stone">{t.area}</span>
             </figcaption>
@@ -498,38 +494,19 @@ const jsonLd = serviceGraph('/after-builders-cleaning-dublin/', faqs, Astro.site
 
   <section class="section-pad bg-night text-cream">
     <div class="container-wide">
-      <div class="grid gap-14 lg:grid-cols-[1.1fr_1fr] lg:gap-20">
-        <div>
-          <p class="kicker !text-gold" data-reveal>Book It In</p>
-          <h2 class="display mt-6 text-[clamp(2.2rem,5vw,4rem)]" data-reveal>
-            <span class="line-mask"><span>Give us the address</span></span>
-            <span class="line-mask"><span style="--d: 0.1s">and the <span class="accent-word text-gold-soft">handover</span> date</span></span>
-          </h2>
-          <p class="mt-8 max-w-xl text-base leading-relaxed text-cream/70" data-reveal style="--d: 0.2s">
-            Tell us the size of the property and what the works involved, and we will come back with
-            a price. No obligation, and nothing is booked until you say so.
-          </p>
-          <div class="mt-10 flex flex-wrap items-center gap-4" data-reveal style="--d: 0.3s">
-            <a href="/quote/" class="btn-gold">Get my price</a>
-            <a href={SITE.phoneHref} class="btn-outline text-cream">Call {SITE.phoneDisplay}</a>
-            <a href={SITE.whatsappHref} class="btn-outline text-cream" rel="noopener">WhatsApp us</a>
-          </div>
-        </div>
-
-        <div class="self-center border-b border-cream/15">
-          <div class="flex items-baseline justify-between gap-6 border-t border-cream/15 py-5" data-reveal>
-            <span class="font-sans text-[0.66rem] font-semibold uppercase tracking-[0.24em] text-cream/50">Hours</span>
-            <span class="font-sans text-sm font-medium text-cream">{SITE.hours}</span>
-          </div>
-          <div class="flex items-baseline justify-between gap-6 border-t border-cream/15 py-5" data-reveal style="--d: 0.08s">
-            <span class="font-sans text-[0.66rem] font-semibold uppercase tracking-[0.24em] text-cream/50">Areas</span>
-            <span class="font-sans text-sm font-medium text-cream">{COUNTIES.length} counties</span>
-          </div>
-          <div class="flex items-baseline justify-between gap-6 border-t border-cream/15 py-5" data-reveal style="--d: 0.16s">
-            <span class="font-sans text-[0.66rem] font-semibold uppercase tracking-[0.24em] text-cream/50">From</span>
-            <span class="font-sans text-sm font-medium text-cream [font-variant-numeric:tabular-nums]">€{FIXED.afterBuilders['1bed']} fixed, or {HOURLY.afterBuilders.label}</span>
-          </div>
-          <p class="py-5 text-xs text-cream/40">{VAT_NOTE}</p>
+      <div class="max-w-2xl">
+        <p class="kicker !text-gold" data-reveal>Book It In</p>
+        <h2 class="display mt-6 text-[clamp(2.2rem,5vw,4rem)]" data-reveal>
+          <span class="line-mask"><span>Give us the address</span></span>
+          <span class="line-mask"><span style="--d: 0.1s">and the <span class="accent-word text-gold-soft">handover</span> date</span></span>
+        </h2>
+        <p class="mt-8 text-base leading-relaxed text-cream/70" data-reveal style="--d: 0.2s">
+          Tell us the size of the property and what the works involved, and we will come back with
+          a price. No obligation, and nothing is booked until you say so.
+        </p>
+        <div class="mt-10 flex flex-wrap items-center gap-x-8 gap-y-4" data-reveal style="--d: 0.3s">
+          <a href="/quote/" class="btn-gold">Get my price</a>
+          <a href={SITE.whatsappHref} class="link-caps text-gold-soft" rel="noopener">Or message us on WhatsApp</a>
         </div>
       </div>
 

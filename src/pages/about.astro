@@ -140,7 +140,6 @@ const jsonLd = graph(breadcrumbs([{ name: 'About', path: PATHS.about }], Astro.s
             <span class="line-mask"><span>A Dublin company,</span></span>
             <span class="line-mask"><span style="--d: 0.1s">kept on for <span class="accent-word text-gold-deep">years</span></span></span>
           </h2>
-          <span class="mt-10 hidden h-px w-12 bg-gold/60 lg:block" data-reveal="fade" style="--d: 0.25s" aria-hidden="true"></span>
         </div>
         <div class="lg:pt-4">
           <p class="text-base leading-relaxed text-ink/70 md:text-lg" data-reveal style="--d: 0.1s">
@@ -182,7 +181,6 @@ const jsonLd = graph(breadcrumbs([{ name: 'About', path: PATHS.about }], Astro.s
               </div>
             </div>
             <figcaption class="mt-5 flex items-center gap-4">
-              <span class="h-px w-10 shrink-0 bg-gold/60" aria-hidden="true"></span>
               <span class="font-sans text-xs leading-relaxed text-ink/55">{photo.caption}</span>
             </figcaption>
           </figure>
@@ -205,7 +203,6 @@ const jsonLd = graph(breadcrumbs([{ name: 'About', path: PATHS.about }], Astro.s
             <p class="mt-5 font-sans text-[0.66rem] font-semibold uppercase tracking-[0.24em] text-stone">
               {fact.label}
             </p>
-            <span class="mt-6 block h-px w-10 bg-gold/60" aria-hidden="true"></span>
           </div>
         ))}
       </div>
@@ -229,7 +226,6 @@ const jsonLd = graph(breadcrumbs([{ name: 'About', path: PATHS.about }], Astro.s
           No long list of promises. Just the things you can hold us to, and nothing we could not
           stand over if you asked.
         </p>
-        <span class="mt-10 block h-px w-12 bg-gold/60" data-reveal="fade" style="--d: 0.3s" aria-hidden="true"></span>
       </div>
 
       <div class="border-t border-ink/15">
@@ -278,7 +274,6 @@ const jsonLd = graph(breadcrumbs([{ name: 'About', path: PATHS.about }], Astro.s
             The city centre and the suburbs, Northside and Southside, out as far as the county
             boundary.
           </p>
-          <span class="mt-10 block h-px w-10 bg-gold/60" aria-hidden="true"></span>
         </div>
 
         <div class="border border-cream/12 p-8 md:p-10 lg:border-l-0">
@@ -292,7 +287,6 @@ const jsonLd = graph(breadcrumbs([{ name: 'About', path: PATHS.about }], Astro.s
                 data-reveal
                 style={`--d: ${0.08 + 0.05 * i}s`}
               >
-                <span class="block h-px w-4 shrink-0 bg-gold" aria-hidden="true"></span>
                 {county.name}
               </li>
             ))}
@@ -336,7 +330,6 @@ const jsonLd = graph(breadcrumbs([{ name: 'About', path: PATHS.about }], Astro.s
                 </p>
               </blockquote>
               <figcaption class="mt-8 flex items-center gap-4">
-                <span class="h-px w-10 bg-gold" aria-hidden="true"></span>
                 <span class="font-sans text-[0.66rem] font-semibold uppercase tracking-[0.24em] text-ink/70">
                   {leadTestimonial.author} &middot; {leadTestimonial.area}
                 </span>

@@ -27,7 +27,6 @@ const rest = COUNTIES.filter((c) => !c.primary);
       <p class="mt-6 max-w-md text-sm leading-relaxed text-ink/55" data-reveal style="--d: 0.3s">
         Not sure if we reach you? Send us the address and we will let you know.
       </p>
-      <span class="mt-10 block h-px w-12 bg-gold/60" data-reveal="fade" style="--d: 0.35s" aria-hidden="true"></span>
     </div>
 
     {/* One panel, one story: home base on top, the travel counties below */}
@@ -51,7 +50,6 @@ const rest = COUNTIES.filter((c) => !c.primary);
               style={`--d: ${0.05 * i + 0.25}s`}
             >
               <span class="font-sans text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-cream/85">{c.name}</span>
-              <span class="h-px w-5 shrink-0 bg-gold/50" aria-hidden="true"></span>
             </li>
           ))}
         </ul>

@@ -176,7 +176,6 @@ const jsonLd = graph(breadcrumbs([{ name: 'Get a Quote', path: PATHS.quote }], A
           Fill in the essentials and send them straight to us. We come back with your price and a
           date. No obligation, no account, nothing to install.
         </p>
-        <span class="mt-10 block h-px w-12 bg-gold/60" data-reveal="fade" style="--d: 0.3s" aria-hidden="true"></span>
       </div>
       <div data-reveal style="--d: 0.15s">
         <QuoteForm />
@@ -213,7 +212,6 @@ const jsonLd = graph(breadcrumbs([{ name: 'Get a Quote', path: PATHS.quote }], A
             style={`--d: ${0.08 * i}s`}
           >
             <p class:list={['font-sans text-[0.66rem] font-semibold uppercase tracking-[0.24em]', i === 1 ? 'text-gold-deep' : 'text-stone']}>{table.title}</p>
-            <span class="mt-5 block h-px w-10 bg-gold/60" aria-hidden="true"></span>
             <dl class="mt-7 border-t border-ink/15">
               {table.rows.map((row) => (
                 <div class="flex items-baseline justify-between gap-6 border-b border-ink/15 py-4">
@@ -237,7 +235,6 @@ const jsonLd = graph(breadcrumbs([{ name: 'Get a Quote', path: PATHS.quote }], A
       <div class="mt-20 grid gap-x-12 gap-y-16 border-t border-ink/15 pt-14 lg:grid-cols-[1.3fr_1fr]">
         <div data-reveal>
           <p class="font-sans text-[0.66rem] font-semibold uppercase tracking-[0.24em] text-stone">By the hour</p>
-          <span class="mt-5 block h-px w-10 bg-gold/60" aria-hidden="true"></span>
           <dl class="mt-7 border-t border-ink/15">
             {hourlyRows.map((row) => (
               <div class="flex flex-wrap items-baseline justify-between gap-x-8 gap-y-1 border-b border-ink/15 py-5">
@@ -253,7 +250,6 @@ const jsonLd = graph(breadcrumbs([{ name: 'Get a Quote', path: PATHS.quote }], A
 
         <div data-reveal style="--d: 0.08s">
           <p class="font-sans text-[0.66rem] font-semibold uppercase tracking-[0.24em] text-stone">Extras</p>
-          <span class="mt-5 block h-px w-10 bg-gold/60" aria-hidden="true"></span>
           <dl class="mt-7 border-t border-ink/15">
             {EXTRAS.map((extra) => (
               <div class="flex flex-wrap items-baseline justify-between gap-x-8 gap-y-1 border-b border-ink/15 py-5">
@@ -361,19 +357,16 @@ const jsonLd = graph(breadcrumbs([{ name: 'Get a Quote', path: PATHS.quote }], A
         <a href={SITE.phoneHref} class="group border-b border-cream/15 py-8 sm:border-b-0 sm:py-10 sm:pr-8" data-reveal>
           <p class="font-sans text-[0.66rem] font-semibold uppercase tracking-[0.24em] text-cream/50">Call us</p>
           <p class="display mt-4 text-2xl text-cream transition-colors duration-300 group-hover:text-gold md:text-3xl">{SITE.phoneDisplay}</p>
-          <span class="mt-6 block h-px w-10 bg-gold/60" aria-hidden="true"></span>
         </a>
 
         <a href={SITE.whatsappHref} class="group border-b border-cream/15 py-8 sm:border-b-0 sm:border-l sm:border-cream/15 sm:px-8 sm:py-10" data-reveal style="--d: 0.08s">
           <p class="font-sans text-[0.66rem] font-semibold uppercase tracking-[0.24em] text-cream/50">WhatsApp</p>
           <p class="display mt-4 text-2xl text-cream transition-colors duration-300 group-hover:text-gold md:text-3xl">Message us</p>
-          <span class="mt-6 block h-px w-10 bg-gold/60" aria-hidden="true"></span>
         </a>
 
         <a href={`mailto:${SITE.email}`} class="group py-8 sm:border-l sm:border-cream/15 sm:px-8 sm:py-10" data-reveal style="--d: 0.16s">
           <p class="font-sans text-[0.66rem] font-semibold uppercase tracking-[0.24em] text-cream/50">Email</p>
           <p class="display mt-4 break-words text-xl text-cream transition-colors duration-300 group-hover:text-gold md:text-2xl">{SITE.email}</p>
-          <span class="mt-6 block h-px w-10 bg-gold/60" aria-hidden="true"></span>
         </a>
       </div>
 

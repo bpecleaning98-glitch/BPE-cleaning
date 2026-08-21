@@ -9,7 +9,6 @@ import heroPhoto from '../../assets/stock/hero-living-room.jpg';
 // set the Elicyon way: uppercase serif with one lowercase italic word.
 // motion.ts opens .hero-clip from a letterboxed strip and drifts
 // .hero-content on scroll; the text delays below start after that opening.
-const marks = ['Fully insured', '7 days a week', 'Satisfaction guaranteed'];
 ---
 {/* Intro overlay. Refresh or fresh arrival only (marker gate in motion.ts):
     dark screen, the lockup wipes itself on, rises into the header slot, and
@@ -77,14 +76,24 @@ const marks = ['Fully insured', '7 days a week', 'Satisfaction guaranteed'];
     <div class="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-night/75 to-transparent" aria-hidden="true"></div>
   </div>
 
-  <div class="hero-content container-wide relative flex min-h-[100svh] flex-col justify-end pb-16 pt-36 md:pb-20">
-    {/* Choreographed entirely by motion.ts (heroTextIn): line one arrives
-        from the left, "meets" breathes in through a blur, "perfection"
-        arrives from the right, everything else slides up. No CSS delays, so
-        internal navigation shows it instantly with the fast variant. */}
-    <p class="hw-kicker kicker !text-cream/75">BPE Cleaning Services &middot; Dublin</p>
+  <div class="hero-content container-wide relative flex min-h-[100svh] flex-col justify-end pb-20 pt-36 md:pb-28">
+    {/* Stripped to the tagline and one row of actions, on Artiom's call: the
+        eyebrow, the descriptive paragraph and the trust strip all came out,
+        because the first screen is where somebody decides who we are, not
+        where they read our terms. The reference site's own opening carries a
+        headline over a photograph and nothing else.
 
-    <h1 class="display-caps mt-6 text-[clamp(2.1rem,10.5vw,8.5rem)]">
+        The words that left did NOT leave the page. "Homes, offices and
+        Airbnb stays across Dublin" is the first line of the Manifesto
+        immediately below, which now also carries the counties, and the
+        insurance and seven-day lines live in Why BPE. Nothing was traded
+        away for the quiet.
+
+        Choreographed entirely by motion.ts (heroTextIn): line one arrives
+        from the left, "meets" breathes in through a blur, "perfection"
+        arrives from the right, the actions slide up. No CSS delays, so
+        internal navigation shows it finished. */}
+    <h1 class="display-caps text-[clamp(2.1rem,10.5vw,8.5rem)]">
       <span class="hw-l1 block">Where clean</span>
       <span class="block">
         <span class="hw-meets accent-word inline-block text-[0.62em] text-gold-soft">meets</span>
@@ -92,22 +101,16 @@ const marks = ['Fully insured', '7 days a week', 'Satisfaction guaranteed'];
       </span>
     </h1>
 
-    <div class="mt-10 flex flex-col gap-8 md:flex-row md:items-end md:justify-between">
-      <p class="hw-up max-w-md text-base leading-relaxed text-cream/80 md:text-lg">
-        Premium cleaning for homes, offices and Airbnb properties across Dublin and seven neighbouring counties.
-      </p>
-      <div class="hw-up flex flex-wrap items-center gap-4">
-        <a href="/quote/" class="btn-gold">Get my price</a>
-        <a href={SITE.phoneHref} class="btn-outline text-cream">Call {SITE.phoneDisplay}</a>
-      </div>
+    {/* One row, both actions, at every width. The number is spelled out
+        where there is room for it and shortened on a phone, which is the
+        only place the two would otherwise stack. */}
+    <div class="hw-up mt-10 flex flex-wrap items-center gap-3 sm:gap-4">
+      <a href="/quote/" class="btn-gold">Get my price</a>
+      <a href={SITE.phoneHref} class="btn-outline text-cream">
+        <span class="sm:hidden">Call us</span>
+        <span class="hidden sm:inline">Call {SITE.phoneDisplay}</span>
+      </a>
     </div>
 
-    <div class="hw-up mt-14 border-t border-cream/20 pt-6">
-      <ul class="flex flex-wrap gap-x-10 gap-y-3">
-        {marks.map((mark) => (
-          <li class="font-sans text-[0.66rem] font-semibold uppercase tracking-[0.26em] text-cream/70">{mark}</li>
-        ))}
-      </ul>
-    </div>
   </div>
 </section>

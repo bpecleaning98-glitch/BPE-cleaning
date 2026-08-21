@@ -167,7 +167,6 @@ const jsonLd = serviceGraph('/house-cleaning-dublin/', faqs, Astro.site);
             <span class="line-mask"><span>A house that stays</span></span>
             <span class="line-mask"><span style="--d: 0.1s">on <span class="accent-word text-gold-deep">top</span> of itself</span></span>
           </h2>
-          <span class="mt-10 block h-px w-12 bg-gold/60" data-reveal="fade" style="--d: 0.2s" aria-hidden="true"></span>
         </div>
 
         <div class="max-w-2xl">
@@ -236,7 +235,6 @@ const jsonLd = serviceGraph('/house-cleaning-dublin/', faqs, Astro.site);
           This is the scope of a regular clean. If your home needs something outside it, add it on and
           we will build the time into the visit.
         </p>
-        <span class="mt-10 block h-px w-12 bg-gold/60" data-reveal="fade" style="--d: 0.3s" aria-hidden="true"></span>
       </div>
 
       <div>
@@ -394,7 +392,6 @@ const jsonLd = serviceGraph('/house-cleaning-dublin/', faqs, Astro.site);
               </p>
             </blockquote>
             <figcaption class="mt-8 flex items-center gap-4">
-              <span class="h-px w-10 bg-gold" aria-hidden="true"></span>
               <span class="font-sans text-[0.66rem] font-semibold uppercase tracking-[0.24em] text-cream/70">
                 {review.author} &middot; {review.area}
               </span>
@@ -414,7 +411,6 @@ const jsonLd = serviceGraph('/house-cleaning-dublin/', faqs, Astro.site);
           <span class="line-mask"><span>Before you</span></span>
           <span class="line-mask"><span style="--d: 0.1s">hand over the <span class="accent-word text-gold-deep">keys</span></span></span>
         </h2>
-        <span class="mt-10 block h-px w-12 bg-gold/60" data-reveal="fade" style="--d: 0.2s" aria-hidden="true"></span>
       </div>
 
       <div class="border-t border-ink/15">
@@ -445,39 +441,19 @@ const jsonLd = serviceGraph('/house-cleaning-dublin/', faqs, Astro.site);
     <Diamond class="pointer-events-none absolute -right-40 -top-44 h-[38rem] w-[38rem] opacity-[0.05]" aria-hidden="true" />
 
     <div class="container-wide relative">
-      <div class="grid gap-14 lg:grid-cols-[1.1fr_1fr] lg:gap-20">
-        <div>
-          <p class="kicker !text-gold" data-reveal>Book Your Clean</p>
-          <h2 class="display mt-6 text-[clamp(2.2rem,5vw,4rem)]" data-reveal>
-            <span class="line-mask"><span>Pick a day that</span></span>
-            <span class="line-mask"><span style="--d: 0.1s">actually <span class="accent-word text-gold-soft">suits</span> you</span></span>
-          </h2>
-          <p class="mt-8 max-w-xl text-base leading-relaxed text-cream/70" data-reveal style="--d: 0.2s">
-            Tell us the size of your home and how often you would like us, and we will come back with a
-            price and a time. No obligation, and nothing is booked until you say so.
-          </p>
-        </div>
-
-        <div class="self-center border-b border-cream/15" data-reveal style="--d: 0.1s">
-          <div class="flex items-baseline justify-between gap-6 border-t border-cream/15 py-5">
-            <span class="font-sans text-[0.66rem] font-semibold uppercase tracking-[0.24em] text-cream/50">Phone</span>
-            <a href={SITE.phoneHref} class="py-5 -my-5 font-sans text-sm font-medium text-cream transition-colors duration-300 hover:text-gold-soft">
-              {SITE.phoneDisplay}
-            </a>
-          </div>
-          <div class="flex items-baseline justify-between gap-6 border-t border-cream/15 py-5">
-            <span class="font-sans text-[0.66rem] font-semibold uppercase tracking-[0.24em] text-cream/50">WhatsApp</span>
-            <a href={SITE.whatsappHref} rel="noopener" class="py-5 -my-5 font-sans text-sm font-medium text-cream transition-colors duration-300 hover:text-gold-soft">
-              Message us
-            </a>
-          </div>
-          <div class="flex items-baseline justify-between gap-6 border-t border-cream/15 py-5">
-            <span class="font-sans text-[0.66rem] font-semibold uppercase tracking-[0.24em] text-cream/50">Hours</span>
-            <span class="font-sans text-sm font-medium text-cream">{SITE.hours}</span>
-          </div>
-          <div class="border-t border-cream/15 py-6">
-            <a href="/quote/" class="btn-gold w-full sm:w-auto">Get my price</a>
-          </div>
+      <div class="max-w-2xl">
+        <p class="kicker !text-gold" data-reveal>Book Your Clean</p>
+        <h2 class="display mt-6 text-[clamp(2.2rem,5vw,4rem)]" data-reveal>
+          <span class="line-mask"><span>Pick a day that</span></span>
+          <span class="line-mask"><span style="--d: 0.1s">actually <span class="accent-word text-gold-soft">suits</span> you</span></span>
+        </h2>
+        <p class="mt-8 max-w-xl text-base leading-relaxed text-cream/70" data-reveal style="--d: 0.2s">
+          Tell us the size of your home and how often you would like us, and we will come back with a
+          price and a time. No obligation, and nothing is booked until you say so.
+        </p>
+        <div class="mt-10 flex flex-wrap items-center gap-x-10 gap-y-5" data-reveal style="--d: 0.3s">
+          <a href="/quote/" class="btn-gold">Get my price</a>
+          <a href={SITE.whatsappHref} rel="noopener" class="link-caps text-gold-soft">Or message us on WhatsApp</a>
         </div>
       </div>
 

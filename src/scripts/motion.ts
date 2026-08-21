@@ -775,10 +775,16 @@ async function boot() {
         .timeline({
           scrollTrigger: {
             trigger: manifesto,
-            start: desktop() ? 'top top' : 'top 70%',
-            end: () => `+=${manifesto.clientHeight * (desktop() ? 1.9 : 0.8)}`,
-            scrub: desktop() ? true : 0.5,
-            pin: desktop(),
+            start: 'top top',
+            // The phone pins too, on Artiom's report that the unpinned morph
+            // swapped the words faster than anyone could read them: the page
+            // must stop, and the scroll must spend itself on the text. The
+            // mobile distance is shorter than the desktop's because a thumb
+            // flick covers more viewport than a wheel notch, but long enough
+            // that both phrases get read at a human pace.
+            end: () => `+=${manifesto.clientHeight * (desktop() ? 1.9 : 1.5)}`,
+            scrub: true,
+            pin: true,
             invalidateOnRefresh: true,
           },
         })
@@ -857,6 +863,31 @@ async function boot() {
         });
       }
     }
+  }
+
+  /* The footer sign-off assembles itself when scrolled to, Artiom's brief:
+   * the caps words arrive OVERSIZED and low, rise as one block, and each
+   * settles into its own place; "you" is absent through all of it and then
+   * simply condenses in, opacity and blur, once the others have landed.
+   * Plays once per page. Initial states are set here, never in markup, so a
+   * visitor without this chunk sees the finished line. */
+  if (ScrollTrigger) {
+    document.querySelectorAll<HTMLElement>('[data-footer-line]').forEach((line) => {
+      const words = line.querySelectorAll<HTMLElement>('.fw-word');
+      const you = line.querySelector<HTMLElement>('.fw-you');
+      if (!words.length) return;
+      gsap.set(words, { y: 90, scale: 1.35, opacity: 0, transformOrigin: '50% 100%' });
+      if (you) gsap.set(you, { opacity: 0, filter: 'blur(12px)' });
+      gsap
+        .timeline({
+          scrollTrigger: { trigger: line, start: 'top 88%', once: true },
+        })
+        // one shared rise, the stagger small enough to read as one block
+        .to(words, { y: 0, opacity: 1, duration: 0.7, ease: 'power3.out', stagger: 0.06 }, 0)
+        // then each word takes its own size, which is what "settling" is
+        .to(words, { scale: 1, duration: 0.55, ease: 'power3.inOut', stagger: 0.07 }, 0.38)
+        .to(you || {}, { opacity: 1, filter: 'blur(0px)', duration: 0.7, ease: 'power2.out' }, 0.85);
+    });
   }
 
   /* Lead quote: the words brighten one after another as the section passes

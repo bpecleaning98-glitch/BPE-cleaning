@@ -161,7 +161,6 @@ const jsonLd = serviceGraph('/end-of-tenancy-cleaning-dublin/', faqs, Astro.site
             <span class="line-mask"><span>An inspection is</span></span>
             <span class="line-mask"><span style="--d: 0.1s">won in the <span class="accent-word text-gold-deep">detail</span></span></span>
           </h2>
-          <span class="mt-10 block h-px w-12 bg-gold/60" data-reveal="fade" style="--d: 0.25s" aria-hidden="true"></span>
         </div>
         <div class="space-y-6 text-base leading-relaxed text-ink/70 md:text-lg">
           <p data-reveal>
@@ -207,7 +206,6 @@ const jsonLd = serviceGraph('/end-of-tenancy-cleaning-dublin/', faqs, Astro.site
             </div>
           </div>
           <figcaption class="mt-4 flex items-center gap-4">
-            <span class="h-px w-8 bg-gold/60" aria-hidden="true"></span>
             <span class="font-sans text-xs text-ink/55">{roomsLead.caption ?? roomsLead.alt}</span>
           </figcaption>
         </figure>
@@ -229,7 +227,6 @@ const jsonLd = serviceGraph('/end-of-tenancy-cleaning-dublin/', faqs, Astro.site
           A move out clean is not a bigger version of a weekly clean. It is done in the order an
           agent walks the property, top to bottom, inside before outside.
         </p>
-        <span class="mt-10 block h-px w-12 bg-gold/60" data-reveal="fade" style="--d: 0.3s" aria-hidden="true"></span>
       </div>
 
       <div>
@@ -245,7 +242,6 @@ const jsonLd = serviceGraph('/end-of-tenancy-cleaning-dublin/', faqs, Astro.site
               <ul class="col-start-2 mt-5 space-y-3.5 md:col-start-3 md:mt-0">
                 {room.items.map((item) => (
                   <li class="flex gap-3 text-sm leading-relaxed text-ink/65">
-                    <span class="mt-2.5 h-px w-3 shrink-0 bg-gold" aria-hidden="true"></span>
                     <span>{item}</span>
                   </li>
                 ))}
@@ -409,7 +405,6 @@ const jsonLd = serviceGraph('/end-of-tenancy-cleaning-dublin/', faqs, Astro.site
               </p>
             </blockquote>
             <figcaption class="mt-8 flex flex-wrap items-center gap-4">
-              <span class="h-px w-10 bg-gold" aria-hidden="true"></span>
               <span class="font-sans text-[0.66rem] font-semibold uppercase tracking-[0.24em] text-cream/70">
                 {reference.author} &middot; {reference.area}
               </span>
@@ -428,7 +423,6 @@ const jsonLd = serviceGraph('/end-of-tenancy-cleaning-dublin/', faqs, Astro.site
           <span class="line-mask"><span>Before you</span></span>
           <span class="line-mask"><span style="--d: 0.1s">hand back the <span class="accent-word text-gold-deep">keys</span></span></span>
         </h2>
-        <span class="mt-10 block h-px w-12 bg-gold/60" data-reveal="fade" style="--d: 0.2s" aria-hidden="true"></span>
       </div>
 
       <div class="border-t border-ink/15">
@@ -456,44 +450,19 @@ const jsonLd = serviceGraph('/end-of-tenancy-cleaning-dublin/', faqs, Astro.site
 
   <section class="section-pad bg-ivory">
     <div class="container-wide">
-      <div class="grid gap-14 lg:grid-cols-[1.1fr_1fr] lg:gap-20">
-        <div>
-          <p class="kicker" data-reveal>Book Your Clean</p>
-          <h2 class="display mt-6 text-[clamp(2.2rem,5vw,4rem)] text-ink" data-reveal>
-            <span class="line-mask"><span>Tell us your</span></span>
-            <span class="line-mask"><span style="--d: 0.1s">handover <span class="accent-word text-gold-deep">date</span></span></span>
-          </h2>
-          <p class="mt-8 max-w-xl text-base leading-relaxed text-ink/70 md:text-lg" data-reveal style="--d: 0.2s">
-            Send the address, the number of bedrooms and the date the keys go back. You get a price
-            for the whole job, add-ons included, before anything is booked.
-          </p>
-          <div class="mt-10 flex flex-wrap items-center gap-4" data-reveal style="--d: 0.3s">
-            <a href="/quote/" class="btn-primary">Get my price</a>
-            <a href={SITE.whatsappHref} class="btn-outline text-ink" rel="noopener">WhatsApp us</a>
-          </div>
-        </div>
-
-        <div class="self-center border-b border-ink/15">
-          <div class="flex items-baseline justify-between gap-6 border-t border-ink/15 py-5" data-reveal>
-            <span class="font-sans text-[0.66rem] font-semibold uppercase tracking-[0.24em] text-stone">Phone</span>
-            <a href={SITE.phoneHref} class="py-5 -my-5 font-sans text-sm font-medium text-ink transition-colors duration-300 hover:text-gold-deep">
-              {SITE.phoneDisplay}
-            </a>
-          </div>
-          <div class="flex items-baseline justify-between gap-6 border-t border-ink/15 py-5" data-reveal style="--d: 0.08s">
-            <span class="font-sans text-[0.66rem] font-semibold uppercase tracking-[0.24em] text-stone">WhatsApp</span>
-            <a href={SITE.whatsappHref} class="py-5 -my-5 font-sans text-sm font-medium text-ink transition-colors duration-300 hover:text-gold-deep" rel="noopener">
-              Message us
-            </a>
-          </div>
-          <div class="flex items-baseline justify-between gap-6 border-t border-ink/15 py-5" data-reveal style="--d: 0.16s">
-            <span class="font-sans text-[0.66rem] font-semibold uppercase tracking-[0.24em] text-stone">Hours</span>
-            <span class="font-sans text-sm font-medium text-ink">{SITE.hours}</span>
-          </div>
-          <div class="flex items-baseline justify-between gap-6 border-t border-ink/15 py-5" data-reveal style="--d: 0.24s">
-            <span class="font-sans text-[0.66rem] font-semibold uppercase tracking-[0.24em] text-stone">Areas</span>
-            <span class="font-sans text-sm font-medium text-ink">{SITE.area}</span>
-          </div>
+      <div class="max-w-2xl">
+        <p class="kicker" data-reveal>Book Your Clean</p>
+        <h2 class="display mt-6 text-[clamp(2.2rem,5vw,4rem)] text-ink" data-reveal>
+          <span class="line-mask"><span>Tell us your</span></span>
+          <span class="line-mask"><span style="--d: 0.1s">handover <span class="accent-word text-gold-deep">date</span></span></span>
+        </h2>
+        <p class="mt-8 text-base leading-relaxed text-ink/70 md:text-lg" data-reveal style="--d: 0.2s">
+          Send the address, the number of bedrooms and the date the keys go back. You get a price
+          for the whole job, add-ons included, before anything is booked.
+        </p>
+        <div class="mt-10 flex flex-wrap items-center gap-x-10 gap-y-5" data-reveal style="--d: 0.3s">
+          <a href="/quote/" class="btn-primary">Get my price</a>
+          <a href={SITE.whatsappHref} class="link-caps text-gold-deep" rel="noopener">Or message us on WhatsApp</a>
         </div>
       </div>
 

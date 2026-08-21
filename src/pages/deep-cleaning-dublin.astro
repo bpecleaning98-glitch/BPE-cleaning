@@ -223,7 +223,6 @@ const jsonLd = serviceGraph('/deep-cleaning-dublin/', faqs, Astro.site);
             </div>
           ))}
         </dl>
-        <span class="mt-8 block h-px w-12 bg-gold/60" data-reveal="fade" style="--d: 0.4s" aria-hidden="true"></span>
       </div>
     </div>
   </section>
@@ -274,7 +273,6 @@ const jsonLd = serviceGraph('/deep-cleaning-dublin/', faqs, Astro.site);
           The full checklist for a fixed price deep clean. If something on it does not apply to your
           property, tell us and we will spend that time elsewhere.
         </p>
-        <span class="mt-10 block h-px w-12 bg-gold/60" data-reveal="fade" style="--d: 0.3s" aria-hidden="true"></span>
       </div>
 
       <div>
@@ -290,7 +288,6 @@ const jsonLd = serviceGraph('/deep-cleaning-dublin/', faqs, Astro.site);
               <ul class="col-start-2 mt-5 space-y-3.5 md:col-start-3 md:mt-0">
                 {group.items.map((item) => (
                   <li class="flex gap-4">
-                    <span class="mt-2.5 h-px w-5 shrink-0 bg-gold/70" aria-hidden="true"></span>
                     <span class="text-sm leading-relaxed text-ink/70">{item}</span>
                   </li>
                 ))}
@@ -368,7 +365,6 @@ const jsonLd = serviceGraph('/deep-cleaning-dublin/', faqs, Astro.site);
             Option two &middot; By the hour
           </p>
           <p class="font-sans font-medium tracking-[-0.01em] mt-6 text-[2.6rem] leading-none text-cream [font-variant-numeric:tabular-nums]">{HOURLY.deep.label}</p>
-          <span class="mt-6 block h-px w-10 bg-gold/60" aria-hidden="true"></span>
           <p class="mt-6 text-sm leading-relaxed text-cream/60">
             Useful when it is one kitchen, one bathroom or a single room that needs the work rather
             than the whole property. Tell us what you want covered and we will tell you how long it
@@ -382,7 +378,6 @@ const jsonLd = serviceGraph('/deep-cleaning-dublin/', faqs, Astro.site);
             Moving out
           </p>
           <p class="display mt-6 text-[2.6rem] leading-none text-cream">Same prices</p>
-          <span class="mt-6 block h-px w-10 bg-gold/60" aria-hidden="true"></span>
           <p class="mt-6 text-sm leading-relaxed text-cream/60">
             End of tenancy cleaning is priced from exactly the same table, from €{END_OF_TENANCY['1bed']}
             for a 1 bedroom. If your clean is for a handover or a deposit, book that one instead.
@@ -437,7 +432,6 @@ const jsonLd = serviceGraph('/deep-cleaning-dublin/', faqs, Astro.site);
               </span>
             </span>
             <figcaption class="mt-5 flex items-center gap-4">
-              <span class="h-px w-8 shrink-0 bg-gold/70" aria-hidden="true"></span>
               <span class="text-sm leading-relaxed text-ink/60">{photo.caption}</span>
             </figcaption>
           </figure>
@@ -473,7 +467,6 @@ const jsonLd = serviceGraph('/deep-cleaning-dublin/', faqs, Astro.site);
               </p>
             </blockquote>
             <figcaption class="mt-8 flex items-center gap-4">
-              <span class="h-px w-10 bg-gold" aria-hidden="true"></span>
               <span class="font-sans text-[0.66rem] font-semibold uppercase tracking-[0.24em] text-ink/70">
                 {leadRef.author} &middot; {leadRef.area}
               </span>
@@ -485,12 +478,10 @@ const jsonLd = serviceGraph('/deep-cleaning-dublin/', faqs, Astro.site);
           <div class="mt-20 grid gap-10 border-t border-ink/15 pt-12 md:grid-cols-2 md:gap-16">
             {restRefs.map((t, i) => (
               <figure data-reveal style={`--d: ${0.08 * i}s`}>
-                <span class="block h-px w-8 bg-gold/60" aria-hidden="true"></span>
                 <blockquote class="mt-5">
                   <p class="font-display text-lg leading-relaxed text-ink/80">&ldquo;{t.quote}&rdquo;</p>
                 </blockquote>
                 <figcaption class="mt-6 flex items-center gap-4">
-                  <span class="h-px w-8 bg-gold" aria-hidden="true"></span>
                   <span class="font-sans text-[0.66rem] font-semibold uppercase tracking-[0.24em] text-ink/70">
                     {t.author} &middot; {t.area}
                   </span>
@@ -515,7 +506,6 @@ const jsonLd = serviceGraph('/deep-cleaning-dublin/', faqs, Astro.site);
         <p class="mt-8 max-w-sm text-sm leading-relaxed text-ink/60" data-reveal style="--d: 0.2s">
           {AREAS_SENTENCE} Not sure we reach you? Send your Eircode and we will confirm.
         </p>
-        <span class="mt-10 block h-px w-12 bg-gold/60" data-reveal="fade" style="--d: 0.3s" aria-hidden="true"></span>
       </div>
 
       <div class="border-t border-ink/15">
@@ -555,12 +545,10 @@ const jsonLd = serviceGraph('/deep-cleaning-dublin/', faqs, Astro.site);
             Send us the number of bedrooms and bathrooms and roughly when you need it. You get a
             price back, and nothing is booked until you say yes.
           </p>
-          <div class="mt-10 flex flex-wrap items-center gap-4" data-reveal style="--d: 0.28s">
+          <div class="mt-10 flex flex-wrap items-center gap-x-8 gap-y-4" data-reveal style="--d: 0.28s">
             <a href="/quote/" class="btn-gold">Get my price</a>
-            <a href={SITE.phoneHref} class="btn-outline text-cream">Call {SITE.phoneDisplay}</a>
-            <a href={SITE.whatsappHref} rel="noopener" class="btn-outline text-cream">WhatsApp</a>
+            <a href={SITE.whatsappHref} rel="noopener" class="link-caps text-gold-soft">Or message us on WhatsApp</a>
           </div>
-          <p class="mt-8 text-sm text-cream/50" data-reveal style="--d: 0.34s">{SITE.hours}</p>
         </div>
 
         <div class="self-center border-b border-cream/15">
