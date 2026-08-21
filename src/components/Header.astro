@@ -23,7 +23,7 @@ const nav = [
     section text mid-page the two never garble into each other. */}
 <header
   id="site-header"
-  class="fixed inset-x-0 top-0 z-50 mix-blend-difference text-gold-soft transition-transform duration-700 [transition-timing-function:cubic-bezier(0.22,1,0.36,1)] data-[hidden]:-translate-y-full data-[scrolled]:backdrop-blur-md"
+  class="fixed inset-x-0 top-0 z-[70] mix-blend-difference text-gold-soft transition-transform duration-700 [transition-timing-function:cubic-bezier(0.22,1,0.36,1)] data-[hidden]:-translate-y-full data-[scrolled]:backdrop-blur-md"
 >
   <div class="container-wide grid h-[84px] grid-cols-[1fr_auto_1fr] items-center md:h-[88px]">
     <nav class="hidden items-center gap-8 lg:flex" aria-label="Main">
@@ -31,11 +31,18 @@ const nav = [
         <a href={item.href} class="link-caps opacity-80 transition-opacity hover:opacity-100">{item.label}</a>
       ))}
     </nav>
-    {/* The word is a rolling cube, Elicyon's own move: two copies of the
-        label sit on adjacent faces of a 3D box, and hover (or tap, via the
-        one-shot class the script adds) rolls the box a quarter turn, so the
-        word tips up and away and its twin rolls in from below. after:hidden
-        because the underline fighting the roll read as clutter. */}
+    {/* One button, not two. MENU and CLOSE live on adjacent faces of a 3D
+        box, so opening the menu rolls the box a quarter turn: MENU tips up
+        and away, CLOSE arrives from below. The roll IS the state change, and
+        closing rolls it back, which is why there is no separate close button
+        and no second header inside the overlay.
+
+        The header itself never moves. It sits above the curtain at z-70, so
+        the lockup stays exactly where it was and mix-blend-difference
+        recolours it against the night as the curtain passes under it. The
+        previous version duplicated the logo inside the overlay, left aligned,
+        so the real one appeared to vanish and a second one slid in from the
+        side. That was the chaos Artiom described. */}
     <button
       id="menu-toggle"
       class="link-caps cube justify-self-start after:hidden lg:hidden"
@@ -45,7 +52,7 @@ const nav = [
     >
       <span class="cube-box">
         <span class="cube-face">Menu</span>
-        <span class="cube-face" aria-hidden="true">Menu</span>
+        <span class="cube-face">Close</span>
       </span>
     </button>
 
@@ -84,17 +91,9 @@ const nav = [
   aria-hidden="true"
   data-lenis-prevent
 >
-  <div class="flex min-h-full flex-col">
-    <div class="container-wide flex h-[84px] shrink-0 items-center justify-between md:h-[88px]">
-      <BpeLogo variant="horizontal" tone="onDark" class="h-9" title={SITE.name} />
-      <button id="menu-close" class="link-caps cube after:hidden" type="button">
-        <span class="cube-box">
-          <span class="cube-face">Close</span>
-          <span class="cube-face" aria-hidden="true">Close</span>
-        </span>
-      </button>
-    </div>
-
+  {/* pt clears the real header, which is floating over this curtain rather
+      than being replaced by one of its own. */}
+  <div class="flex min-h-full flex-col pt-[84px] md:pt-[88px]">
     <nav class="container-wide my-auto flex flex-col items-center gap-3 py-10 text-center" aria-label="Menu">
       {[...nav, { href: '/contact/', label: 'Contact' }].map((item, i) => (
         <a
@@ -143,7 +142,6 @@ const nav = [
 
   const overlay = document.getElementById('menu-overlay');
   const toggle = document.getElementById('menu-toggle');
-  const close = document.getElementById('menu-close');
   /* Holding the page still while the menu is open must NOT be done with
    * overflow:hidden. That deletes the scrollbar, the viewport grows by its
    * width, and any ScrollTrigger measurement that lands in that window bakes
@@ -153,31 +151,19 @@ const nav = [
    * the layout never moves. */
   const lenis = () => (window as unknown as { __lenis?: { stop: () => void; start: () => void } }).__lenis;
 
+  // The cube stays turned for as long as the menu is open, so the button
+  // reads CLOSE the whole time rather than flashing it and rolling back.
   const setOpen = (open: boolean) => {
     if (!overlay || !toggle) return;
     overlay.toggleAttribute('data-open', open);
     overlay.setAttribute('aria-hidden', String(!open));
     toggle.setAttribute('aria-expanded', String(open));
+    toggle.classList.toggle('cube-turned', open);
+    toggle.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
     if (open) lenis()?.stop();
     else lenis()?.start();
   };
-  // Touch has no hover, so a tap plays the cube roll once: the class holds
-  // the quarter turn just long enough to be seen, then lets go. By then the
-  // curtain is covering (or has uncovered) the button, so the return leg of
-  // the roll is never on screen.
-  const spin = (el: HTMLElement | null) => {
-    if (!el) return;
-    el.classList.add('cube-spin');
-    setTimeout(() => el.classList.remove('cube-spin'), 700);
-  };
-  toggle?.addEventListener('click', () => {
-    spin(toggle);
-    setOpen(true);
-  });
-  close?.addEventListener('click', () => {
-    spin(close);
-    setOpen(false);
-  });
+  toggle?.addEventListener('click', () => setOpen(!overlay?.hasAttribute('data-open')));
   overlay?.querySelectorAll('a').forEach((a) => a.addEventListener('click', () => setOpen(false)));
   addEventListener('keydown', (e) => {
     if (e.key === 'Escape') setOpen(false);

@@ -97,7 +97,11 @@ const label =
     </div>
   </div>
 
-  <div class="container-wide relative z-10 flex min-h-[100svh] flex-col justify-center py-24">
+    {/* min-h only from md up. On a phone the section is not pinned, so a full
+      viewport of height with the copy centred in it left a screen of empty
+      porcelain above and below the words. Here it is simply as tall as what
+      is in it. */}
+  <div class="container-wide relative z-10 flex flex-col justify-center py-20 md:min-h-[100svh] md:py-24">
     <div class="mx-auto w-full max-w-4xl">
     <p class="kicker" data-reveal>The Company</p>
 

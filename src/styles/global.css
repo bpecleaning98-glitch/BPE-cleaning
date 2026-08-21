@@ -114,14 +114,15 @@
     @apply relative inline-flex items-center gap-2 font-sans text-[0.7rem] font-semibold uppercase tracking-[0.22em] before:absolute before:inset-x-0 before:-inset-y-3 before:content-[''] after:absolute after:-bottom-1 after:left-0 after:h-px after:w-full after:origin-right after:scale-x-0 after:bg-current after:transition-transform after:duration-300 hover:after:origin-left hover:after:scale-x-100;
   }
 
-  /* The rolling cube word. Two copies of a label sit on adjacent faces of a
-   * 3D box: the visible one pushed toward the viewer by half the line box,
-   * its twin folded under at ninety degrees. Rolling the box a quarter turn
-   * around X tips the visible word up and away while the twin rolls in from
-   * below, which is the reference site's exact move. Perspective sits on the
-   * parent, so the roll has depth instead of squashing flat. Hover is gated
-   * to devices that have it; taps get the same turn for one beat through
-   * .cube-spin, added and removed by the header's script. */
+  /* The rolling cube word. MENU and CLOSE sit on adjacent faces of a 3D box:
+   * the visible one pushed toward the viewer by half the line box, the other
+   * folded under at ninety degrees. Rolling the box a quarter turn around X
+   * tips the first word up and away while the second arrives from below.
+   *
+   * The turn is HELD, not played: .cube-turned goes on while the menu is
+   * open and comes off when it closes, so the button reads CLOSE for as long
+   * as there is something to close. That is why there is no hover rotation,
+   * which would roll an already-turned box onto a blank third face. */
   .cube {
     perspective: 20rem;
   }
@@ -142,13 +143,13 @@
     inset: 0;
     transform: rotateX(-90deg) translateZ(0.62em);
   }
-  @media (hover: hover) {
-    .cube:hover .cube-box {
-      transform: rotateX(90deg);
-    }
-  }
-  .cube.cube-spin .cube-box {
+  .cube.cube-turned .cube-box {
     transform: rotateX(90deg);
+  }
+  /* The second face is only ever reached by the turn, so it must not be read
+   * aloud as part of the button's name while the first one is showing. */
+  .cube .cube-face + .cube-face {
+    speak: never;
   }
 }
 
