@@ -879,32 +879,78 @@ async function boot() {
     }
   }
 
-  /* The closing line assembles itself when scrolled to, Artiom's brief,
-   * second pass: no arriving oversized, no fading, nothing that reads as a
-   * pop. Each caps word starts below the edge of its own overflow-hidden
-   * mask (Footer.astro provides those), and they rise one after another,
-   * each decelerating into its place; "you" is the one exception, never
-   * masked, condensing in through opacity and blur once the words have
-   * landed. Travel is in percent of the word's own height, so the same
-   * numbers hold at every viewport width. Plays once per page. Initial
-   * states are set here, never in markup, so a visitor without this chunk
-   * sees the finished line. */
+  /* The closing line, Artiom's brief, third pass: the three caps words
+   * first appear STACKED as a column, one under the other, each revealing
+   * itself bottom-up in turn; then the column unfolds, every word
+   * travelling to its own place in the sentence. "you" never takes part in
+   * the flight and condenses in, opacity and blur, once the others have
+   * landed.
+   *
+   * The mechanics are FLIP: the words never leave the document flow, the
+   * layout IS the finished sentence. When the line scrolls into view their
+   * final rectangles are measured, each word is offset by transform into
+   * the column (anchored on the first word, one line-height per row), and
+   * flying home is nothing more than animating those offsets back to zero.
+   * Measuring inside onEnter, not at build time, keeps the numbers honest
+   * after webfont swaps and late layout shifts.
+   *
+   * The column reveal uses a clip-path on each word rather than mask
+   * elements in the markup: the flight home crosses half the line's width,
+   * and any overflow-hidden wrapper would cut the word mid-journey.
+   *
+   * Until the trigger fires the words simply sit at opacity 0, set from
+   * here and never in markup, so a visitor without this chunk sees the
+   * finished line. */
   if (ScrollTrigger) {
     document.querySelectorAll<HTMLElement>('[data-footer-line]').forEach((line) => {
-      const words = line.querySelectorAll<HTMLElement>('.fw-word');
+      const words = Array.from(line.querySelectorAll<HTMLElement>('.fw-word'));
       const you = line.querySelector<HTMLElement>('.fw-you');
+      // The buttons live in the row next to the line, not inside it.
+      const cta = line.parentElement?.querySelector<HTMLElement>('[data-footer-cta]');
       if (!words.length) return;
-      gsap.set(words, { yPercent: 115 });
+      gsap.set(words, { opacity: 0 });
       if (you) gsap.set(you, { opacity: 0, filter: 'blur(12px)' });
-      gsap
-        .timeline({
-          scrollTrigger: { trigger: line, start: 'top 88%', once: true },
-        })
-        // power4 spends its speed early and lands slowly: the words slide
-        // up and settle rather than stopping dead. The stagger is wide
-        // enough to read as one-after-another, not as a shared block.
-        .to(words, { yPercent: 0, duration: 1.05, ease: 'power4.out', stagger: 0.12 }, 0)
-        .to(you || {}, { opacity: 1, filter: 'blur(0px)', duration: 0.8, ease: 'power2.out' }, 0.6);
+      if (cta) gsap.set(cta, { opacity: 0 });
+
+      ScrollTrigger.create({
+        trigger: line,
+        start: 'top 88%',
+        once: true,
+        onEnter: () => {
+          // The words are opacity 0 but fully laid out, so these are the
+          // rectangles of the finished sentence.
+          const rects = words.map((w) => w.getBoundingClientRect());
+          const rowHeight = parseFloat(getComputedStyle(line).fontSize) * 1.04;
+          const tl = gsap.timeline();
+          words.forEach((w, i) => {
+            // Into the column: align with the first word's left edge, one
+            // row down per word. The first word's offset is zero by
+            // definition, which is what anchors the column to the layout.
+            const dx = rects[0].left - rects[i].left;
+            const dy = rects[0].top + i * rowHeight - rects[i].top;
+            gsap.set(w, { x: dx, y: dy, opacity: 1, clipPath: 'inset(0% 0% 102% 0%)' });
+            // Phase one, the column: each word rises open bottom-up in
+            // its row, one after another.
+            tl.to(
+              w,
+              { clipPath: 'inset(0% 0% -8% 0%)', duration: 0.55, ease: 'power2.out' },
+              i * 0.14
+            );
+            // Phase two, the unfolding: each word travels home. inOut, so
+            // it leaves as gently as it lands; no pop at either end.
+            tl.to(
+              w,
+              { x: 0, y: 0, duration: 0.95, ease: 'power3.inOut' },
+              0.75 + i * 0.1
+            );
+          });
+          if (you) {
+            tl.to(you, { opacity: 1, filter: 'blur(0px)', duration: 0.8, ease: 'power2.out' }, 1.7);
+          }
+          // Last, once nothing is flying over them any more.
+          if (cta) tl.to(cta, { opacity: 1, duration: 0.6, ease: 'power2.out' }, 1.85);
+        },
+      });
     });
   }
 

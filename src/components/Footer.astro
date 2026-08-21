@@ -18,21 +18,28 @@ const isHome = Astro.url.pathname === '/';
   <div class="container-wide py-16 md:py-24">
     {!isHome && (
     <div class="flex flex-col gap-4 border-b border-cream/12 pb-12 md:flex-row md:items-end md:justify-between">
-      {/* Each caps word sits inside its own overflow-hidden mask, so on
-          scroll motion.ts can push the word below its baseline and let it
-          rise back up, cut off by the mask edge, each into its own place;
-          "you" is never masked and simply condenses in, opacity and blur,
-          once the others have landed. Masking the caps words is safe only
-          because they are uppercase: no descenders to clip at rest. The
-          spans carry no hidden state in markup, the script sets it, so a
-          page without the motion chunk simply shows the finished line. */}
+      {/* Each caps word is its own span so motion.ts can choreograph the
+          line on scroll: the words first reveal themselves STACKED as a
+          column, then each one travels to its place in the sentence;
+          "you" stays out of the choreography and condenses in, opacity
+          and blur, once the others have landed. No masks in the markup:
+          the words fly far from their layout slots, so any overflow
+          clipping would cut them mid-flight. The script measures, moves
+          and reveals everything itself, which also means a page without
+          the motion chunk simply shows the finished line. */}
       <p class="display-caps text-[clamp(2.4rem,6vw,5rem)] text-cream" data-footer-line>
-        <span class="inline-block overflow-hidden align-bottom"><span class="fw-word inline-block">Ready</span></span>
-        <span class="inline-block overflow-hidden align-bottom"><span class="fw-word inline-block">when</span></span>
+        <span class="fw-word inline-block">Ready</span>
+        <span class="fw-word inline-block">when</span>
         <span class="fw-you accent-word inline-block text-[0.62em] text-gold-soft">you</span>
-        <span class="inline-block overflow-hidden align-bottom"><span class="fw-word inline-block">are</span></span>
+        <span class="fw-word inline-block">are</span>
       </p>
-      <div class="flex flex-wrap items-center gap-4">
+      {/* The buttons wait for the line. While the words are stacked as a
+          column they occupy three rows instead of one and would cross
+          this block, which reads as a rendering fault rather than as
+          choreography. So motion.ts holds them back and brings them in
+          once the sentence has landed. Marked here, hidden only from the
+          script, so a page without the motion chunk shows them at once. */}
+      <div class="flex flex-wrap items-center gap-4" data-footer-cta>
         <a href="/quote/" class="btn-gold">Get my price</a>
         <a href={SITE.whatsappHref} class="btn-outline text-cream" rel="noopener">WhatsApp</a>
       </div>
