@@ -383,13 +383,19 @@ if (matchMedia('(pointer: fine)').matches) {
 // for the libraries, so they were never fetched and the words simply sat
 // there finished. Cheap to check, and it is the last thing a visitor sees.
 const footerLine = document.querySelector('[data-footer-line]');
+// The giant BPE sign-off is in the footer of every page INCLUDING the home
+// page, which is the one place the closing line above it is deliberately
+// absent. So it earns its own entry here rather than riding on footerLine:
+// on the home page that check is null and the letters would never rise.
+const footerMark = document.querySelector('[data-footer-mark]');
 const wantsScrollTrigger = !!(
   (heroSection && heroContent) ||
   manifesto ||
   quotes.length ||
   orbits.length ||
   drifts.length ||
-  footerLine
+  footerLine ||
+  footerMark
 );
 // GSAP itself is also needed by the two timed pieces that never touch
 // scroll: the intro and the hero copy arriving.
@@ -895,6 +901,45 @@ async function boot() {
         // then each word takes its own size, which is what "settling" is
         .to(words, { scale: 1, duration: 0.55, ease: 'power3.inOut', stagger: 0.07 }, 0.38)
         .to(you || {}, { opacity: 1, filter: 'blur(0px)', duration: 0.7, ease: 'power2.out' }, 0.85);
+    });
+  }
+
+  /* The name itself, last thing on every page: the three letters rise out of
+   * their own baseline, Artiom's brief. P leads and E and B come up behind
+   * it, so the row assembles from the middle outwards instead of reading
+   * left to right like text. Nothing fades: a pure masked rise is what makes
+   * a letterform this size feel like weight being lifted rather than a
+   * graphic being switched on.
+   *
+   * The letters are three shapes inside ONE svg, in the artwork's own order,
+   * B then P then E. They are picked by position and immediately named,
+   * because marks.ts is generated from the brand pack and carries no
+   * per-letter hook; adding one there would be undone by the next run of
+   * scripts/build-marks.mjs.
+   *
+   * Travel is measured in the svg's own user units, never pixels, so it
+   * follows the lockup at every width: one viewBox height is exactly one
+   * letter height here, the mark having been trimmed tight against the
+   * glyphs, so the letters always start just clear of the box and the mask
+   * has nothing to show until they move. As with the line above, the low
+   * state is set here and never in markup, so a visitor whose device never
+   * buys this chunk simply sees the name finished. */
+  if (ScrollTrigger) {
+    document.querySelectorAll<HTMLElement>('[data-footer-mark]').forEach((mask) => {
+      const svg = mask.querySelector<SVGSVGElement>('svg[data-logo="wordmarkBpe"]');
+      const shapes = svg ? Array.from(svg.querySelectorAll<SVGElement>('path, polygon')) : [];
+      // Three and only three. If the artwork is ever regenerated into a
+      // different number of pieces, the name stays put rather than half of
+      // it hiding below a mask that never lifts.
+      if (!svg || shapes.length !== 3) return;
+      const [b, p, e] = shapes;
+      const drop = svg.viewBox.baseVal.height || 325;
+      gsap.set(shapes, { y: drop });
+      gsap
+        .timeline({ scrollTrigger: { trigger: mask, start: 'top 92%', once: true } })
+        .to(p, { y: 0, duration: 1.15, ease: 'power3.out' }, 0)
+        .to(e, { y: 0, duration: 1.15, ease: 'power3.out' }, 0.1)
+        .to(b, { y: 0, duration: 1.15, ease: 'power3.out' }, 0.18);
     });
   }
 

@@ -86,7 +86,15 @@ const isHome = Astro.url.pathname === '/';
       letters was tried twice and rejected twice: a cropped glyph reads as a
       rendering fault, not as a crop. */}
   <div class="container-wide pb-4" aria-hidden="true">
-    <BpeLogo variant="wordmarkBpe" tone="onDark" sizing="width" class="opacity-95" />
+    {/* The mask the three letters rise out of, and the hook motion.ts looks
+        for. It hugs the artwork exactly, because the lockup was trimmed
+        tight against the glyphs, so each letter appears from its own
+        baseline rather than from some arbitrary line under the row. The
+        clip is doubled on purpose: an <svg> root already hides what leaves
+        its box, and this says out loud that the overflow is the effect. */}
+    <div class="overflow-hidden" data-footer-mark>
+      <BpeLogo variant="wordmarkBpe" tone="onDark" sizing="width" class="opacity-95" />
+    </div>
   </div>
   <div class="border-t border-cream/12">
     <div class="container-wide flex flex-col items-center justify-between gap-2 py-6 text-xs text-cream/40 md:flex-row">
