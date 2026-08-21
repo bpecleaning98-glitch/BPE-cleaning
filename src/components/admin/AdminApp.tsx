@@ -91,7 +91,7 @@ export default function AdminApp() {
               <BrandMark />
             </a>
             <span className="hidden h-6 w-px bg-ink/15 sm:block" />
-            <Caps className="hidden sm:inline">Client cabinet</Caps>
+            <Caps className="hidden sm:inline">Admin cabinet</Caps>
           </div>
           <div className="flex items-center gap-4">
             <span className="hidden font-sans text-[0.72rem] text-stone md:inline">
@@ -215,7 +215,7 @@ function SignIn() {
         <div className="mb-8 flex justify-center">
           <BrandMark />
         </div>
-        <h1 className="text-center font-display text-2xl font-[380] text-ink">Client cabinet</h1>
+        <h1 className="text-center font-display text-2xl font-[380] text-ink">Admin cabinet</h1>
         <p className="mt-2 text-center text-[0.8rem] text-stone">
           Traffic, campaign links, blog and requests for bpecleaning.ie
         </p>
