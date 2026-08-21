@@ -108,12 +108,18 @@ import heroPhoto from '../../assets/stock/hero-living-room.jpg';
       </span>
     </h1>
 
-    {/* One row, both actions, at every width. The number is spelled out
-        where there is room for it and shortened on a phone, which is the
-        only place the two would otherwise stack. */}
-    <div class="hw-up mt-10 flex flex-wrap items-center gap-3 sm:gap-4">
-      <a href="/quote/" class="btn-gold">Get my price</a>
-      <a href={SITE.phoneHref} class="btn-outline text-cream">
+    {/* On the phone the pair is a balanced, centred unit: two equal columns
+        filling the width, so neither button looks like the other's shadow
+        and the row sits on the same centre axis the spread headline uses.
+        From md up they return to their natural widths on the left, where
+        the desktop lockup is anchored. The number is spelled out where
+        there is room and shortened where there is not. */}
+    {/* auto columns, not two equal halves: at 375px an equal split is too
+        narrow for GET MY PRICE and it broke onto two lines. Each button takes
+        the width its label needs, and the pair is centred as a unit. */}
+    <div class="hw-up mt-10 flex flex-wrap items-center justify-center gap-3 md:justify-start md:gap-4">
+      <a href="/quote/" class="btn-gold whitespace-nowrap !px-6 md:!px-8">Get my price</a>
+      <a href={SITE.phoneHref} class="btn-outline whitespace-nowrap !px-6 text-cream md:!px-8">
         <span class="sm:hidden">Call us</span>
         <span class="hidden sm:inline">Call {SITE.phoneDisplay}</span>
       </a>

@@ -890,18 +890,29 @@ async function boot() {
     });
   }
 
-  /* Lead quote: the words brighten one after another as the section passes
-   * through the viewport. No pin, just a scrub window. */
+  /* Lead quote: the words arrive one after another, then STAY.
+   *
+   * This used to be a scrub: the words sat at 14 percent opacity and
+   * brightened as you scrolled through them, which meant most of the
+   * testimonial was half transparent most of the time, and if you stopped
+   * scrolling mid-way it stayed that way. Artiom read it, fairly, as broken
+   * text rather than as an effect. Now it plays once when the quote comes
+   * into view and the words simply lift in and stay solid.
+   *
+   * A from() tween, not a set() plus to(): the finished state is what lives
+   * in the markup, so a browser that never runs this shows a normal, fully
+   * legible quotation. */
   if (ScrollTrigger) {
     quotes.forEach((quote) => {
       const words = quote.querySelectorAll<HTMLElement>('.q-word');
       if (!words.length) return;
-      gsap.set(words, { opacity: 0.14 });
-      gsap.to(words, {
-        opacity: 1,
-        ease: 'none',
-        stagger: 0.05,
-        scrollTrigger: { trigger: quote, start: 'top 82%', end: 'top 28%', scrub: true },
+      gsap.from(words, {
+        opacity: 0,
+        y: 14,
+        duration: 0.7,
+        ease: 'power2.out',
+        stagger: 0.024,
+        scrollTrigger: { trigger: quote, start: 'top 78%', once: true },
       });
     });
 

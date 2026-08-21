@@ -113,13 +113,18 @@ const seoLine =
       porcelain being scrolled past. The earlier content-height version
       existed only because the mobile morph ran unpinned and raced the
       reader, which is the exact complaint that brought the pin back. */}
-  <div class="container-wide relative z-10 flex min-h-[100svh] flex-col justify-center py-24">
+  {/* min-h ONLY from md up, and this keeps getting lost, so: on a phone the
+      section is not pinned, so reserving a whole viewport and centring half
+      a screen of copy inside it leaves a screen of empty porcelain under the
+      words. Artiom has circled that gap twice. Here it is as tall as what is
+      in it. The pinned scrub on desktop is what needs the full height. */}
+  <div class="container-wide relative z-10 flex flex-col justify-center py-16 md:min-h-[100svh] md:py-24">
     <div class="mx-auto w-full max-w-4xl">
     <p class="kicker" data-reveal>The Company</p>
 
     {/* pb reserves a line: phrase B runs one line longer than phrase A and
         overlays it absolutely, so without this it would kiss the stats row. */}
-    <div class="relative mt-10 pb-[1.6em]" aria-label={label} role="img">
+    <div class="relative mt-8 pb-[1.6em] md:mt-10" aria-label={label} role="img">
       <p class="m-phrase m-phrase-a font-display text-[clamp(1.9rem,4.3vw,3.6rem)] leading-[1.16] text-ink" aria-hidden="true">
         {phraseA.map((token) => (
           <span class={tokenClass(token)} data-key={token.key}>{token.t}{' '}</span>
@@ -132,7 +137,7 @@ const seoLine =
       </p>
     </div>
 
-    <div class="mt-16 grid max-w-3xl grid-cols-2 gap-x-8 gap-y-8 sm:grid-cols-4" data-reveal>
+    <div class="mt-10 grid max-w-3xl grid-cols-2 gap-x-8 gap-y-8 sm:grid-cols-4 md:mt-16" data-reveal>
       {stats.map((stat) => (
         <div class="border-t border-ink/15 pt-4">
           <p class="display text-3xl text-ink md:text-4xl">{stat.value}</p>
@@ -141,7 +146,7 @@ const seoLine =
       ))}
     </div>
 
-    <p class="mt-12 max-w-xl text-sm leading-relaxed text-ink/60" data-reveal>{seoLine}</p>
+    <p class="mt-8 max-w-xl text-sm leading-relaxed text-ink/60 md:mt-12" data-reveal>{seoLine}</p>
     </div>
   </div>
 </section>

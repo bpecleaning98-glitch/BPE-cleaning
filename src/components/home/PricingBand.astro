@@ -1,5 +1,5 @@
 ---
-import { FIXED, HOURLY, VAT_NOTE } from '../../data/pricing';
+import { FIXED, HOURLY } from '../../data/pricing';
 
 /**
  * Homepage pricing TEASER, light and airy. The full tables live on /prices/
@@ -44,9 +44,10 @@ const figures = [
       ))}
     </div>
 
-    <div class="mt-10 flex flex-wrap items-center justify-between gap-6" data-reveal style="--d: 0.1s">
-      <p class="text-xs text-ink/45">{VAT_NOTE}</p>
-      <a href="/prices/" class="link-caps text-gold-deep">See the full price list</a>
-    </div>
+    {/* The VAT line lives on /prices/ and on every service page, beside the
+        figures it actually qualifies. Repeating it under a three-number
+        teaser was the fourth time a visitor met it before reaching the
+        pricing page, and the link that followed it is the same trip the
+        three figures above already invite. Both gone. */}
   </div>
 </section>
