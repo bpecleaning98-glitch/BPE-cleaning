@@ -376,12 +376,20 @@ if (matchMedia('(pointer: fine)').matches) {
 
 // Anything scroll-scrubbed or pinned. ScrollTrigger is only worth its 40 KB
 // when one of these is on the page.
+//
+// footerLine belongs in this list and was missing from it, which is the whole
+// bug: the closing line is in the footer of EVERY page, but on a page with no
+// hero and no manifesto, /contact and /guides among them, nothing else asked
+// for the libraries, so they were never fetched and the words simply sat
+// there finished. Cheap to check, and it is the last thing a visitor sees.
+const footerLine = document.querySelector('[data-footer-line]');
 const wantsScrollTrigger = !!(
   (heroSection && heroContent) ||
   manifesto ||
   quotes.length ||
   orbits.length ||
-  drifts.length
+  drifts.length ||
+  footerLine
 );
 // GSAP itself is also needed by the two timed pieces that never touch
 // scroll: the intro and the hero copy arriving.

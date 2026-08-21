@@ -3,9 +3,20 @@ import BpeLogo from './brand/BpeLogo.astro';
 import { SITE, SERVICES } from '../data/site';
 import { AREAS_SENTENCE } from '../data/areas';
 const year = new Date().getFullYear();
+
+/**
+ * The homepage closes on its own card, "Let's begin", which asks for exactly
+ * the same thing this footer line asks for. Two closing calls to action back
+ * to back read as a page that has run out of things to say, so the footer
+ * keeps its quiet half there and hands the ask to the card above it. Every
+ * other page still gets the full line: they end on their own content, not on
+ * an invitation.
+ */
+const isHome = Astro.url.pathname === '/';
 ---
 <footer class="bg-night text-cream">
   <div class="container-wide py-16 md:py-24">
+    {!isHome && (
     <div class="flex flex-col gap-4 border-b border-cream/12 pb-12 md:flex-row md:items-end md:justify-between">
       {/* Each word is its own span so motion.ts can assemble the line on
           scroll: the caps words arrive oversized, rise as one and settle
@@ -23,12 +34,13 @@ const year = new Date().getFullYear();
         <a href={SITE.whatsappHref} class="btn-outline text-cream" rel="noopener">WhatsApp</a>
       </div>
     </div>
+    )}
 
     {/* Two columns from the smallest screen up. Stacked, the brand block, eight
         service links and five contact lines made the footer a single strip
         taller than the page above it. Side by side they cost half the height
         and read as a structure rather than a list that will not end. */}
-    <div class="grid grid-cols-2 gap-x-6 gap-y-10 pt-12 md:gap-12 md:grid-cols-[1.4fr_1fr_1fr]">
+    <div class:list={['grid grid-cols-2 gap-x-6 gap-y-10 md:gap-12 md:grid-cols-[1.4fr_1fr_1fr]', !isHome && 'pt-12']}>
       <div class="col-span-2 md:col-span-1">
         {/* The footer column is portrait on a phone and a wide row from the
             tablet breakpoint up, so it takes the lockup built for each. */}
