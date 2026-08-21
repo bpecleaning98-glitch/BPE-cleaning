@@ -1,0 +1,329 @@
+---
+import Base from '../../layouts/Base.astro';
+import { breadcrumbs, businessRef, graph } from '../../lib/schema';
+import Diamond from '../../components/Diamond.astro';
+import { SITE } from '../../data/site';
+import {
+  HOURLY,
+  FIXED,
+  SIZE_LABELS,
+  DISCOUNTS,
+  VAT_NOTE,
+  ESTIMATE_NOTE,
+} from '../../data/pricing';
+import { AREAS_SENTENCE } from '../../data/areas';
+
+/**
+ * Guide: deep cleaning vs regular cleaning.
+ *
+ * An evergreen explainer, not a doorway page. The cleaning knowledge in it is
+ * general craft knowledge, written concretely; every fact ABOUT BPE is read
+ * from src/data or is one of the confirmed proof points, exactly as on the
+ * service pages. No price appears as a literal anywhere in this file: they all
+ * interpolate from pricing.ts, so a client correction moves this page with it.
+ *
+ * Structured data is Article plus the breadcrumb trail. No FAQPage: the page
+ * has no FAQ block on screen, and schema for content a page does not show is
+ * a policy violation. The trail runs Guides then this page, matching the live
+ * /guides/ index and the pattern the other guide pages use.
+ */
+
+const GUIDE_PATH = '/guides/deep-cleaning-vs-regular-cleaning/';
+
+const description =
+  'What a weekly clean maintains, what a deep clean reaches that maintenance never touches, how often each makes sense and how each one is priced. A plain answer from a Dublin cleaning company.';
+
+// The four confirmed deep cleaning tiers. Studio is deliberately absent:
+// pricing.ts flags it as unconfirmed, same as on the service pages.
+const tiers = (['1bed', '2bed', '3bed', '4bed'] as const).map((size) => ({
+  label: SIZE_LABELS[size],
+  price: FIXED.deep[size],
+}));
+
+// The self-diagnosis list. Each spot is checkable in seconds and each verdict
+// is physical: what the reader sees or feels, not what we assert about them.
+const checklist = [
+  {
+    title: 'The base of the kitchen tap',
+    body: 'Run a fingertip around where the tap meets the sink. Smooth chrome means maintenance is holding. A rough white ring is limescale, and it will not wipe off.',
+  },
+  {
+    title: 'The shower screen, against the light',
+    body: 'Look through the glass at an angle. A cloudy film that survives an ordinary clean is mineral and soap bonded to the surface, and it needs a descale, not another wipe.',
+  },
+  {
+    title: 'The top of the extractor hood',
+    body: 'Draw a finger along it. If it comes back tacky, airborne grease has settled up there and started holding dust.',
+  },
+  {
+    title: 'Skirting behind the furniture',
+    body: 'Check the skirting behind the sofa, not the stretch by the door. The hidden runs show what the visible ones are wiped often enough to hide.',
+  },
+  {
+    title: 'The window tracks',
+    body: 'Slide a window open and look into the track. Grit, dead flies and grey silt collect in there for months at a time, because no quick clean opens the window.',
+  },
+  {
+    title: 'The grout in the shower',
+    body: 'Compare the grout lines inside the shower with the lines behind the bathroom door. If the shower lines are darker, that is not shadow.',
+  },
+  {
+    title: 'The floor behind one appliance',
+    body: 'Pull out one piece you can safely move, a bin, a chair, a small unit. The floor behind it is the floor a maintenance visit never sees.',
+  },
+  {
+    title: 'The wall around the busiest light switch',
+    body: 'Look at the paint around it. Finger marks around switches and door handles build in layers, and a quick wipe polishes the layer rather than removing it.',
+  },
+];
+
+const pageUrl = new URL(GUIDE_PATH, Astro.site ?? 'https://bpecleaning.ie').href;
+
+const jsonLd = graph(
+  {
+    '@type': 'Article',
+    '@id': `${pageUrl}#article`,
+    headline: 'Deep cleaning vs regular cleaning: what is the difference',
+    description,
+    url: pageUrl,
+    inLanguage: 'en-IE',
+    mainEntityOfPage: { '@type': 'WebPage', '@id': pageUrl },
+    datePublished: '2026-08-21',
+    author: businessRef(Astro.site),
+    publisher: businessRef(Astro.site),
+  },
+  breadcrumbs(
+    [
+      { name: 'Guides', path: '/guides/' },
+      { name: 'Deep Cleaning vs Regular Cleaning', path: GUIDE_PATH },
+    ],
+    Astro.site
+  )
+);
+---
+<Base
+  title="Deep Cleaning vs Regular Cleaning | What Is the Difference"
+  description={description}
+  ogType="article"
+  jsonLd={jsonLd}
+>
+  <section class="bg-night pt-40 pb-20 text-cream md:pt-48 md:pb-24">
+    <div class="container-wide">
+      <p class="kicker !text-gold" data-reveal>Cleaning Guides</p>
+      <h1 class="display-caps mt-6 text-[clamp(2.4rem,6.5vw,5rem)]" data-reveal>
+        <span class="line-mask"><span>Deep cleaning vs</span></span>
+        <span class="line-mask"><span style="--d: 0.1s"><span class="accent-word text-gold-soft">regular</span> cleaning</span></span>
+      </h1>
+      <p class="mt-8 max-w-xl text-base leading-relaxed text-cream/70" data-reveal style="--d: 0.2s">
+        The two names get used as if they were one job, and they are not. One holds
+        a home at a standard, week after week. The other recovers the places a
+        weekly visit never has time to reach. This guide sets out the honest
+        difference, what each one costs, and how to tell which one your home
+        actually needs.
+      </p>
+    </div>
+  </section>
+
+  <!-- The difference, in three numbered sections -->
+  <section class="section-pad relative overflow-hidden bg-porcelain">
+    <Diamond class="pointer-events-none absolute -right-40 -top-44 h-[38rem] w-[38rem] opacity-[0.05]" aria-hidden="true" />
+    <div class="container-x relative">
+      <article class="py-10 pt-0 md:grid md:grid-cols-[6rem_1fr] md:gap-10" data-reveal>
+        <p class="font-sans text-[0.7rem] font-medium tabular-nums text-gold-deep">01</p>
+        <div>
+          <h2 class="h-serif text-2xl text-ink md:text-[1.75rem]">What a regular clean is for</h2>
+          <p class="mt-5 max-w-2xl text-base leading-relaxed text-ink/75">
+            A regular clean is maintenance. It is the same visit repeating weekly or
+            every two weeks, and its job is to keep a lived-in home at the standard
+            you set: kitchen surfaces and the hob wiped down, the bathroom cleaned
+            and dried, floors hoovered and mopped, bins emptied, mirrors finished,
+            the visible dust gone.
+          </p>
+          <p class="mt-5 max-w-2xl text-base leading-relaxed text-ink/75">
+            The quiet rule of maintenance is that it works on what builds up in
+            days. Crumbs, splashes, dust on open surfaces, a film on the hob,
+            toothpaste marks on the mirror. All of it arrives quickly and all of it
+            lifts quickly, which is why this kind of cleaning is booked by the hour
+            and settles into a rhythm. Our version of it is the
+            <a href="/house-cleaning-dublin/" class="font-medium text-gold-deep underline decoration-gold/40 underline-offset-4 transition-colors hover:text-ink">house cleaning</a>
+            service.
+          </p>
+          <p class="mt-5 max-w-2xl text-base leading-relaxed text-ink/75">
+            What a maintenance visit does not do is chase what builds up over
+            months. Not through carelessness, through arithmetic. A weekly visit has
+            a fixed number of hours, and those hours go where the difference shows
+            this week. The base of the tap, the top of the extractor and the
+            skirting behind the sofa never make that cut, so they drift, slowly, in
+            any home that only ever gets maintenance.
+          </p>
+        </div>
+      </article>
+
+      <article class="border-t border-ink/12 py-10 md:grid md:grid-cols-[6rem_1fr] md:gap-10" data-reveal>
+        <p class="font-sans text-[0.7rem] font-medium tabular-nums text-gold-deep">02</p>
+        <div>
+          <h2 class="h-serif text-2xl text-ink md:text-[1.75rem]">What a deep clean reaches</h2>
+          <p class="mt-5 max-w-2xl text-base leading-relaxed text-ink/75">
+            A <a href="/deep-cleaning-dublin/" class="font-medium text-gold-deep underline decoration-gold/40 underline-offset-4 transition-colors hover:text-ink">deep clean</a>
+            starts where the weekly clock runs out. It is a slower, once-off pass
+            through the whole property, and it works on the build-up that is
+            measured in months rather than days.
+          </p>
+          <p class="mt-5 max-w-2xl text-base leading-relaxed text-ink/75">
+            Limescale is the clearest example. Most of Dublin runs on hard water,
+            and it shows: taps, shower screens and shower heads slowly grow a
+            mineral crust. A wipe takes off the water and leaves the mineral. Shifting it
+            needs descaler, time for the descaler to sit, and scrubbing. Kitchen
+            grease behaves the same way. Cooking puts fat into the air, the fat
+            settles on the extractor, the cupboard tops and the appliance
+            exteriors, and it bonds with dust into a layer no quick wipe moves.
+          </p>
+          <p class="mt-5 max-w-2xl text-base leading-relaxed text-ink/75">
+            Then there is the geography a fast clean never visits: skirting boards,
+            door tops and frames, window sills and tracks, radiators, light
+            switches and socket plates, bathroom grout, the ceiling corners where
+            cobwebs collect, and the floor under and behind any furniture that can
+            safely be moved. None of it is difficult work. All of it is slow work,
+            and slow is exactly what a maintenance visit cannot afford to be.
+          </p>
+        </div>
+      </article>
+
+      <article class="border-t border-ink/12 py-10 pb-0 md:grid md:grid-cols-[6rem_1fr] md:gap-10" data-reveal>
+        <p class="font-sans text-[0.7rem] font-medium tabular-nums text-gold-deep">03</p>
+        <div>
+          <h2 class="h-serif text-2xl text-ink md:text-[1.75rem]">How often each one makes sense</h2>
+          <p class="mt-5 max-w-2xl text-base leading-relaxed text-ink/75">
+            Regular cleaning earns its keep weekly or bi-weekly. Stretched to
+            monthly, each visit spends its hours winning ground back rather than
+            holding it, which is the expensive way to buy cleaning.
+          </p>
+          <p class="mt-5 max-w-2xl text-base leading-relaxed text-ink/75">
+            A deep clean is occasional by design. The moments it fits: before a
+            regular schedule begins, so the maintenance visits protect a high
+            standard instead of preserving a backlog; when a home has gone a long
+            stretch without help; when a kitchen or bathroom has visibly lost the
+            fight with limescale and grease; and around a move, in either
+            direction.
+          </p>
+          <p class="mt-5 max-w-2xl text-base leading-relaxed text-ink/75">
+            One version of the deep clean has its own name. When the property is a
+            rental being handed back, the same work done to the same standard is
+            called end of tenancy cleaning, and we price the two identically. If
+            that is your situation, our
+            <a href="/guides/end-of-tenancy-cleaning-checklist/" class="font-medium text-gold-deep underline decoration-gold/40 underline-offset-4 transition-colors hover:text-ink">end of tenancy cleaning checklist</a>
+            walks the whole handover room by room.
+          </p>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- The self-diagnosis checklist -->
+  <section class="section-pad bg-ivory">
+    <div class="container-wide grid gap-14 lg:grid-cols-[1fr_1.5fr] lg:gap-20">
+      <div class="lg:sticky lg:top-32 lg:self-start">
+        <p class="kicker" data-reveal>The Honest Test</p>
+        <h2 class="display mt-6 text-[clamp(2.2rem,5vw,4rem)] text-ink" data-reveal>
+          <span class="line-mask"><span>Eight places that</span></span>
+          <span class="line-mask"><span style="--d: 0.1s">give the <span class="accent-word text-gold-deep">answer</span></span></span>
+        </h2>
+        <p class="mt-8 max-w-sm text-base leading-relaxed text-ink/70" data-reveal style="--d: 0.2s">
+          You do not need a professional to diagnose this. Walk your home with the
+          list. Each spot takes a few seconds to check, and together they tell you
+          which clean to book.
+        </p>
+      </div>
+
+      <div class="border-t border-ink/15">
+        {checklist.map((item, i) => (
+          <div
+            class="grid grid-cols-[2.6rem_1fr] items-baseline gap-x-6 border-b border-ink/15 py-8 md:grid-cols-[3.2rem_1fr_1.4fr] md:gap-x-10"
+            data-reveal
+            style={`--d: ${0.06 * i}s`}
+          >
+            <span class="font-sans text-[0.66rem] font-semibold tracking-[0.2em] text-stone">{String(i + 1).padStart(2, '0')}</span>
+            <h3 class="display text-xl text-ink md:text-2xl">{item.title}</h3>
+            <p class="col-start-2 mt-3 text-sm leading-relaxed text-ink/60 md:col-start-3 md:mt-0">{item.body}</p>
+          </div>
+        ))}
+        <p class="mt-8 max-w-2xl text-base leading-relaxed text-ink/70" data-reveal>
+          Two or three of these failing is normal life, and a good regular clean
+          will keep it that way. If five or more fail, the backlog has outgrown
+          maintenance. Book one deep clean, reset the property, and then let a
+          regular schedule hold the line. That order is cheaper than asking a
+          weekly visit to fight history.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- How each one is priced -->
+  <section class="section-pad relative overflow-hidden bg-porcelain">
+    <Diamond class="pointer-events-none absolute -left-44 -bottom-48 h-[38rem] w-[38rem] opacity-[0.05]" aria-hidden="true" />
+    <div class="container-x relative">
+      <p class="kicker" data-reveal>What Each Costs</p>
+      <h2 class="display mt-6 max-w-2xl text-[clamp(2.2rem,5vw,4rem)] text-ink" data-reveal>
+        <span class="line-mask"><span>Two prices, because</span></span>
+        <span class="line-mask"><span style="--d: 0.1s">they are two <span class="accent-word text-gold-deep">jobs</span></span></span>
+      </h2>
+
+      <div class="mt-14 grid gap-12 border-t border-ink/15 pt-10 lg:grid-cols-2 lg:gap-20">
+        <div data-reveal>
+          <p class="font-sans text-[0.66rem] font-semibold uppercase tracking-[0.24em] text-stone">Regular cleaning</p>
+          <p class="display mt-4 text-3xl text-ink md:text-4xl">{HOURLY.regular.label}</p>
+          <p class="mt-6 text-base leading-relaxed text-ink/75">
+            Regular cleaning is priced by the hour, {HOURLY.regular.label}, with a
+            minimum booking of {HOURLY.regular.minHours} hours. Hourly is the
+            honest unit for it, because the scope repeats: the same rooms to the
+            same standard, visit after visit.
+          </p>
+          <p class="mt-5 text-base leading-relaxed text-ink/75">
+            On a recurring schedule the rate drops. A weekly clean saves
+            {' '}{DISCOUNTS.weekly.pct} percent and a bi-weekly clean saves
+            {' '}{DISCOUNTS.biweekly.pct} percent, because a home that is held
+            never needs rescuing.
+          </p>
+        </div>
+
+        <div data-reveal style="--d: 0.1s">
+          <p class="font-sans text-[0.66rem] font-semibold uppercase tracking-[0.24em] text-stone">Deep cleaning</p>
+          <p class="display mt-4 text-3xl text-ink md:text-4xl">Priced by property size</p>
+          <div class="mt-6 border-t border-ink/15">
+            {tiers.map((tier) => (
+              <div class="flex items-baseline justify-between gap-6 border-b border-ink/15 py-4">
+                <span class="font-sans text-[0.7rem] font-semibold uppercase tracking-[0.22em] text-ink/70">{tier.label}</span>
+                <span class="font-sans text-sm font-medium tabular-nums text-ink">from €{tier.price}</span>
+              </div>
+            ))}
+          </div>
+          <p class="mt-6 text-base leading-relaxed text-ink/75">
+            A deep clean is a whole job, so it is priced as one. Larger properties
+            are priced individually, and if you prefer, the same clean can be
+            booked by the hour at {HOURLY.deep.label}. End of tenancy cleaning is
+            priced exactly the same as deep cleaning.
+          </p>
+        </div>
+      </div>
+
+      <p class="mt-10 max-w-2xl text-sm leading-relaxed text-ink/55" data-reveal>
+        {VAT_NOTE} {ESTIMATE_NOTE} Every figure above comes from our published
+        list, side by side with every other service, on the
+        <a href="/prices/" class="font-medium text-gold-deep underline decoration-gold/40 underline-offset-4 transition-colors hover:text-ink">prices page</a>.
+      </p>
+
+      <div class="mt-14 border-t border-ink/15 pt-10" data-reveal>
+        <p class="max-w-2xl text-base leading-relaxed text-ink/75">
+          The short version: if the eight spots above are broadly passing, a
+          regular schedule will keep them passing. If they are failing, one deep
+          clean resets the property and the schedule keeps it there. BPE Cleaning
+          Services has been trading for more than seven years, fully insured,
+          cleaning with eco-friendly products, and available {SITE.hours}.
+          {' '}{AREAS_SENTENCE} When you are ready, tell us the property size and
+          the date on the <a href="/quote/" class="font-medium text-gold-deep underline decoration-gold/40 underline-offset-4 transition-colors hover:text-ink">quote page</a>
+          and your price is confirmed before anything is booked.
+        </p>
+      </div>
+    </div>
+  </section>
+</Base>

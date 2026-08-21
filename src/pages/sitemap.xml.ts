@@ -32,6 +32,11 @@ const STATIC_PAGES: StaticPage[] = [
   { path: '/about/', changefreq: 'yearly', priority: '0.6' },
   { path: '/contact/', changefreq: 'yearly', priority: '0.6' },
   { path: '/blog/', changefreq: 'weekly', priority: '0.7' },
+  { path: '/guides/', changefreq: 'monthly', priority: '0.7' },
+  { path: '/guides/end-of-tenancy-cleaning-checklist/', changefreq: 'yearly', priority: '0.6' },
+  { path: '/guides/deep-cleaning-vs-regular-cleaning/', changefreq: 'yearly', priority: '0.6' },
+  { path: '/guides/airbnb-turnover-checklist/', changefreq: 'yearly', priority: '0.6' },
+  { path: '/guides/after-builders-cleaning-guide/', changefreq: 'yearly', priority: '0.6' },
   { path: '/privacy/', changefreq: 'yearly', priority: '0.3' },
 ];
 

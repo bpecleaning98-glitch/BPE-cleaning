@@ -93,11 +93,18 @@ import heroPhoto from '../../assets/stock/hero-living-room.jpg';
         from the left, "meets" breathes in through a blur, "perfection"
         arrives from the right, the actions slide up. No CSS delays, so
         internal navigation shows it finished. */}
-    <h1 class="display-caps text-[clamp(2.1rem,10.5vw,8.5rem)]">
-      <span class="hw-l1 block">Where clean</span>
-      <span class="block">
-        <span class="hw-meets accent-word inline-block text-[0.62em] text-gold-soft">meets</span>
-        <span class="hw-perf inline-block">perfection</span>
+    {/* On a phone the headline is the reference's full-height spread: the
+        three words hold the whole photograph, one high, one centred, one
+        low, with the picture breathing between them. flex-1 stretches the
+        h1 through the empty height and justify-evenly deals the words out;
+        the middle wrapper is display:contents there, so its two words count
+        as separate lines. From md up the wrapper becomes a block again and
+        the lockup reassembles into the two bottom-anchored lines. */}
+    <h1 class="display-caps flex flex-1 flex-col justify-evenly py-8 text-[clamp(2.3rem,10.5vw,8.5rem)] md:block md:flex-none md:py-0">
+      <span class="hw-l1 block self-start">Where clean</span>
+      <span class="contents md:block">
+        <span class="hw-meets accent-word inline-block self-center text-[0.62em] text-gold-soft">meets</span>
+        <span class="hw-perf inline-block self-end">perfection</span>
       </span>
     </h1>
 

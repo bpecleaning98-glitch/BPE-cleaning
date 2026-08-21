@@ -1,0 +1,341 @@
+---
+import Base from '../../layouts/Base.astro';
+import { breadcrumbs, businessRef, graph } from '../../lib/schema';
+import { SITE } from '../../data/site';
+import { AREAS_SENTENCE } from '../../data/areas';
+import { HOURLY, FIXED, SIZE_LABELS, VAT_NOTE, ESTIMATE_NOTE } from '../../data/pricing';
+
+/**
+ * Evergreen guide: what an after builders clean actually involves. The point of
+ * the page is craft knowledge a reader can use whoever they hire: what fine
+ * construction dust does, the order the work has to be done in, why the same
+ * property costs more after a build than after ordinary living, and what to
+ * inspect before any cleaning crew leaves.
+ *
+ * FACTS DISCIPLINE, same rule as everywhere on this site:
+ *   - every figure is interpolated from data/pricing.ts, none typed by hand
+ *   - the only BPE claims are the evidenced set: fully insured, eco-friendly
+ *     products, seven days a week 8:00 to 20:00, the published coverage list
+ *   - everything else on the page is general cleaning craft, stated as such
+ */
+
+const sizes = ['1bed', '2bed', '3bed', '4bed'] as const;
+const comparison = sizes.map((size) => ({
+  label: SIZE_LABELS[size],
+  deep: FIXED.deep[size],
+  builders: FIXED.afterBuilders[size],
+}));
+
+/** The method, high level to low, dry before wet, floors last. */
+const steps = [
+  {
+    title: 'Clear the debris first',
+    text: 'Offcuts, packaging, tape, protective film and sheeting go out before any cleaning starts. Cleaning around debris only moves dust from one pile to another, and every bag carried through a finished room afterwards undoes work.',
+  },
+  {
+    title: 'Dry before wet',
+    text: 'The whole property is hoovered and dusted before water touches anything. Dust lifted dry leaves the room. Dust wiped wet smears, and on a new floor it dries into a grey film that takes a second full wash to shift.',
+  },
+  {
+    title: 'Top down, always',
+    text: 'Light fittings, curtain poles, tops of doors and frames, and vents come first, then walls and joinery, then worktop height, then the floor. Dust falls. Work with gravity or clean everything twice.',
+  },
+  {
+    title: 'Detail the fittings',
+    text: 'Sockets, switch plates, hinges, handles, window tracks and extractor covers are done by hand. This is slow, unglamorous work, and it is exactly where a builders clean earns its price.',
+  },
+  {
+    title: 'Lift the marks',
+    text: 'Paint spots, plaster splashes, adhesive, silicone smears, sticker residue and grout haze come off glass, tiles, sanitary ware and worktops with the right scraper or solvent for each surface. One product for everything scratches something.',
+  },
+  {
+    title: 'Floors, last of all',
+    text: 'Hoovered thoroughly, the edge against the skirting done by hand, then washed. A floor cleaned any earlier is re-dirtied by every step that follows it.',
+  },
+];
+
+/** The handover inspection, written for the reader to actually use. */
+const checks = [
+  {
+    title: 'Window tracks and hinges',
+    body: 'Run a finger along each track. It should come up clean, not grey. Open every window and look into the hinge recess, because fine dust packs in there and blows back out on the first windy day.',
+  },
+  {
+    title: 'Glass, at an angle',
+    body: 'Stand where the light rakes across the pane rather than looking straight on. Paint spots, plaster flecks and silicone smears hide from a head-on view and show instantly in raking light.',
+  },
+  {
+    title: 'The high edges',
+    body: 'Tops of door frames, picture rails, the top of the kitchen units. Dust survives up there because nobody looks up. A clean fingertip along one door frame tells you how thorough the whole job was.',
+  },
+  {
+    title: 'Sockets and switches',
+    body: 'The plate should be clean and dry with no grey line packed around its edge. Plates are cleaned with a barely damp cloth, never a wet one, so streaks here also tell you the crew was careless.',
+  },
+  {
+    title: 'Inside the units',
+    body: 'Open the kitchen cupboards and the wardrobes. Dust drifts in through every gap for the whole length of the works, and shelves are quick to check and slow to argue about later.',
+  },
+  {
+    title: 'Extractor grilles and filters',
+    body: 'Bathroom fans and cooker hoods pull airborne dust into themselves for the entire build. A grey furred grille means the airways were skipped, and it will shed back into the room.',
+  },
+  {
+    title: 'Grout, silicone and tiles',
+    body: 'Haze on tiling shows as a dull bloom that no amount of dry buffing fixes. Grout lines should be one colour end to end, and silicone beads should be smooth, not smeared with trapped dust.',
+  },
+  {
+    title: 'Floor edges and thresholds',
+    body: 'The middle of a floor is the easy part. Check the line against the skirting, the corners, and the strip under each door, because that is where builders dust makes its last stand.',
+  },
+];
+
+const PAGE_PATH = '/guides/after-builders-cleaning-guide/';
+const DESCRIPTION =
+  'Why construction dust keeps coming back, the order a proper builders clean follows, what it costs, and what to check before the cleaning crew leaves.';
+
+const origin = Astro.site ?? new URL('https://bpecleaning.ie');
+const pageUrl = new URL(PAGE_PATH, origin).href;
+
+/**
+ * Article plus the breadcrumb trail. The last crumb mints a WebPage at the bare
+ * page URL, so mainEntityOfPage points at that same @id and the two nodes meet.
+ * Author and publisher are the business stub, same @id as everywhere else.
+ */
+const jsonLd = graph(
+  {
+    '@type': 'Article',
+    '@id': `${pageUrl}#article`,
+    headline: 'After Builders Cleaning: What It Involves',
+    description: DESCRIPTION,
+    url: pageUrl,
+    mainEntityOfPage: { '@type': 'WebPage', '@id': pageUrl },
+    datePublished: '2026-08-21',
+    inLanguage: 'en-IE',
+    author: businessRef(Astro.site),
+    publisher: businessRef(Astro.site),
+  },
+  breadcrumbs([{ name: 'After Builders Cleaning Guide', path: PAGE_PATH }], Astro.site)
+);
+---
+<Base
+  title="After Builders Cleaning: What It Involves | BPE Cleaning"
+  description={DESCRIPTION}
+  ogType="article"
+  jsonLd={jsonLd}
+>
+  <section class="bg-night pt-40 pb-20 text-cream md:pt-48 md:pb-24">
+    <div class="container-wide">
+      <p class="kicker !text-gold" data-reveal>Guides</p>
+      <h1 class="display-caps mt-6 text-[clamp(2.4rem,6.5vw,5rem)]" data-reveal>
+        <span class="line-mask"><span>After builders cleaning,</span></span>
+        <span class="line-mask"><span style="--d: 0.1s">done <span class="accent-word text-gold-soft">properly</span></span></span>
+      </h1>
+      <p class="mt-8 max-w-xl text-base leading-relaxed text-cream/70" data-reveal style="--d: 0.2s">
+        The trades have gone and the house looks finished, until the light catches the floor. This
+        guide explains what construction dust actually does, the order a proper builders clean has
+        to follow, why it costs more than a deep clean of the same rooms, and what to check before
+        any cleaning crew drives away.
+      </p>
+    </div>
+  </section>
+
+  <!-- What the dust does -->
+  <section class="section-pad bg-porcelain">
+    <div class="container-wide grid gap-14 lg:grid-cols-[1fr_1.15fr] lg:gap-20">
+      <div>
+        <p class="kicker" data-reveal>The Problem</p>
+        <h2 class="display mt-6 text-[clamp(2.2rem,5vw,4rem)] text-ink" data-reveal>
+          <span class="line-mask"><span>Dust that comes</span></span>
+          <span class="line-mask"><span style="--d: 0.1s">back <span class="accent-word text-gold-deep">twice</span></span></span>
+        </h2>
+      </div>
+
+      <div class="self-center">
+        <p class="max-w-xl text-base leading-relaxed text-ink/70 md:text-lg" data-reveal>
+          Plaster, cement and MDF dust is not household dust. The particles are far finer, so they
+          hang in the air for hours after the work stops and keep settling for days. Wipe a
+          windowsill on Friday and by Monday it wears a fresh grey film. Nobody missed it. The room
+          itself was still shedding.
+        </p>
+        <p class="mt-6 max-w-xl text-base leading-relaxed text-ink/70" data-reveal style="--d: 0.1s">
+          It travels, too. Every footstep and every opened door lifts it again, and it drifts into
+          places ordinary cleaning never reaches: window tracks and hinge recesses, the faces of
+          sockets and switches, extractor grilles and appliance filters, the tops of door frames
+          and kitchen units, the fins of radiators. Sanding dust is abrasive as well. Rub it across
+          glass, chrome or a lacquered floor with a damp cloth and you are polishing the surface
+          with fine sandpaper.
+        </p>
+        <p class="mt-6 max-w-xl text-base leading-relaxed text-ink/70" data-reveal style="--d: 0.18s">
+          That is why the first pass of a builders clean is always dry: hoovering with fine
+          filtration, brushing down, tack cloths. Water comes later. Mop a dusty floor first and the
+          dust does not leave. It turns into a thin grey slurry that dries into the grain of the
+          boards and the lines of the grout.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- The sequence -->
+  <section class="section-pad bg-ivory">
+    <div class="container-wide grid gap-14 lg:grid-cols-[1fr_1.5fr] lg:gap-20">
+      <div class="lg:sticky lg:top-32 lg:self-start">
+        <p class="kicker" data-reveal>The Method</p>
+        <h2 class="display mt-6 text-[clamp(2.2rem,5vw,4rem)] text-ink" data-reveal>
+          <span class="line-mask"><span>In this order,</span></span>
+          <span class="line-mask"><span style="--d: 0.1s">or <span class="accent-word text-gold-deep">twice</span></span></span>
+        </h2>
+        <p class="mt-8 max-w-sm text-base leading-relaxed text-ink/70" data-reveal style="--d: 0.2s">
+          Every step below exists to stop dust landing on something already cleaned. Skip one and
+          the price is paid in repeated work, whoever is doing it.
+        </p>
+      </div>
+
+      <div>
+        <div class="border-t border-ink/15">
+          {steps.map((step, i) => (
+            <div
+              class="grid grid-cols-[2.6rem_1fr] items-baseline gap-x-6 border-b border-ink/15 py-7 md:grid-cols-[3.2rem_1fr_1.4fr] md:gap-x-10"
+              data-reveal
+              style={`--d: ${0.06 * i}s`}
+            >
+              <span class="font-sans text-[0.66rem] font-semibold tracking-[0.2em] text-stone">{String(i + 1).padStart(2, '0')}</span>
+              <h3 class="display text-xl text-ink md:text-2xl">{step.title}</h3>
+              <p class="col-start-2 mt-2 text-sm leading-relaxed text-ink/60 md:col-start-3 md:mt-0">{step.text}</p>
+            </div>
+          ))}
+        </div>
+        <p class="mt-8 max-w-2xl text-sm leading-relaxed text-ink/60" data-reveal>
+          Even in this order, expect some settle-out: fine dust that was airborne during the clean
+          lands over the next day or so, and a finished job allows for a final wipe of the
+          horizontal surfaces once the air has cleared. The full room by room scope we quote
+          for is on the
+          <a href="/after-builders-cleaning-dublin/" class="font-medium text-gold-deep underline decoration-gold/40 underline-offset-4 hover:decoration-gold">after builders cleaning</a>
+          service page.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Why it costs more than a deep clean -->
+  <section class="section-pad bg-night text-cream">
+    <div class="container-wide">
+      <div class="flex flex-wrap items-end justify-between gap-6">
+        <div>
+          <p class="kicker !text-gold" data-reveal>The Price</p>
+          <h2 class="display mt-6 max-w-2xl text-[clamp(2.2rem,5vw,4rem)]" data-reveal>
+            <span class="line-mask"><span>Same rooms,</span></span>
+            <span class="line-mask"><span style="--d: 0.1s">more <span class="accent-word text-gold-soft">work</span></span></span>
+          </h2>
+        </div>
+        <p class="max-w-sm text-sm leading-relaxed text-cream/60" data-reveal style="--d: 0.2s">
+          A deep clean and a builders clean cover the same property, and the builders clean is
+          priced higher. The difference is what is being removed.
+        </p>
+      </div>
+
+      <div class="mt-14 grid gap-12 lg:grid-cols-[1.15fr_1fr] lg:gap-20">
+        <div data-reveal>
+          <p class="max-w-xl text-base leading-relaxed text-cream/70">
+            A deep clean deals with living: grease, limescale, the slow everyday build up. A
+            builders clean deals with construction residue, and residue fights back. The dust needs
+            two or three passes instead of one because it keeps resettling. Paint, adhesive and
+            silicone have to be lifted spot by spot without scratching what is underneath. Tracks,
+            filters and fittings all need hand work. The rooms are the same. The hours are not.
+          </p>
+          <p class="mt-6 max-w-xl text-base leading-relaxed text-cream/70">
+            By the hour the same gap holds: deep cleaning runs {HOURLY.deep.label} and after
+            builders work runs {HOURLY.afterBuilders.label}. If what you are actually weighing is a
+            deep clean against a regular clean, that comparison has
+            <a href="/guides/deep-cleaning-vs-regular-cleaning/" class="font-medium text-gold-soft underline decoration-gold/40 underline-offset-4 hover:decoration-gold">its own guide</a>.
+          </p>
+        </div>
+
+        <div data-reveal style="--d: 0.1s">
+          <div class="grid grid-cols-[1fr_auto_auto] gap-x-8 border-b border-cream/15 pb-3 md:gap-x-12">
+            <span class="font-sans text-[0.62rem] font-semibold uppercase tracking-[0.26em] text-cream/50">Property</span>
+            <span class="font-sans text-[0.62rem] font-semibold uppercase tracking-[0.26em] text-cream/50">Deep</span>
+            <span class="font-sans text-[0.62rem] font-semibold uppercase tracking-[0.26em] text-cream/50">Builders</span>
+          </div>
+          {comparison.map((row) => (
+            <div class="grid grid-cols-[1fr_auto_auto] items-baseline gap-x-8 border-b border-cream/15 py-4 md:gap-x-12">
+              <span class="text-sm text-cream/75">{row.label}</span>
+              <span class="font-sans text-sm font-medium text-cream [font-variant-numeric:tabular-nums]">&euro;{row.deep}</span>
+              <span class="font-sans text-sm font-medium text-gold-soft [font-variant-numeric:tabular-nums]">&euro;{row.builders}</span>
+            </div>
+          ))}
+          <p class="mt-5 text-xs leading-relaxed text-cream/40">
+            {VAT_NOTE} {ESTIMATE_NOTE} The full tables, including add-ons, are on the
+            <a href="/prices/" class="text-cream/70 underline decoration-cream/30 underline-offset-4 hover:text-cream">price list</a>.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- The handover inspection -->
+  <section class="section-pad bg-porcelain">
+    <div class="container-x">
+      <p class="kicker" data-reveal>Before They Leave</p>
+      <h2 class="display mt-6 max-w-2xl text-[clamp(2.2rem,5vw,4rem)] text-ink" data-reveal>
+        <span class="line-mask"><span>Walk it before</span></span>
+        <span class="line-mask"><span style="--d: 0.1s">they <span class="accent-word text-gold-deep">drive away</span></span></span>
+      </h2>
+      <p class="mt-8 max-w-2xl text-base leading-relaxed text-ink/70" data-reveal style="--d: 0.2s">
+        Whoever does the clean, inspect the property while the crew is still on site. A few minutes
+        with daylight and a bright torch will settle more than any conversation afterwards, because
+        anything found now gets fixed on the spot. Check these eight places, in any order.
+      </p>
+
+      <div class="mt-14 border-t border-ink/12">
+        {checks.map((check, i) => (
+          <article class="border-b border-ink/12 py-8 md:grid md:grid-cols-[6rem_1fr] md:gap-10" data-reveal>
+            <p class="font-sans text-[0.7rem] font-medium tabular-nums text-gold-deep">
+              {String(i + 1).padStart(2, '0')}
+            </p>
+            <div>
+              <h3 class="h-serif text-xl text-ink md:text-2xl">{check.title}</h3>
+              <p class="mt-4 max-w-2xl text-base leading-relaxed text-ink/75">{check.body}</p>
+            </div>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- When to quote after a walkthrough, and the quiet close -->
+  <section class="section-pad bg-ivory">
+    <div class="container-wide grid gap-14 lg:grid-cols-[1fr_1.15fr] lg:gap-20">
+      <div>
+        <p class="kicker" data-reveal>Pricing The Job</p>
+        <h2 class="display mt-6 text-[clamp(2.2rem,5vw,4rem)] text-ink" data-reveal>
+          <span class="line-mask"><span>When a quote needs</span></span>
+          <span class="line-mask"><span style="--d: 0.1s">a <span class="accent-word text-gold-deep">walkthrough</span></span></span>
+        </h2>
+      </div>
+
+      <div class="self-center">
+        <p class="max-w-xl text-base leading-relaxed text-ink/70 md:text-lg" data-reveal>
+          A builders clean can usually be priced from a description: the size of the property, what
+          the works were, and whether the trades are finished. Sometimes it cannot, and it is worth
+          knowing when. If the site is not actually finished, if a snag list is still open, if
+          rooms are still storing materials, or if the works were out of the ordinary, heavy
+          sanding of old floorboards, a full replaster, a build that followed fire or water damage,
+          then a figure quoted blind is a guess dressed up as a price.
+        </p>
+        <p class="mt-6 max-w-xl text-base leading-relaxed text-ink/70" data-reveal style="--d: 0.1s">
+          In those cases the honest route is a short walkthrough first. Whoever cleans can see the
+          residue for themselves, agree the scope with you, and give a figure that will not move on
+          the day. Be wary of anyone happy to name a firm price for an unfinished site they have
+          never seen.
+        </p>
+        <p class="mt-6 max-w-xl text-base leading-relaxed text-ink/70" data-reveal style="--d: 0.18s">
+          We do this work ourselves, {SITE.hours}, fully insured and with eco-friendly
+          products. {AREAS_SENTENCE} If your own handover is coming up, tell us the size of the
+          property and what the works involved, and
+          <a href="/quote/" class="font-medium text-gold-deep underline decoration-gold/40 underline-offset-4 hover:decoration-gold">ask us for a price</a>.
+        </p>
+      </div>
+    </div>
+  </section>
+</Base>

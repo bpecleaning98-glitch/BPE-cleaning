@@ -1,0 +1,317 @@
+---
+import Base from '../../layouts/Base.astro';
+import { breadcrumbs, businessRef, graph } from '../../lib/schema';
+import Diamond from '../../components/Diamond.astro';
+import { SITE } from '../../data/site';
+import { END_OF_TENANCY, EXTRAS, VAT_NOTE, ESTIMATE_NOTE } from '../../data/pricing';
+
+/**
+ * Guide page. Evergreen, renter-facing: the room by room checklist for getting
+ * a deposit back. The cleaning knowledge here is general craft knowledge and is
+ * the point of the page. The ONLY facts about BPE are the ones the data files
+ * hold: every price is interpolated from pricing.ts, hours from site.ts, and
+ * the business facts are the verbatim set (7+ years trading, fully insured,
+ * eco-friendly products, seven days a week). Nothing else is claimed.
+ */
+
+const GUIDE_PATH = '/guides/end-of-tenancy-cleaning-checklist/';
+const canonical = new URL(GUIDE_PATH, Astro.site ?? 'https://bpecleaning.ie').href;
+
+const oven = EXTRAS.find((e) => e.key === 'oven')!;
+const fridge = EXTRAS.find((e) => e.key === 'fridge')!;
+
+const rooms = [
+  {
+    title: 'Kitchen',
+    items: [
+      'Oven interior first. Racks out, degreaser on, door glass and the roof of the oven included, then leave it to work while you clean the rest of the room.',
+      'Fridge and freezer emptied, defrosted, shelves and door seals washed, then switched off with the door propped open.',
+      'Every cupboard and drawer wiped inside, corners included, and left open to dry.',
+      'Hob, extractor hood and splashback degreased, and the extractor filter washed or replaced.',
+      'Sink, taps and draining board descaled and polished dry.',
+      'Floor washed out to the skirting, including under any appliance you can safely pull forward.',
+    ],
+  },
+  {
+    title: 'Bathroom',
+    items: [
+      'Shower glass, screen and tray descaled. The white crust dissolves with an acid-based descaler and time, not with harder scrubbing.',
+      'Grout and tiles scrubbed, and the silicone seals checked for mould.',
+      'Taps, shower head and chrome polished dry, because water left sitting turns straight back into limescale.',
+      'Toilet cleaned under the rim, around the seat hinges and behind the pan, and the cistern wiped.',
+      'Mirror, extractor vent, radiator and bin, then the floor last.',
+    ],
+  },
+  {
+    title: 'Bedrooms and living rooms',
+    items: [
+      'Wardrobes and drawers emptied and wiped inside, shelf tops especially.',
+      'Skirting boards, door frames, handles, light switches and sockets wiped down.',
+      'Radiators cleaned on top and, as far as you can reach, behind.',
+      'Windows cleaned on the inside: glass, frames, sills and trickle vents.',
+      'Cobwebs taken off ceilings, corners and light fittings.',
+      'Carpets hoovered edge to edge, hard floors mopped.',
+    ],
+  },
+  {
+    title: 'Everywhere else',
+    items: [
+      'Hallway, stairs and landing, including the banister and spindles.',
+      'Both sides of every door, and the top edge nobody ever sees.',
+      'Bins emptied, washed and left dry.',
+      'Bulbs checked and working. A dead bulb reads as neglect on an inspection report.',
+      'Windows left ajar for an hour if you can, so the property smells of nothing at all.',
+    ],
+  },
+];
+
+const steps = [
+  {
+    title: 'Empty first',
+    body: 'Move everything out before you clean anything. A room cleaned around furniture is a room cleaned twice, and the inspection looks inside and behind the things you cleaned around.',
+  },
+  {
+    title: 'Start the slow chemistry',
+    body: 'Degreaser in the oven, descaler on the shower glass. Both need time far more than they need effort, so they go on before anything else happens.',
+  },
+  {
+    title: 'Work top to bottom',
+    body: 'In every room: cobwebs and light fittings, then surfaces, then skirting boards, floors last. Nothing should fall onto a level you have already finished.',
+  },
+  {
+    title: 'Hard rooms before easy rooms',
+    body: 'Finish the kitchen and bathroom completely before the bedrooms. They take the longest and demand the most, and it is better to be tired in a bedroom than in an oven.',
+  },
+  {
+    title: 'Floors last of all',
+    body: 'Work from the far corner of each room back to the door, and finish at the front door of the property so you never cross a wet floor.',
+  },
+  {
+    title: 'Walk it once, then open things',
+    body: 'When you think you are done, walk the property with fresh eyes and open the oven, the cupboards and a wardrobe. That walk is your own inspection, held before the one that counts.',
+  },
+];
+
+const photos = [
+  'Every room from the doorway, from the same angles as the photos in your check-in inventory if you have them.',
+  'The oven with the door open, and the fridge the same.',
+  'The inside of a wardrobe, a kitchen cupboard and a drawer or two.',
+  'The shower glass and taps, close enough to show they are clear.',
+  'The meter readings, with the display legible.',
+];
+
+const description =
+  'A room by room end of tenancy cleaning checklist: what landlords inspect, the order to clean in, what to photograph, and when it is worth hiring out.';
+
+const article = {
+  '@type': 'Article',
+  '@id': `${canonical}#article`,
+  headline: 'The end of tenancy cleaning checklist',
+  description,
+  url: canonical,
+  mainEntityOfPage: { '@type': 'WebPage', '@id': canonical },
+  inLanguage: 'en-IE',
+  datePublished: '2026-08-21',
+  author: businessRef(Astro.site),
+  publisher: businessRef(Astro.site),
+};
+
+const jsonLd = graph(
+  article,
+  breadcrumbs([{ name: 'End of Tenancy Cleaning Checklist', path: GUIDE_PATH }], Astro.site)
+);
+---
+<Base
+  title="End of Tenancy Cleaning Checklist Ireland | BPE Cleaning"
+  description={description}
+  ogType="article"
+  jsonLd={jsonLd}
+>
+  <section class="bg-night pt-40 pb-20 text-cream md:pt-48 md:pb-24">
+    <div class="container-wide">
+      <p class="kicker !text-gold" data-reveal>Guides</p>
+      <h1 class="display-caps mt-6 text-[clamp(2.4rem,6.5vw,5rem)]" data-reveal>
+        <span class="line-mask"><span>The end of tenancy</span></span>
+        <span class="line-mask"><span style="--d: 0.1s">cleaning <span class="accent-word text-gold-soft">checklist</span></span></span>
+      </h1>
+      <p class="mt-8 max-w-xl text-base leading-relaxed text-cream/70" data-reveal style="--d: 0.2s">
+        Getting a deposit back is not about how clean the property looks on a
+        walk-through. It is about a handful of specific places an inspection
+        goes and a viewing never does. This guide lists them room by room,
+        gives you a working order, and tells you what to photograph before you
+        hand the keys back.
+      </p>
+    </div>
+  </section>
+
+  <section class="section-pad bg-porcelain">
+    <div class="container-wide">
+      <div class="grid gap-10 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1fr)] lg:gap-20">
+        <div>
+          <p class="kicker" data-reveal>The Inspection</p>
+          <h2 class="display mt-6 text-[clamp(2rem,4.5vw,3.4rem)] text-ink" data-reveal>
+            <span class="line-mask"><span>Where the inspection</span></span>
+            <span class="line-mask"><span style="--d: 0.1s">actually <span class="accent-word text-gold-deep">goes</span></span></span>
+          </h2>
+        </div>
+        <div class="lg:pt-4">
+          <p class="text-base leading-relaxed text-ink/70 md:text-lg" data-reveal>
+            An end of tenancy inspection is not a glance around. The landlord or
+            agent walks the property against the condition recorded when you
+            moved in, less fair wear and tear. Dust settling on a shelf is wear.
+            A greasy oven is not.
+          </p>
+          <p class="mt-6 text-base leading-relaxed text-ink/70" data-reveal style="--d: 0.08s">
+            The places that decide the outcome are the ones weekly cleaning
+            never reaches. The oven interior, because grease bakes a little
+            harder onto the glass and the roof with every use. The fridge,
+            emptied and wiped, door seals included. Cupboards, wardrobes and
+            drawers, opened and looked inside. Limescale on shower glass, taps
+            and shower heads, because hard water leaves a white crust wherever a
+            drop is left to dry. Skirting boards and door frames, which collect
+            a grey film that eye-level cleaning walks straight past. And the
+            inside of the windows: glass, frames and sills.
+          </p>
+          <p class="mt-6 text-base leading-relaxed text-ink/70" data-reveal style="--d: 0.16s">
+            None of it is difficult. It is just slow, and it is exactly the work
+            the checklist below is built around.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-pad bg-ivory">
+    <div class="container-wide">
+      <div class="flex flex-wrap items-end justify-between gap-6">
+        <div>
+          <p class="kicker" data-reveal>The Checklist</p>
+          <h2 class="display mt-6 max-w-2xl text-[clamp(2rem,4.5vw,3.4rem)] text-ink" data-reveal>
+            <span class="line-mask"><span>Room by room,</span></span>
+            <span class="line-mask"><span style="--d: 0.1s">in <span class="accent-word text-gold-deep">full</span></span></span>
+          </h2>
+        </div>
+        <p class="max-w-sm text-sm leading-relaxed text-ink/60" data-reveal style="--d: 0.2s">
+          Work through each room with the doors, drawers and appliances open. A
+          finished room is one you could open anything in.
+        </p>
+      </div>
+
+      <div class="mt-14 border-t border-ink/15">
+        {rooms.map((room, i) => (
+          <article
+            class="border-b border-ink/15 py-10 md:grid md:grid-cols-[6rem_1fr] md:gap-10"
+            data-reveal
+            style={`--d: ${0.06 * i}s`}
+          >
+            <p class="font-sans text-[0.7rem] font-medium tabular-nums text-gold-deep">
+              {String(i + 1).padStart(2, '0')}
+            </p>
+            <div>
+              <h3 class="h-serif text-2xl text-ink md:text-[1.75rem]">{room.title}</h3>
+              <ul class="mt-6 max-w-2xl">
+                {room.items.map((item) => (
+                  <li class="border-t border-ink/10 py-4 text-base leading-relaxed text-ink/75 first:border-t-0 first:pt-0">
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="relative overflow-hidden bg-night py-20 text-cream md:py-32">
+    <Diamond class="pointer-events-none absolute -right-40 -top-44 h-[38rem] w-[38rem] opacity-[0.05]" aria-hidden="true" />
+    <div class="container-wide relative">
+      <p class="kicker !text-gold" data-reveal>The Order</p>
+      <h2 class="display mt-6 max-w-2xl text-[clamp(2rem,4.5vw,3.4rem)]" data-reveal>
+        <span class="line-mask"><span>The order that</span></span>
+        <span class="line-mask"><span style="--d: 0.1s">saves you a <span class="accent-word text-gold-soft">day</span></span></span>
+      </h2>
+
+      <div class="mt-14 border-t border-cream/15">
+        {steps.map((step, i) => (
+          <div
+            class="grid grid-cols-[2.6rem_1fr] items-baseline gap-x-6 border-b border-cream/15 py-8 md:grid-cols-[3.2rem_1fr_1.4fr] md:gap-x-10"
+            data-reveal
+            style={`--d: ${0.05 * i}s`}
+          >
+            <span class="font-sans text-[0.66rem] font-semibold tracking-[0.2em] text-gold">
+              {String(i + 1).padStart(2, '0')}
+            </span>
+            <h3 class="display text-xl md:text-2xl">{step.title}</h3>
+            <p class="col-start-2 mt-3 text-sm leading-relaxed text-cream/60 md:col-start-3 md:mt-0">{step.body}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section-pad bg-porcelain">
+    <div class="container-x">
+      <p class="kicker" data-reveal>The Evidence</p>
+      <h2 class="display mt-6 text-[clamp(2rem,4.5vw,3.4rem)] text-ink" data-reveal>
+        <span class="line-mask"><span>What to photograph</span></span>
+        <span class="line-mask"><span style="--d: 0.1s">at <span class="accent-word text-gold-deep">handover</span></span></span>
+      </h2>
+      <p class="mt-8 max-w-2xl text-base leading-relaxed text-ink/70" data-reveal>
+        Once the property is clean, record it. Photographs taken on handover day
+        close arguments before they start, because they are dated and specific
+        where memory is neither. Five minutes covers it:
+      </p>
+      <ul class="mt-8 max-w-2xl border-t border-ink/15" data-reveal>
+        {photos.map((photo, i) => (
+          <li class="grid grid-cols-[2.6rem_1fr] gap-x-6 border-b border-ink/15 py-4 text-base leading-relaxed text-ink/75">
+            <span class="font-sans text-[0.7rem] font-medium leading-6 tabular-nums text-gold-deep">
+              {String(i + 1).padStart(2, '0')}
+            </span>
+            <span>{photo}</span>
+          </li>
+        ))}
+      </ul>
+      <p class="mt-8 max-w-2xl text-base leading-relaxed text-ink/70" data-reveal>
+        Send the set with your handover email on the day, and keep your own
+        copies until the deposit is back in your account.
+      </p>
+
+      <div class="mt-16 border-t border-ink/15 pt-12 md:mt-20">
+        <h2 class="h-serif text-2xl text-ink md:text-[1.75rem]" data-reveal>
+          When hiring it out beats doing it yourself
+        </h2>
+        <p class="mt-6 max-w-2xl text-base leading-relaxed text-ink/70" data-reveal>
+          Be honest about the size of the job. An empty two or three bedroom
+          property, cleaned to the standard above, is a long day of work with
+          proper products, and the oven alone can swallow hours if it has years
+          of use baked in. With a clear week between the movers leaving and the
+          handover, the checklist is entirely doable yourself. With one evening,
+          or a large deposit riding on a bad oven, buying the clean is usually
+          the calmer choice.
+        </p>
+        <p class="mt-6 max-w-2xl text-base leading-relaxed text-ink/70" data-reveal>
+          BPE prices <a href="/end-of-tenancy-cleaning-dublin/" class="underline decoration-gold/60 underline-offset-4 hover:text-ink">end of tenancy cleaning</a>
+          by property size rather than by the hour, so a stubborn oven never
+          turns into a bigger bill: from &euro;{END_OF_TENANCY['1bed']} for a 1
+          bedroom to &euro;{END_OF_TENANCY['4bed']} for a 4 bedroom. By policy
+          it costs exactly the same as our deep clean, because it is the same
+          standard of work pointed at a handover date. Oven cleaning at
+          {' '}{oven.label} and fridge cleaning at {fridge.label} are the two
+          add-ons worth considering on a move out. {VAT_NOTE} {ESTIMATE_NOTE}
+          {' '}The full list is on the <a href="/prices/" class="underline decoration-gold/60 underline-offset-4 hover:text-ink">prices page</a>.
+          BPE Cleaning Services has been trading for over 7 years, is fully
+          insured, cleans with eco-friendly products and works {SITE.hours}.
+        </p>
+        <p class="mt-6 max-w-2xl text-base leading-relaxed text-ink/70" data-reveal>
+          If you are still weighing up how far the property needs to go, our
+          guide to <a href="/guides/deep-cleaning-vs-regular-cleaning/" class="underline decoration-gold/60 underline-offset-4 hover:text-ink">deep cleaning versus regular cleaning</a>
+          draws the line between the two. And if the dates are already fixed,
+          send the property size and the handover date through the
+          {' '}<a href="/quote/" class="underline decoration-gold/60 underline-offset-4 hover:text-ink">quote page</a> and your price is
+          confirmed before anything is booked.
+        </p>
+      </div>
+    </div>
+  </section>
+</Base>

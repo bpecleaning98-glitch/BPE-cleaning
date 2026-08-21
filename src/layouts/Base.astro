@@ -115,6 +115,52 @@ const ogImage = new URL(image, Astro.site);
       import '../scripts/track.ts';
     </script>
     <script>
+      // Accordion grace, site wide. A native <details> snaps open, which
+      // Artiom read as abrupt, so every summary click is intercepted and the
+      // answer's height is animated instead: down and in on open, up and out
+      // on close. The wrapper div is created here rather than in the markup,
+      // so the seven pages that use <details> did not have to change and a
+      // page without JS keeps the native, instant, fully working control.
+      const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+      document.querySelectorAll('details').forEach((detail) => {
+        const summary = detail.querySelector(':scope > summary');
+        if (!summary || reducedMotion) return;
+        const body = document.createElement('div');
+        body.style.overflow = 'hidden';
+        while (summary.nextSibling) body.appendChild(summary.nextSibling);
+        detail.appendChild(body);
+
+        let anim: Animation | null = null;
+        const OPEN_MS = 420;
+        const CLOSE_MS = 280;
+        summary.addEventListener('click', (e) => {
+          e.preventDefault();
+          anim?.cancel();
+          if (!detail.open) {
+            detail.open = true;
+            anim = body.animate(
+              [
+                { height: '0px', opacity: 0, transform: 'translateY(12px)' },
+                { height: `${body.scrollHeight}px`, opacity: 1, transform: 'none' },
+              ],
+              { duration: OPEN_MS, easing: 'cubic-bezier(0.22, 1, 0.36, 1)' }
+            );
+          } else {
+            anim = body.animate(
+              [
+                { height: `${body.scrollHeight}px`, opacity: 1 },
+                { height: '0px', opacity: 0 },
+              ],
+              { duration: CLOSE_MS, easing: 'cubic-bezier(0.4, 0, 0.2, 1)' }
+            );
+            anim.onfinish = () => {
+              detail.open = false;
+            };
+          }
+        });
+      });
+    </script>
+    <script>
       // Scroll reveals. IntersectionObserver where it works, and a hard
       // timer fallback because the in-app Browser pane never fires IO.
       const targets = document.querySelectorAll<HTMLElement>('[data-reveal]');

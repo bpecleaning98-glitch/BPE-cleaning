@@ -1,0 +1,338 @@
+---
+import Base from '../../layouts/Base.astro';
+import { breadcrumbs, businessRef, graph } from '../../lib/schema';
+import Diamond from '../../components/Diamond.astro';
+import { FIXED, VAT_NOTE, ESTIMATE_NOTE } from '../../data/pricing';
+
+/**
+ * Guide: the Airbnb turnover checklist. Evergreen craft content for the
+ * long-tail "airbnb cleaning checklist" search, written to be genuinely
+ * usable by a host who never books us.
+ *
+ * THE FACTS RULE, same as everywhere on this site: the only BPE facts stated
+ * are the ones the repo holds. Prices are interpolated from data/pricing.ts,
+ * never typed. The 80+ figure is cited in exactly its documented scope, one
+ * lettings client's own count of the properties in our care. Everything else
+ * on the page is general cleaning craft, which is the point of a guide.
+ *
+ * Schema: Article plus the breadcrumb trail. No FAQPage, because the page
+ * carries no FAQ block. The Article's author and publisher share the
+ * business @id every other page uses, so it is one entity site-wide.
+ */
+
+const PATH = '/guides/airbnb-turnover-checklist/';
+
+// Interpolated, never typed. Studio is excluded site-wide: pricing.ts marks
+// it as mirrored from the 1 bed rate and unconfirmed, so the range quoted in
+// the closing section runs 1 bed to 4 bed, exactly as the service page does.
+const turnoverFrom = FIXED.airbnbTurnover['1bed'];
+const turnoverTo = FIXED.airbnbTurnover['4bed'];
+const deepFrom = FIXED.airbnbDeep['1bed'];
+
+// The five things a guest judges before the bags are unpacked.
+const touchpoints = [
+  {
+    title: 'The air at the door',
+    text: 'A property that has been shut since checkout smells shut. Open the windows the moment you arrive and let the rooms breathe while you work, the bedrooms especially.',
+  },
+  {
+    title: 'The bed',
+    text: 'Smooth linen, squared corners, and not one stray hair on the pillowcase. A single hair on white cotton reads as unclean, whatever else you polished.',
+  },
+  {
+    title: 'The shower screen and the mirror',
+    text: 'Glass shows watermarks and smears before anything else in the property. Finish both with a dry cloth after cleaning, so they are still streak free at check in.',
+  },
+  {
+    title: 'The kettle and the sink',
+    text: 'The kettle is filled within minutes of arrival. Limescale inside it, or a tea stained sink beneath it, undoes an otherwise perfect kitchen.',
+  },
+  {
+    title: 'The toilet',
+    text: 'Checked by every guest, enjoyed by no host. Under the rim, behind the hinges and around the base, not just the bowl, and finish with the lid down.',
+  },
+];
+
+// The reset itself, in the order that wastes the least motion.
+const checklist = [
+  {
+    title: 'Strip every bed',
+    text: 'Even the ones that look untouched. Guests nap on top of made beds and remake them. While the mattress is bare, check the protector for marks and change it if it needs it.',
+  },
+  {
+    title: 'Count the linen out',
+    text: 'Bag the used linen and towels and count what goes into the bag. If the property runs on two sets per bed, a pillowcase lost this week is a bed you cannot make next week.',
+  },
+  {
+    title: 'Make the beds to the photos',
+    text: 'Fresh linen, the same fold and the same cushion order every time, matched to the listing photographs. The bed is the first thing a guest looks at, so it is the thing to be pedantic about.',
+  },
+  {
+    title: 'Reset the bathroom',
+    text: 'Toilet, basin and shower cleaned, the screen dried, the mirror and taps polished, fresh towels laid out the way your photos show them. Replace whatever the last guest opened: soap, and paper on the holder plus spares.',
+  },
+  {
+    title: 'Reset the kitchen',
+    text: 'Wash and put away anything left out, clear and wipe the fridge, the microwave inside, the crumbs from the toaster. A guest will forgive a small kitchen. Somebody else’s food in the fridge is another matter.',
+  },
+  {
+    title: 'Wipe the touchpoints',
+    text: 'Door handles, light switches, remote controls, lamp switches, the hairdryer, the iron, the keys themselves. These are the surfaces every guest handles and the ones a quick clean misses.',
+  },
+  {
+    title: 'Empty every bin',
+    text: 'Kitchen, bathroom, bedrooms and the recycling, each with a fresh liner. A used liner, however empty, is one of those details a guest cannot unsee.',
+  },
+  {
+    title: 'Restock the consumables',
+    text: 'Tea, coffee, sugar, dishwasher tablets, bin liners, toilet paper, soap: topped up from the stock kept at the property, with a note of anything running low.',
+  },
+  {
+    title: 'Sweep for damage',
+    text: 'Walk every room looking for what has changed: marks on the walls, a chipped glass, a wobbly chair, a missing remote. Found now it is maintenance. Found by the next guest it is a review.',
+  },
+  {
+    title: 'Floors last',
+    text: 'Hoover every room, then mop the hard floors, working back towards the door so you never cross your own work. Under the bed at least as far as a guest kneeling for a suitcase can see.',
+  },
+  {
+    title: 'Stage each room',
+    text: 'Cushions plumped, throws folded, curtains open, the welcome note where it lives. Set each room to match the listing photographs, because that exact frame is what the guest paid for.',
+  },
+  {
+    title: 'Photograph and lock up',
+    text: 'A photo of each room from the doorway, then windows closed, heating set, key back in the safe. Two minutes of photographs turn the property’s condition at handover into a record instead of a memory.',
+  },
+];
+
+const description =
+  'The between-guests turnover checklist for Airbnb hosts: linen change, restocking, the touchpoints guests judge in the first five minutes, damage spotting and photographing the reset.';
+
+const pageUrl = new URL(PATH, Astro.site ?? 'https://bpecleaning.ie').href;
+
+const jsonLd = graph(
+  {
+    '@type': 'Article',
+    '@id': `${pageUrl}#article`,
+    headline: 'The Airbnb turnover checklist for hosts',
+    description,
+    url: pageUrl,
+    inLanguage: 'en-IE',
+    mainEntityOfPage: { '@type': 'WebPage', '@id': pageUrl },
+    author: businessRef(Astro.site),
+    publisher: businessRef(Astro.site),
+  },
+  breadcrumbs(
+    [
+      { name: 'Guides', path: '/guides/' },
+      { name: 'Airbnb turnover checklist', path: PATH },
+    ],
+    Astro.site
+  )
+);
+
+const inlineLink = 'text-gold-deep underline underline-offset-2 transition-colors hover:text-ink';
+---
+<Base
+  title="Airbnb Turnover Cleaning Checklist for Hosts | BPE Cleaning"
+  description={description}
+  ogType="article"
+  jsonLd={jsonLd}
+>
+  <section class="bg-night pt-40 pb-20 text-cream md:pt-48 md:pb-24">
+    <div class="container-wide">
+      <p class="kicker !text-gold" data-reveal>Host Guides</p>
+      <h1 class="display-caps mt-6 text-[clamp(2.4rem,6.5vw,5rem)]" data-reveal>
+        <span class="line-mask"><span>The Airbnb</span></span>
+        <span class="line-mask"><span style="--d: 0.1s">turnover <span class="accent-word text-gold-soft">checklist</span></span></span>
+      </h1>
+      <p class="mt-8 max-w-xl text-base leading-relaxed text-cream/70" data-reveal style="--d: 0.2s">
+        A turnover is the same job in the same order, every changeover. This is the checklist we
+        work to between guests, written down so you can run it yourself, whether you clean your
+        own listing or hand the reset to a company like ours.
+      </p>
+    </div>
+  </section>
+
+  {/* Why a checklist at all, and the five touchpoints guests judge first */}
+  <section class="section-pad relative overflow-hidden bg-porcelain">
+    <Diamond class="pointer-events-none absolute -right-40 -top-44 h-[38rem] w-[38rem] opacity-[0.05]" aria-hidden="true" />
+    <div class="container-x relative">
+      <p class="max-w-2xl text-base leading-relaxed text-ink/75 md:text-lg" data-reveal>
+        A short let is not cleaned the way a home is. There is no clutter to work around, and
+        yet the standard is higher, because every guest arrives expecting the rooms in the
+        photographs they booked. The clean is not deep, it is exact: the same bed, the same
+        towel fold, the same empty fridge, every time.
+      </p>
+      <p class="mt-5 max-w-2xl text-base leading-relaxed text-ink/75" data-reveal>
+        That repetition is the whole craft. A turnover done from memory drifts a little with
+        every changeover, and the drift only ever shows up in a review. A turnover done from a
+        written checklist is identical on the fortieth stay and the four hundredth, and identical
+        is what a five star cleanliness rating is made of.
+      </p>
+
+      <div class="mt-16 border-t border-ink/15 pt-12" data-reveal>
+        <h2 class="display text-[clamp(1.8rem,3.6vw,2.8rem)] text-ink">
+          The first five minutes decide the review
+        </h2>
+        <p class="mt-6 max-w-2xl text-base leading-relaxed text-ink/75">
+          A guest does not inspect a property the way a cleaner does. They open the door and
+          breathe in. They look at the bed. They step into the bathroom and run an eye over the
+          shower screen. Then they fill the kettle. A handful of touchpoints, checked in the
+          first five minutes, and the tone of the review is set before the bags are unpacked.
+          Clean these five to a higher standard than everything around them.
+        </p>
+      </div>
+
+      <div class="mt-10 border-t border-ink/15">
+        {touchpoints.map((item, i) => (
+          <div
+            class="grid grid-cols-[2.6rem_1fr] items-baseline gap-x-6 border-b border-ink/15 py-7 md:grid-cols-[3.2rem_1fr_1.4fr] md:gap-x-10"
+            data-reveal
+            style={`--d: ${0.06 * i}s`}
+          >
+            <span class="font-sans text-[0.66rem] font-semibold tracking-[0.2em] text-stone">{String(i + 1).padStart(2, '0')}</span>
+            <h3 class="display text-xl text-ink md:text-2xl">{item.title}</h3>
+            <p class="col-start-2 mt-3 text-sm leading-relaxed text-ink/60 md:col-start-3 md:mt-0">{item.text}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  {/* The checklist itself */}
+  <section class="section-pad bg-ivory">
+    <div class="container-wide grid gap-14 lg:grid-cols-[1fr_1.5fr] lg:gap-20">
+      <div class="lg:sticky lg:top-32 lg:self-start">
+        <p class="kicker" data-reveal>The Reset</p>
+        <h2 class="display mt-6 text-[clamp(2.2rem,5vw,4rem)] text-ink" data-reveal>
+          <span class="line-mask"><span>The turnover,</span></span>
+          <span class="line-mask"><span style="--d: 0.1s">top to <span class="accent-word text-gold-deep">bottom</span></span></span>
+        </h2>
+        <p class="mt-8 max-w-sm text-base leading-relaxed text-ink/70" data-reveal style="--d: 0.2s">
+          The full reset, in the order that wastes the least motion. Work each room top to
+          bottom and leave the floors until last, so nothing gets undone by the next task. On a
+          property you know, the order becomes automatic, which is exactly the point: a routine
+          you cannot accidentally shorten.
+        </p>
+      </div>
+
+      <div class="border-t border-ink/15">
+        {checklist.map((item, i) => (
+          <div
+            class="grid grid-cols-[2.6rem_1fr] items-baseline gap-x-6 border-b border-ink/15 py-7 md:grid-cols-[3.2rem_1fr_1.4fr] md:gap-x-10"
+            data-reveal
+            style={`--d: ${0.05 * i}s`}
+          >
+            <span class="font-sans text-[0.66rem] font-semibold tracking-[0.2em] text-stone">{String(i + 1).padStart(2, '0')}</span>
+            <h3 class="display text-xl text-ink md:text-2xl">{item.title}</h3>
+            <p class="col-start-2 mt-3 text-sm leading-relaxed text-ink/60 md:col-start-3 md:mt-0">{item.text}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  {/* The parts of the job that live around the clean */}
+  <section class="section-pad bg-porcelain">
+    <div class="container-x">
+      <article class="py-2 md:grid md:grid-cols-[6rem_1fr] md:gap-10" data-reveal>
+        <p class="font-sans text-[0.7rem] font-medium tabular-nums text-gold-deep">01</p>
+        <div>
+          <h2 class="h-serif text-2xl text-ink md:text-[1.75rem]">Restock from a list, not from memory</h2>
+          <p class="mt-5 max-w-2xl text-base leading-relaxed text-ink/75">
+            Keep a written stock list at each property: what lives where, how many of each, and
+            the level at which you reorder. Whoever cleans tops up from the stock on site and
+            writes down what is running low, on every changeover. Without the list, restocking
+            depends on somebody remembering what the cupboard looked like two weeks ago, and the
+            first person to discover the missing dishwasher tablets is a guest, mid stay.
+          </p>
+        </div>
+      </article>
+
+      <article class="mt-10 border-t border-ink/15 py-10 md:grid md:grid-cols-[6rem_1fr] md:gap-10" data-reveal>
+        <p class="font-sans text-[0.7rem] font-medium tabular-nums text-gold-deep">02</p>
+        <div>
+          <h2 class="h-serif text-2xl text-ink md:text-[1.75rem]">Damage is found on the changeover, or not at all</h2>
+          <p class="mt-5 max-w-2xl text-base leading-relaxed text-ink/75">
+            The changeover is the only moment the property is empty and someone is looking at it
+            closely, so the damage sweep belongs inside the clean, not after it. Whatever is
+            found can be photographed, dated and tied to a specific booking while that booking
+            is still identifiable. One more stay, and nobody can say which guest chipped the
+            worktop.
+          </p>
+          <p class="mt-5 max-w-2xl text-base leading-relaxed text-ink/75">
+            Look where luggage strikes, walls and door edges at case height. Count what breaks
+            quietly, glasses, mugs and crockery. Test what has a battery or an element, remotes,
+            lamps, kettle, hairdryer. And check the mattress protector every single time.
+          </p>
+        </div>
+      </article>
+
+      <article class="border-t border-ink/15 py-10 md:grid md:grid-cols-[6rem_1fr] md:gap-10" data-reveal>
+        <p class="font-sans text-[0.7rem] font-medium tabular-nums text-gold-deep">03</p>
+        <div>
+          <h2 class="h-serif text-2xl text-ink md:text-[1.75rem]">Photograph the reset before you lock up</h2>
+          <p class="mt-5 max-w-2xl text-base leading-relaxed text-ink/75">
+            A set of doorway photos after every turnover costs two minutes and settles nearly
+            every dispute a short let can produce. A guest says the property was not clean at
+            check in: you hold its timestamped condition from hours earlier. You wonder whether
+            a mark was there last week: the last set answers. The photos also hold the standard
+            itself steady, because whoever cleans is composing the same frame every time and
+            sees at once when a room does not match it.
+          </p>
+        </div>
+      </article>
+
+      <article class="border-t border-ink/15 py-10 md:grid md:grid-cols-[6rem_1fr] md:gap-10" data-reveal>
+        <p class="font-sans text-[0.7rem] font-medium tabular-nums text-gold-deep">04</p>
+        <div>
+          <h2 class="h-serif text-2xl text-ink md:text-[1.75rem]">The checklist is easy, the window is not</h2>
+          <p class="mt-5 max-w-2xl text-base leading-relaxed text-ink/75">
+            Nothing on this page is difficult. What makes short let cleaning hard is that all of
+            it has to happen inside a fixed window, between one guest checking out and the next
+            one checking in, and the window does not stretch because a guest left late or a wash
+            cycle ran long. One listing, and a host can do this to a high standard themselves.
+            Two listings turning over on the same afternoon, in
+            different parts of town, cannot be reset by one pair of hands, however good the
+            checklist. That is the point where hosting stops meaning cleaning and starts meaning
+            managing the cleaning.
+          </p>
+        </div>
+      </article>
+
+      <article class="border-t border-ink/15 pt-10 md:grid md:grid-cols-[6rem_1fr] md:gap-10" data-reveal>
+        <p class="font-sans text-[0.7rem] font-medium tabular-nums text-gold-deep">05</p>
+        <div>
+          <h2 class="h-serif text-2xl text-ink md:text-[1.75rem]">Where BPE fits</h2>
+          <p class="mt-5 max-w-2xl text-base leading-relaxed text-ink/75">
+            This checklist is our own working method. Short lets are a core part
+            of what BPE Cleaning Services does, and one lettings client alone has 80+ properties
+            in our care. A standard turnover, with the linen change, the restocking and a
+            written note of any damage, is a fixed price per property size, from
+            &euro;{turnoverFrom} for a one bedroom to &euro;{turnoverTo} for a four bedroom, so
+            your cost per stay is known before anyone arrives.
+          </p>
+          <p class="mt-5 max-w-2xl text-base leading-relaxed text-ink/75">
+            Between seasons, or after a long stay, a listing also needs the clean this checklist
+            deliberately leaves out: inside the oven and the fridge, limescale, grout, under the
+            furniture. That reset is the Airbnb deep clean, from &euro;{deepFrom}, and the
+            difference between the two levels is set out in our guide to
+            <a href="/guides/deep-cleaning-vs-regular-cleaning/" class={inlineLink}>deep cleaning versus regular cleaning</a>.
+            Both price tables are on the
+            <a href="/airbnb-cleaning-dublin/" class={inlineLink}>Airbnb cleaning page</a>, with
+            everything else we charge on the
+            <a href="/prices/" class={inlineLink}>price list</a>.
+          </p>
+          <p class="mt-5 max-w-2xl text-base leading-relaxed text-ink/75">
+            We work seven days a week, 8:00 to 20:00, fully insured, with eco-friendly products.
+            If you would rather spend the changeover window on your guests than on the shower
+            screen, <a href="/quote/" class={inlineLink}>tell us about your property</a> and we
+            will send you a price.
+          </p>
+          <p class="mt-6 text-xs text-ink/45">{VAT_NOTE} {ESTIMATE_NOTE}</p>
+        </div>
+      </article>
+    </div>
+  </section>
+</Base>

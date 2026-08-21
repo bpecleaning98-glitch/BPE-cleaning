@@ -671,50 +671,9 @@ const jsonLd = graph(
     </div>
   </section>
 
-  <!-- Booking -->
-  <section class="relative overflow-hidden section-pad bg-night text-cream">
-    <Diamond class="pointer-events-none absolute -bottom-48 -left-44 h-[38rem] w-[38rem] opacity-[0.05]" aria-hidden="true" />
-
-    <div class="container-wide relative grid gap-14 lg:grid-cols-[1.1fr_1fr] lg:gap-20">
-      <div>
-        <p class="kicker !text-gold" data-reveal>Book It</p>
-        <h2 class="display mt-6 text-[clamp(2.2rem,5vw,4rem)]" data-reveal>
-          <span class="line-mask"><span>Get your exact</span></span>
-          <span class="line-mask"><span style="--d: 0.1s">price <span class="accent-word text-gold-soft">today</span></span></span>
-        </h2>
-        <p class="mt-8 max-w-xl text-base leading-relaxed text-cream/70" data-reveal style="--d: 0.2s">
-          Answer a few questions about your property and we come back with the figure for your job. No
-          obligation, and nothing is booked until you say so.
-        </p>
-        <div class="mt-10 flex flex-wrap items-center gap-4" data-reveal style="--d: 0.3s">
-          <a href="/quote/" class="btn-gold">Get my price</a>
-          <a href={SITE.phoneHref} class="btn-outline text-cream">Call {SITE.phoneDisplay}</a>
-        </div>
-      </div>
-
-      <div class="self-center border-b border-cream/15">
-        <div class="flex items-baseline justify-between gap-6 border-t border-cream/15 py-5" data-reveal>
-          <span class="font-sans text-[0.66rem] font-semibold uppercase tracking-[0.24em] text-cream/50">Phone</span>
-          <a href={SITE.phoneHref} class="font-sans text-sm font-medium text-cream transition-colors duration-300 hover:text-gold-soft">
-            {SITE.phoneDisplay}
-          </a>
-        </div>
-        <div class="flex items-baseline justify-between gap-6 border-t border-cream/15 py-5" data-reveal style="--d: 0.08s">
-          <span class="font-sans text-[0.66rem] font-semibold uppercase tracking-[0.24em] text-cream/50">WhatsApp</span>
-          <a href={SITE.whatsappHref} rel="noopener" class="font-sans text-sm font-medium text-cream transition-colors duration-300 hover:text-gold-soft">
-            Send us the details
-          </a>
-        </div>
-        <div class="flex items-baseline justify-between gap-6 border-t border-cream/15 py-5" data-reveal style="--d: 0.16s">
-          <span class="font-sans text-[0.66rem] font-semibold uppercase tracking-[0.24em] text-cream/50">Hours</span>
-          <span class="font-sans text-sm font-medium text-cream">{SITE.hours}</span>
-        </div>
-        <div class="flex items-baseline justify-between gap-6 border-t border-cream/15 py-5" data-reveal style="--d: 0.24s">
-          <span class="font-sans text-[0.66rem] font-semibold uppercase tracking-[0.24em] text-cream/50">Areas</span>
-          <span class="max-w-xs text-right font-sans text-sm font-medium text-cream">{AREAS_SENTENCE}</span>
-        </div>
-        <p class="pt-6 text-xs text-cream/40" data-reveal style="--d: 0.3s">{VAT_NOTE} {ESTIMATE_NOTE}</p>
-      </div>
-    </div>
-  </section>
+  {/* No closing call to action. The page ends on the price questions, and
+      the footer that follows opens with "Ready when you are" and the same
+      two actions. The old section here repeated the buttons a third time
+      next to a Phone/WhatsApp/Hours/Areas panel, which Artiom read, fairly,
+      as clutter: everything in it already lives in the footer below. */}
 </Base>

@@ -1,0 +1,81 @@
+---
+import Base from '../../layouts/Base.astro';
+import { breadcrumbs, graph } from '../../lib/schema';
+
+/**
+ * The guides hub: four evergreen, honestly useful articles that earn the
+ * long-tail searches the service pages are too commercial to answer. This is
+ * the SEO surface Artiom asked for, built as a library rather than as thin
+ * doorway pages: the county-page route was considered and rejected in
+ * PLAN.md, because eight near-identical location pages would dilute the six
+ * service pages that actually rank.
+ *
+ * The list is static and hand-kept, like the sitemap: a guide is added here,
+ * in the sitemap, and as a file, deliberately, or not at all.
+ */
+const guides = [
+  {
+    href: '/guides/end-of-tenancy-cleaning-checklist/',
+    title: 'The end of tenancy cleaning checklist',
+    blurb: 'What landlords and agents actually inspect, room by room, and how to hand back a property with your deposit intact.',
+  },
+  {
+    href: '/guides/deep-cleaning-vs-regular-cleaning/',
+    title: 'Deep cleaning vs regular cleaning',
+    blurb: 'What a weekly clean maintains, what only a deep clean reaches, and how to tell which one your home is asking for.',
+  },
+  {
+    href: '/guides/airbnb-turnover-checklist/',
+    title: 'The Airbnb turnover checklist for hosts',
+    blurb: 'The between-guests reset that keeps reviews at five stars: linen, restocking, the touchpoints guests judge first.',
+  },
+  {
+    href: '/guides/after-builders-cleaning-guide/',
+    title: 'After builders cleaning, explained',
+    blurb: 'Why construction dust needs its own kind of clean, what a proper builders clean involves, and what to check before the crew leaves.',
+  },
+];
+
+const jsonLd = graph(breadcrumbs([{ name: 'Guides', path: '/guides/' }], Astro.site));
+---
+<Base
+  title="Cleaning Guides and Checklists | BPE Cleaning Dublin"
+  description="Practical cleaning guides from a Dublin cleaning team: end of tenancy checklists, deep cleaning explained, Airbnb turnovers and after builders cleaning."
+  jsonLd={jsonLd}
+>
+  <section class="bg-porcelain pb-20 pt-36 md:pb-28 md:pt-44">
+    <div class="container-wide">
+      <p class="kicker">Guides</p>
+      <h1 class="display-caps mt-6 max-w-3xl text-[clamp(2.3rem,6.4vw,4.6rem)] leading-[1.06] text-ink">
+        Cleaning, <span class="accent-word text-[0.78em] text-gold-deep">explained</span> properly
+      </h1>
+      <p class="mt-8 max-w-xl text-base leading-relaxed text-ink/65">
+        What we know from doing this every day, written down so you can use it whether you book
+        us or not.
+      </p>
+
+      <div class="mt-16 border-t border-ink/15">
+        {guides.map((guide, i) => (
+          <a
+            href={guide.href}
+            class="group grid grid-cols-[2.6rem_1fr] items-baseline gap-x-5 border-b border-ink/15 py-8 md:grid-cols-[3.2rem_1fr_auto] md:gap-x-10 md:py-10"
+          >
+            <span class="font-sans text-[0.66rem] font-semibold tracking-[0.2em] text-stone">{String(i + 1).padStart(2, '0')}</span>
+            <span class="min-w-0">
+              <span class="display block text-xl text-ink transition-colors duration-300 group-hover:text-gold-deep md:text-2xl">{guide.title}</span>
+              <span class="mt-2 block max-w-2xl text-sm leading-relaxed text-ink/60">{guide.blurb}</span>
+            </span>
+            <span class="hidden h-10 w-10 items-center justify-center border border-ink/20 transition-all duration-300 group-hover:border-ink group-hover:bg-ink group-hover:text-cream md:flex" aria-hidden="true">
+              <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7" /><path d="M8 7h9v9" /></svg>
+            </span>
+          </a>
+        ))}
+      </div>
+
+      <p class="mt-10 max-w-xl text-sm leading-relaxed text-ink/60">
+        Looking for the numbers instead? Every price we charge is published on
+        <a href="/prices/" class="text-gold-deep underline underline-offset-2 transition-colors hover:text-ink"> the price list</a>.
+      </p>
+    </div>
+  </section>
+</Base>
