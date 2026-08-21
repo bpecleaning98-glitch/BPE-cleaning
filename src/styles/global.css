@@ -113,6 +113,71 @@
   .link-caps {
     @apply relative inline-flex items-center gap-2 font-sans text-[0.7rem] font-semibold uppercase tracking-[0.22em] before:absolute before:inset-x-0 before:-inset-y-3 before:content-[''] after:absolute after:-bottom-1 after:left-0 after:h-px after:w-full after:origin-right after:scale-x-0 after:bg-current after:transition-transform after:duration-300 hover:after:origin-left hover:after:scale-x-100;
   }
+
+  /* The rolling cube word. Two copies of a label sit on adjacent faces of a
+   * 3D box: the visible one pushed toward the viewer by half the line box,
+   * its twin folded under at ninety degrees. Rolling the box a quarter turn
+   * around X tips the visible word up and away while the twin rolls in from
+   * below, which is the reference site's exact move. Perspective sits on the
+   * parent, so the roll has depth instead of squashing flat. Hover is gated
+   * to devices that have it; taps get the same turn for one beat through
+   * .cube-spin, added and removed by the header's script. */
+  .cube {
+    perspective: 20rem;
+  }
+  .cube .cube-box {
+    position: relative;
+    display: inline-flex;
+    transform-style: preserve-3d;
+    transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .cube .cube-face {
+    display: inline-flex;
+    align-items: center;
+    backface-visibility: hidden;
+    transform: translateZ(0.62em);
+  }
+  .cube .cube-face + .cube-face {
+    position: absolute;
+    inset: 0;
+    transform: rotateX(-90deg) translateZ(0.62em);
+  }
+  @media (hover: hover) {
+    .cube:hover .cube-box {
+      transform: rotateX(90deg);
+    }
+  }
+  .cube.cube-spin .cube-box {
+    transform: rotateX(90deg);
+  }
+}
+
+/* Menu overlay choreography. The curtain itself is Tailwind (transform +
+ * data-open variant on #menu-overlay); this is the second act, the items.
+ * Base state: invisible, sitting 26px low, with NO delay, so closing snaps
+ * everything away together under the rising curtain. Open state: each item
+ * lifts in on its own beat, --i set in the markup, first one waiting 0.26s
+ * for the curtain to be mostly down. */
+#menu-overlay .m-stag {
+  opacity: 0;
+  transform: translateY(26px);
+  transition:
+    opacity 0.3s ease,
+    transform 0.3s ease;
+}
+#menu-overlay[data-open] .m-stag {
+  opacity: 1;
+  transform: none;
+  transition-duration: 0.65s, 0.65s;
+  transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  transition-delay: calc(0.26s + var(--i, 0) * 0.07s);
+}
+@media (prefers-reduced-motion: reduce) {
+  #menu-overlay,
+  #menu-overlay .m-stag,
+  .cube .cube-box {
+    transition: none !important;
+  }
 }
 
 /*

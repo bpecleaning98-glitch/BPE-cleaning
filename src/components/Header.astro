@@ -31,14 +31,22 @@ const nav = [
         <a href={item.href} class="link-caps opacity-80 transition-opacity hover:opacity-100">{item.label}</a>
       ))}
     </nav>
+    {/* The word is a rolling cube, Elicyon's own move: two copies of the
+        label sit on adjacent faces of a 3D box, and hover (or tap, via the
+        one-shot class the script adds) rolls the box a quarter turn, so the
+        word tips up and away and its twin rolls in from below. after:hidden
+        because the underline fighting the roll read as clutter. */}
     <button
       id="menu-toggle"
-      class="link-caps justify-self-start lg:hidden"
+      class="link-caps cube justify-self-start after:hidden lg:hidden"
       type="button"
       aria-expanded="false"
       aria-controls="menu-overlay"
     >
-      Menu
+      <span class="cube-box">
+        <span class="cube-face">Menu</span>
+        <span class="cube-face" aria-hidden="true">Menu</span>
+      </span>
     </button>
 
     {/* The primary horizontal lockup, at every width. The vertical one was
@@ -64,32 +72,51 @@ const nav = [
   </div>
 </header>
 
-{/* Full-screen overlay menu, ink background, oversized serif links */}
+{/* Full-screen overlay menu, the reference's mobile anatomy: a solid night
+    curtain that slides DOWN from the top edge (transform only, so it cannot
+    stutter), links dead centre in oversized serif, small tracked-caps
+    columns pinned to the foot. Each .m-stag child fades and lifts in on its
+    own delay once the curtain is down; closing drops the delays, so the
+    items vanish together while the curtain rises. */}
 <div
   id="menu-overlay"
-  class="pointer-events-none fixed inset-0 z-[60] overflow-y-auto overscroll-contain bg-night pb-16 text-cream opacity-0 transition-opacity duration-500"
+  class="pointer-events-none fixed inset-0 z-[60] -translate-y-full overflow-y-auto overscroll-contain bg-night pb-10 text-cream transition-transform duration-700 [transition-timing-function:cubic-bezier(0.16,1,0.3,1)] data-[open]:pointer-events-auto data-[open]:translate-y-0"
   aria-hidden="true"
   data-lenis-prevent
 >
-  <div class="container-wide flex h-[84px] items-center justify-between md:h-[88px]">
-    <BpeLogo variant="horizontal" tone="onDark" class="h-9" title={SITE.name} />
-    <button id="menu-close" class="link-caps" type="button">Close</button>
-  </div>
-  <nav class="container-wide mt-10 flex flex-col gap-1" aria-label="Menu">
-    {[...nav, { href: '/contact/', label: 'Contact' }].map((item, i) => (
-      <a
-        href={item.href}
-        class="menu-link display-caps border-b border-cream/10 py-4 text-[2.1rem] text-cream/90 transition-colors hover:text-gold sm:text-[2.6rem]"
-        style={`--d: ${0.06 * i + 0.1}s`}
-      >
-        {item.label}
-      </a>
-    ))}
-  </nav>
-  <div class="container-wide mt-10 flex flex-col gap-4">
-    <a href={SITE.phoneHref} class="link-caps text-gold">{SITE.phoneDisplay}</a>
-    <a href={SITE.whatsappHref} class="link-caps opacity-70" rel="noopener">WhatsApp</a>
-    <a href="/quote/" class="btn-gold mt-4 w-fit">Get my price</a>
+  <div class="flex min-h-full flex-col">
+    <div class="container-wide flex h-[84px] shrink-0 items-center justify-between md:h-[88px]">
+      <BpeLogo variant="horizontal" tone="onDark" class="h-9" title={SITE.name} />
+      <button id="menu-close" class="link-caps cube after:hidden" type="button">
+        <span class="cube-box">
+          <span class="cube-face">Close</span>
+          <span class="cube-face" aria-hidden="true">Close</span>
+        </span>
+      </button>
+    </div>
+
+    <nav class="container-wide my-auto flex flex-col items-center gap-3 py-10 text-center" aria-label="Menu">
+      {[...nav, { href: '/contact/', label: 'Contact' }].map((item, i) => (
+        <a
+          href={item.href}
+          class="m-stag display-caps text-[2.2rem] leading-[1.15] text-cream/90 transition-colors hover:text-gold sm:text-[2.7rem]"
+          style={`--i: ${i}`}
+        >
+          {item.label}
+        </a>
+      ))}
+    </nav>
+
+    <div class="container-wide grid shrink-0 grid-cols-2 gap-x-6 gap-y-4">
+      <div class="flex flex-col items-start gap-4">
+        <a href={SITE.phoneHref} class="m-stag link-caps text-gold" style="--i: 6">{SITE.phoneDisplay}</a>
+        <a href={SITE.whatsappHref} class="m-stag link-caps opacity-70" style="--i: 7" rel="noopener">WhatsApp</a>
+      </div>
+      <div class="flex flex-col items-end gap-4">
+        <a href="/quote/" class="m-stag link-caps text-gold" style="--i: 8">Get my price</a>
+        <a href="/prices/" class="m-stag link-caps opacity-70" style="--i: 9">Full price list</a>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -128,15 +155,29 @@ const nav = [
 
   const setOpen = (open: boolean) => {
     if (!overlay || !toggle) return;
-    overlay.classList.toggle('opacity-0', !open);
-    overlay.classList.toggle('pointer-events-none', !open);
+    overlay.toggleAttribute('data-open', open);
     overlay.setAttribute('aria-hidden', String(!open));
     toggle.setAttribute('aria-expanded', String(open));
     if (open) lenis()?.stop();
     else lenis()?.start();
   };
-  toggle?.addEventListener('click', () => setOpen(true));
-  close?.addEventListener('click', () => setOpen(false));
+  // Touch has no hover, so a tap plays the cube roll once: the class holds
+  // the quarter turn just long enough to be seen, then lets go. By then the
+  // curtain is covering (or has uncovered) the button, so the return leg of
+  // the roll is never on screen.
+  const spin = (el: HTMLElement | null) => {
+    if (!el) return;
+    el.classList.add('cube-spin');
+    setTimeout(() => el.classList.remove('cube-spin'), 700);
+  };
+  toggle?.addEventListener('click', () => {
+    spin(toggle);
+    setOpen(true);
+  });
+  close?.addEventListener('click', () => {
+    spin(close);
+    setOpen(false);
+  });
   overlay?.querySelectorAll('a').forEach((a) => a.addEventListener('click', () => setOpen(false)));
   addEventListener('keydown', (e) => {
     if (e.key === 'Escape') setOpen(false);
