@@ -879,28 +879,32 @@ async function boot() {
     }
   }
 
-  /* The footer sign-off assembles itself when scrolled to, Artiom's brief:
-   * the caps words arrive OVERSIZED and low, rise as one block, and each
-   * settles into its own place; "you" is absent through all of it and then
-   * simply condenses in, opacity and blur, once the others have landed.
-   * Plays once per page. Initial states are set here, never in markup, so a
-   * visitor without this chunk sees the finished line. */
+  /* The closing line assembles itself when scrolled to, Artiom's brief,
+   * second pass: no arriving oversized, no fading, nothing that reads as a
+   * pop. Each caps word starts below the edge of its own overflow-hidden
+   * mask (Footer.astro provides those), and they rise one after another,
+   * each decelerating into its place; "you" is the one exception, never
+   * masked, condensing in through opacity and blur once the words have
+   * landed. Travel is in percent of the word's own height, so the same
+   * numbers hold at every viewport width. Plays once per page. Initial
+   * states are set here, never in markup, so a visitor without this chunk
+   * sees the finished line. */
   if (ScrollTrigger) {
     document.querySelectorAll<HTMLElement>('[data-footer-line]').forEach((line) => {
       const words = line.querySelectorAll<HTMLElement>('.fw-word');
       const you = line.querySelector<HTMLElement>('.fw-you');
       if (!words.length) return;
-      gsap.set(words, { y: 90, scale: 1.35, opacity: 0, transformOrigin: '50% 100%' });
+      gsap.set(words, { yPercent: 115 });
       if (you) gsap.set(you, { opacity: 0, filter: 'blur(12px)' });
       gsap
         .timeline({
           scrollTrigger: { trigger: line, start: 'top 88%', once: true },
         })
-        // one shared rise, the stagger small enough to read as one block
-        .to(words, { y: 0, opacity: 1, duration: 0.7, ease: 'power3.out', stagger: 0.06 }, 0)
-        // then each word takes its own size, which is what "settling" is
-        .to(words, { scale: 1, duration: 0.55, ease: 'power3.inOut', stagger: 0.07 }, 0.38)
-        .to(you || {}, { opacity: 1, filter: 'blur(0px)', duration: 0.7, ease: 'power2.out' }, 0.85);
+        // power4 spends its speed early and lands slowly: the words slide
+        // up and settle rather than stopping dead. The stagger is wide
+        // enough to read as one-after-another, not as a shared block.
+        .to(words, { yPercent: 0, duration: 1.05, ease: 'power4.out', stagger: 0.12 }, 0)
+        .to(you || {}, { opacity: 1, filter: 'blur(0px)', duration: 0.8, ease: 'power2.out' }, 0.6);
     });
   }
 

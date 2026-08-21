@@ -18,16 +18,19 @@ const isHome = Astro.url.pathname === '/';
   <div class="container-wide py-16 md:py-24">
     {!isHome && (
     <div class="flex flex-col gap-4 border-b border-cream/12 pb-12 md:flex-row md:items-end md:justify-between">
-      {/* Each word is its own span so motion.ts can assemble the line on
-          scroll: the caps words arrive oversized, rise as one and settle
-          into place; "you" comes last, through opacity and a blur. The
+      {/* Each caps word sits inside its own overflow-hidden mask, so on
+          scroll motion.ts can push the word below its baseline and let it
+          rise back up, cut off by the mask edge, each into its own place;
+          "you" is never masked and simply condenses in, opacity and blur,
+          once the others have landed. Masking the caps words is safe only
+          because they are uppercase: no descenders to clip at rest. The
           spans carry no hidden state in markup, the script sets it, so a
           page without the motion chunk simply shows the finished line. */}
       <p class="display-caps text-[clamp(2.4rem,6vw,5rem)] text-cream" data-footer-line>
-        <span class="fw-word inline-block">Ready</span>
-        <span class="fw-word inline-block">when</span>
+        <span class="inline-block overflow-hidden align-bottom"><span class="fw-word inline-block">Ready</span></span>
+        <span class="inline-block overflow-hidden align-bottom"><span class="fw-word inline-block">when</span></span>
         <span class="fw-you accent-word inline-block text-[0.62em] text-gold-soft">you</span>
-        <span class="fw-word inline-block">are</span>
+        <span class="inline-block overflow-hidden align-bottom"><span class="fw-word inline-block">are</span></span>
       </p>
       <div class="flex flex-wrap items-center gap-4">
         <a href="/quote/" class="btn-gold">Get my price</a>
