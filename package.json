@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "astro dev --port 4380",
     "build": "astro build",
-    "preview": "astro preview"
+    "preview": "astro preview",
+    "email:preview": "esbuild scripts/preview-email.ts --bundle --platform=node --format=esm --log-level=error --outfile=node_modules/.cache/preview-email.mjs && node node_modules/.cache/preview-email.mjs"
   },
   "dependencies": {
     "@astrojs/react": "^4.4.2",

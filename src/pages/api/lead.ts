@@ -1,5 +1,6 @@
 import type { APIRoute } from 'astro';
 import { dbAdmin } from '../../lib/db';
+import { sendLeadEmail } from '../../lib/email';
 import {
   clientIp,
   clip,
@@ -68,7 +69,12 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
     // or a script, and both are worth being able to see.
     if (body === null) return answer({ skipped: 'too-large' });
 
-    if (!dbAdmin) return answer({ skipped: 'not-configured' });
+    // No early exit on a missing database any more. Writing the row and
+    // ringing the owner's phone are two separate jobs with two separate
+    // failure modes, and the notification is the one that has to survive: a
+    // request nobody sees today is worth more lost than a row in a report
+    // read at the end of the month. The database is checked where it is
+    // actually used, below.
     if (isBot(ua)) return answer({ skipped: 'bot' });
     // Honeypot: a hidden field only an automated filler would ever complete.
     if (clip(body.hp, 100)) return answer({ skipped: 'trap' });
@@ -100,28 +106,58 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
     if (shortFields.some(looksInjected)) return answer({ skipped: 'junk' });
     if ((notes?.match(/https?:\/\//gi) || []).length >= 3) return answer({ skipped: 'junk' });
 
-    const { error } = await dbAdmin.from('leads').insert({
-      name: name || '',
-      phone: phone || '',
-      // An address that is not an address is dropped rather than stored, so
-      // the cabinet never offers a mailto that goes nowhere.
-      service,
-      size,
-      preferred_date: date,
-      area,
-      notes,
-      // The campaign fields are written by our own script from the address
-      // bar, so they are still only a claim from the browser's side.
-      utm_source: tagOrNull(body.us, 80),
-      utm_medium: tagOrNull(body.um, 80),
-      utm_campaign: tagOrNull(body.uc, 120),
-      link_code: tagOrNull(body.code, 60),
-      referrer_host: hostOrNull(body.ref),
-      landing_path: pathOrNull(body.landing),
-      session_id: uuidOrNull(body.sid),
-    });
+    // The campaign fields are written by our own script from the address
+    // bar, so they are still only a claim from the browser's side.
+    const source = tagOrNull(body.us, 80);
+    const campaign = tagOrNull(body.uc, 120);
+    const linkCode = tagOrNull(body.code, 60);
+    const referrer = hostOrNull(body.ref);
+    const landing = pathOrNull(body.landing);
 
-    return answer(error ? { skipped: 'error' } : {});
+    // Both at once, because they have nothing to say to each other and the
+    // visitor's browser stops waiting after 1.2s either way. Neither can
+    // reject: insert() reports errors in its result and sendLeadEmail
+    // answers with a status, so there is no failure here to catch.
+    const [written, mailed] = await Promise.all([
+      dbAdmin
+        ? dbAdmin
+            .from('leads')
+            .insert({
+              name: name || '',
+              phone: phone || '',
+              service,
+              size,
+              preferred_date: date,
+              area,
+              notes,
+              utm_source: source,
+              utm_medium: tagOrNull(body.um, 80),
+              utm_campaign: campaign,
+              link_code: linkCode,
+              referrer_host: referrer,
+              landing_path: landing,
+              session_id: uuidOrNull(body.sid),
+            })
+            .then(({ error }) => (error ? 'error' : 'ok'))
+        : Promise.resolve('not-configured' as const),
+      sendLeadEmail({
+        name: name || '',
+        phone: phone || '',
+        service,
+        size,
+        date,
+        area,
+        notes,
+        // The label the owner reads, not the raw tag: a request that came
+        // through a flyer's QR code should say so in one word.
+        source: source || referrer || null,
+        campaign,
+        linkCode,
+        landing,
+      }),
+    ]);
+
+    return answer({ stored: written, mailed });
   } catch {
     // The record is a bonus, the WhatsApp hand off is the job.
     return answer({ skipped: 'error' });
