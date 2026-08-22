@@ -1,6 +1,6 @@
 import type { APIRoute } from 'astro';
 import { dbAdmin } from '../../lib/db';
-import { deviceOf, isBot, placeOf, referrerHost } from '../../lib/request';
+import { deviceOf, isBot, placeOf, publicOrigin, referrerHost } from '../../lib/request';
 
 export const prerender = false;
 
@@ -19,7 +19,10 @@ export const prerender = false;
  */
 export const GET: APIRoute = async ({ params, request, url, redirect }) => {
   const code = (params.code || '').toLowerCase().slice(0, 60);
-  const home = new URL('/', url).toString();
+  // Every address below is built on the origin the visitor asked for, not on
+  // the internal one this function was handed. See publicOrigin().
+  const origin = publicOrigin(request, url);
+  const home = new URL('/', origin).toString();
   if (!dbAdmin || !code) return redirect(home, 302);
 
   const { data: link } = await dbAdmin
@@ -33,7 +36,7 @@ export const GET: APIRoute = async ({ params, request, url, redirect }) => {
 
   let target = home;
   if (link && !expired) {
-    const destination = new URL(link.destination || '/', url);
+    const destination = new URL(link.destination || '/', origin);
     if (link.utm_source) destination.searchParams.set('utm_source', link.utm_source);
     if (link.utm_medium) destination.searchParams.set('utm_medium', link.utm_medium);
     if (link.utm_campaign) destination.searchParams.set('utm_campaign', link.utm_campaign);
@@ -52,7 +55,7 @@ export const GET: APIRoute = async ({ params, request, url, redirect }) => {
     await dbAdmin.from('link_clicks').insert({
       link_id: link?.id ?? null,
       code,
-      referrer_host: referrerHost(request.headers.get('referer'), url.hostname),
+      referrer_host: referrerHost(request.headers.get('referer'), origin.hostname),
       country,
       city,
       device: deviceOf(ua),

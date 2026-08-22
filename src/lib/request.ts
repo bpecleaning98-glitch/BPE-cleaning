@@ -126,6 +126,33 @@ export function clientIp(request: Request, fallback?: string | null): string {
 }
 
 /**
+ * The origin the VISITOR typed, which is not the one the function sees.
+ *
+ * Astro builds context.url from the incoming request, and on Vercel a
+ * serverless function is handed the platform's internal address, so that URL
+ * reads as localhost no matter which domain was actually asked for. Anything
+ * built on it leaves the site: /go/[code] was redirecting every campaign
+ * link, printed QR codes included, to https://localhost/.
+ *
+ * The real host is in x-forwarded-host, written by the platform and not by
+ * the visitor's browser. It is only trusted for building our own addresses,
+ * never for a security decision, and it is validated as a bare hostname so a
+ * malformed header cannot smuggle anything into a Location line. Locally
+ * neither header exists and the request URL is already right, which is what
+ * keeps `astro dev` pointing at localhost instead of production.
+ */
+export function publicOrigin(request: Request, url: URL): URL {
+  const host = (request.headers.get('x-forwarded-host') || '').split(',')[0].trim();
+  if (!host || !/^[a-z0-9.-]+(:\d+)?$/i.test(host)) return new URL(url.origin);
+  const proto = (request.headers.get('x-forwarded-proto') || '').split(',')[0].trim();
+  try {
+    return new URL(`${proto === 'http' ? 'http' : 'https'}://${host}`);
+  } catch {
+    return new URL(url.origin);
+  }
+}
+
+/**
  * Rate limiting, in memory.
  *
  * Read this before trusting it: the counters live in the memory of one
