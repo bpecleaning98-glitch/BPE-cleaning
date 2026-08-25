@@ -14,7 +14,7 @@ export const SITE = {
 // Prices live in ./pricing.ts and areas in ./areas.ts. Both were revised by the
 // client on 5 Aug 2026 and override the original flyer. Never hardcode a price
 // or a county in a component.
-export { HOURLY, FIXED, EXTRAS, VAT_NOTE } from './pricing';
+export { HOURLY, FIXED, EXTRAS, VAT_NOTE, VAT_LABEL } from './pricing';
 export { COUNTIES, AREAS_SENTENCE } from './areas';
 
 export const SERVICES = [

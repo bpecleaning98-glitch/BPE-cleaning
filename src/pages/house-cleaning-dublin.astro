@@ -5,10 +5,11 @@ import { serviceGraph } from '../lib/schema';
 import Gallery from '../components/Gallery.astro';
 import Diamond from '../components/Diamond.astro';
 import { SITE, SERVICES } from '../data/site';
-import { HOURLY, FIXED, END_OF_TENANCY, EXTRAS, DISCOUNTS, VAT_NOTE, ESTIMATE_NOTE } from '../data/pricing';
+import { HOURLY, FIXED, END_OF_TENANCY, EXTRAS, DISCOUNTS } from '../data/pricing';
 import { COUNTIES, AREAS_SENTENCE } from '../data/areas';
 import { END_OF_TENANCY_ROOMS, AIRBNB } from '../data/work';
 import { TESTIMONIALS } from '../data/testimonials';
+import PriceNote from '../components/PriceNote.astro';
 
 /**
  * Regular domestic cleaning. Hourly, minimum 3 hours, with the recurring
@@ -337,7 +338,7 @@ const jsonLd = serviceGraph('/house-cleaning-dublin/', faqs, Astro.site);
         </p>
         <a href="/quote/" class="btn-gold shrink-0">Get my price</a>
       </div>
-      <p class="mt-6 text-xs text-cream/40">{VAT_NOTE} {ESTIMATE_NOTE}</p>
+      <PriceNote class="mt-10" tone="dark" />
     </div>
   </section>
 

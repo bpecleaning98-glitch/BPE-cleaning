@@ -3,7 +3,8 @@ import Base from '../../layouts/Base.astro';
 import { breadcrumbs, businessRef, graph } from '../../lib/schema';
 import { SITE } from '../../data/site';
 import { AREAS_SENTENCE } from '../../data/areas';
-import { HOURLY, FIXED, SIZE_LABELS, VAT_NOTE, ESTIMATE_NOTE } from '../../data/pricing';
+import { HOURLY, FIXED, SIZE_LABELS } from '../../data/pricing';
+import PriceNote from '../../components/PriceNote.astro';
 
 /**
  * Evergreen guide: what an after builders clean actually involves. The point of
@@ -264,9 +265,10 @@ const jsonLd = graph(
               <span class="font-sans text-sm font-medium text-gold-soft [font-variant-numeric:tabular-nums]">&euro;{row.builders}</span>
             </div>
           ))}
-          <p class="mt-5 text-xs leading-relaxed text-cream/40">
-            {VAT_NOTE} {ESTIMATE_NOTE} The full tables, including add-ons, are on the
-            <a href="/prices/" class="text-cream/70 underline decoration-cream/30 underline-offset-4 hover:text-cream">price list</a>.
+          <PriceNote class="mt-8" tone="dark" rule={false} />
+          <p class="mt-5 text-sm leading-relaxed text-cream/70">
+            The full tables, including add-ons, are on the
+            <a href="/prices/" class="underline decoration-cream/40 underline-offset-4 hover:text-cream">price list</a>.
           </p>
         </div>
       </div>

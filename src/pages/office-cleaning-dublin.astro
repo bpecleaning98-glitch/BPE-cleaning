@@ -8,6 +8,7 @@ import { COMMERCIAL } from '../data/work';
 import { HOURLY, VAT_NOTE, ESTIMATE_NOTE } from '../data/pricing';
 import { TESTIMONIALS } from '../data/testimonials';
 import { COUNTIES, AREAS_SENTENCE } from '../data/areas';
+import PriceNote from '../components/PriceNote.astro';
 
 // One usable commercial photo exists, so it sits beside the copy rather than in a
 // grid. A one-item gallery grid reads as a gap where more photos should be.
@@ -271,7 +272,7 @@ const jsonLd = serviceGraph('/office-cleaning-dublin/', faqs, Astro.site);
           <a href="/prices/" class="link-caps text-cream">Full price list</a>
         </div>
       </div>
-      <p class="mt-6 text-xs text-cream/40">{VAT_NOTE}</p>
+      <PriceNote class="mt-10" tone="dark" estimate={false} />
     </div>
   </section>
 

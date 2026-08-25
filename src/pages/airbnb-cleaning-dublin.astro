@@ -7,13 +7,14 @@ import Diamond from '../components/Diamond.astro';
 import { SITE } from '../data/site';
 import { AIRBNB } from '../data/work';
 import { TESTIMONIALS } from '../data/testimonials';
-import { FIXED, SIZE_LABELS, VAT_NOTE, ESTIMATE_NOTE } from '../data/pricing';
+import { FIXED, SIZE_LABELS } from '../data/pricing';
 import { AREAS_SENTENCE, COUNTIES } from '../data/areas';
 // The same photograph the homepage opens on, so the two full-bleed moments on
 // the site speak with one voice. It is atmosphere, not evidence: this band
 // makes no claim about the room, which is why a stock frame belongs here and
 // nowhere near the gallery.
 import bandPhoto from '../assets/stock/hero-living-room.jpg';
+import PriceNote from '../components/PriceNote.astro';
 
 // The City Stays reference is the single strongest proof point on the whole site
 // for this service: 80+ properties over 2 years. It belongs here, not buried on
@@ -343,7 +344,7 @@ const jsonLd = serviceGraph('/airbnb-cleaning-dublin/', faqs, Astro.site);
         </p>
         <a href="/quote/" class="btn-gold shrink-0">Get my price</a>
       </div>
-      <p class="mt-6 text-xs text-cream/40">{VAT_NOTE} {ESTIMATE_NOTE}</p>
+      <PriceNote class="mt-10" tone="dark" />
     </div>
   </section>
 

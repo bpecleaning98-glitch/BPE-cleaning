@@ -1,0 +1,68 @@
+---
+import Diamond from './Diamond.astro';
+import { VAT_LABEL, ESTIMATE_NOTE } from '../data/pricing';
+
+/**
+ * The line that closes a price block: prices exclude VAT, and the figure on
+ * screen is confirmed before anyone is booked in.
+ *
+ * It used to be a 12px paragraph at 40 percent opacity, which measures about
+ * 3.4:1 against the night band and 3.6:1 on porcelain. That is under the 4.5:1
+ * AA floor for text this size, and it showed: the owner asked for the VAT line
+ * to be mentioned on a site that was already printing it eight times over.
+ *
+ * So it is set as a statement rather than a disclaimer. The diamond marks it,
+ * a hairline lifts it off the block above, the VAT fact is tracked caps at full
+ * ink or full cream, and the softer sentence about confirming the price sits
+ * under it in reading size. Same shape on every price block on the site, which
+ * is what makes it read as a caption to the figures rather than as small print.
+ */
+interface Props {
+  /** `dark` for the night bands, `light` for porcelain and ivory. */
+  tone?: 'light' | 'dark';
+  /** Off where the surrounding copy already says the price is confirmed. */
+  estimate?: boolean;
+  /** Off where the block above already ends in a hairline. */
+  rule?: boolean;
+  /** Off where an ancestor already carries data-reveal. */
+  reveal?: boolean;
+  class?: string;
+}
+const {
+  tone = 'light',
+  estimate = true,
+  rule = true,
+  reveal = true,
+  class: className = '',
+} = Astro.props;
+
+const dark = tone === 'dark';
+const attrs = reveal ? { 'data-reveal': '' } : {};
+---
+<div
+  class:list={[
+    'flex items-start gap-4',
+    rule && 'border-t pt-6',
+    rule && (dark ? 'border-cream/15' : 'border-ink/15'),
+    className,
+  ]}
+  {...attrs}
+>
+  <Diamond class="mt-[0.1rem] h-3.5 w-3.5 shrink-0" />
+  <div>
+    <p
+      class:list={[
+        'font-sans text-[0.7rem] font-semibold uppercase tracking-[0.2em]',
+        dark ? 'text-cream' : 'text-ink',
+      ]}
+    >{VAT_LABEL}</p>
+    {estimate && (
+      <p
+        class:list={[
+          'mt-2.5 max-w-md text-sm leading-relaxed',
+          dark ? 'text-cream/70' : 'text-ink/70',
+        ]}
+      >{ESTIMATE_NOTE}</p>
+    )}
+  </div>
+</div>

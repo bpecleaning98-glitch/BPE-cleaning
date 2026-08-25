@@ -6,10 +6,11 @@ import Gallery from '../components/Gallery.astro';
 import Diamond from '../components/Diamond.astro';
 import { Image } from 'astro:assets';
 import { SITE, SERVICES } from '../data/site';
-import { HOURLY, FIXED, SIZE_LABELS, EXTRAS, VAT_NOTE, ESTIMATE_NOTE } from '../data/pricing';
+import { HOURLY, FIXED, SIZE_LABELS, EXTRAS, ESTIMATE_NOTE } from '../data/pricing';
 import { BUILDERS_PAIR, END_OF_TENANCY_ROOMS, DEEP_CLEAN } from '../data/work';
 import { TESTIMONIALS } from '../data/testimonials';
 import { COUNTIES, AREAS_SENTENCE } from '../data/areas';
+import PriceNote from '../components/PriceNote.astro';
 
 /** Fixed prices, straight from pricing.ts. Studio is deliberately omitted: the
  *  studio figure mirrors 1 bedroom in the data but the client has not confirmed
@@ -400,7 +401,7 @@ const jsonLd = serviceGraph('/after-builders-cleaning-dublin/', faqs, Astro.site
           <a href="/prices/" class="link-caps text-cream/80 hover:text-cream">Full price list</a>
         </div>
       </div>
-      <p class="mt-6 text-xs text-cream/40">{VAT_NOTE}</p>
+      <PriceNote class="mt-10" tone="dark" estimate={false} />
     </div>
   </section>
 

@@ -22,6 +22,7 @@ import { DEEP_CLEAN } from '../data/work';
 // repeats a photo already shown in this page's DEEP_CLEAN gallery.
 import stripKitchen from '../assets/work/eot-after-23.jpg';
 import stripLiving from '../assets/work/airbnb-01.jpg';
+import PriceNote from '../components/PriceNote.astro';
 
 /**
  * The full price list. Every figure on this page is read from data/pricing.ts,
@@ -204,6 +205,7 @@ const jsonLd = graph(
       </h1>
       <p class="mt-8 max-w-xl text-base leading-relaxed text-cream/70" data-reveal style="--d: 0.2s">
         Hourly rates, fixed prices by property size and extras, all in one place. No hidden fees.
+        {VAT_NOTE}
       </p>
       <div class="mt-10 flex flex-wrap items-center gap-4" data-reveal style="--d: 0.3s">
         <a href="/quote/" class="btn-gold">Get my price</a>
@@ -228,9 +230,13 @@ const jsonLd = graph(
             published rates, the same ones we quote from. Read them, work out roughly what your clean
             will cost, then talk to us and we confirm the exact figure.
           </p>
-          <div class="mt-8 flex flex-col gap-2.5" data-reveal style="--d: 0.28s">
-            <span class="font-sans text-[0.66rem] font-semibold uppercase tracking-[0.24em] text-stone">{VAT_NOTE}</span>
-            <span class="font-sans text-[0.66rem] font-semibold uppercase tracking-[0.24em] text-stone">{ESTIMATE_NOTE}</span>
+          {/* The only note on this page that carries the second sentence.
+              Five tables closing on "your final price is confirmed before we
+              book you in" is the same qualifier five times; said once here,
+              in the column that introduces every table below it, it reads as
+              the terms of the list rather than as a repeated disclaimer. */}
+          <div class="mt-8" data-reveal style="--d: 0.28s">
+            <PriceNote reveal={false} />
           </div>
         </div>
 
@@ -311,7 +317,7 @@ const jsonLd = graph(
         ))}
       </div>
 
-      <p class="mt-8 text-xs text-stone" data-reveal>{VAT_NOTE} {ESTIMATE_NOTE}</p>
+      <PriceNote class="mt-9" rule={false} estimate={false} />
     </div>
   </section>
 
@@ -406,7 +412,7 @@ const jsonLd = graph(
       </div>
 
       <div class="mt-12 flex flex-col justify-between gap-6 border-t border-cream/15 pt-8 md:flex-row md:items-center" data-reveal>
-        <p class="text-xs text-cream/40">{VAT_NOTE} {ESTIMATE_NOTE}</p>
+        <PriceNote tone="dark" rule={false} reveal={false} estimate={false} />
         <a href="/quote/" class="btn-gold shrink-0">Get my price</a>
       </div>
     </div>
@@ -502,7 +508,7 @@ const jsonLd = graph(
         Hosts with several properties usually run on a standing arrangement rather than booking one clean
         at a time. Tell us how many units you have and how often they turn over, and we price it together.
       </p>
-      <p class="mt-4 text-xs text-stone" data-reveal>{VAT_NOTE} {ESTIMATE_NOTE}</p>
+      <PriceNote class="mt-9" estimate={false} />
 
       {cityStays && (
         <figure class="mt-20 grid gap-6 border-t border-ink/15 pt-12 md:grid-cols-[auto_1fr] md:gap-10">
@@ -594,9 +600,10 @@ const jsonLd = graph(
           </div>
         ))}
       </div>
-      <p class="mt-8 text-xs text-stone" data-reveal>
-        Discounts apply to the recurring clean. {VAT_NOTE}
+      <p class="mt-8 max-w-2xl text-sm leading-relaxed text-ink/70" data-reveal>
+        Discounts apply to the recurring clean itself, not to the add-ons booked alongside it.
       </p>
+      <PriceNote class="mt-9" estimate={false} />
     </div>
   </section>
 

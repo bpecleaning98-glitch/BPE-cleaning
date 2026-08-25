@@ -74,11 +74,21 @@ export const DISCOUNTS = {
 } as const;
 
 /**
- * The client is not VAT registered on these figures: "Preturile nu includ TVA"
- * (5 Aug 2026). Every price table must carry this line so no customer is
- * surprised at invoicing.
+ * VAT. Every figure in this file is the cleaning price on its own, per the
+ * owner's wording of 5 Aug 2026, "Preturile nu includ TVA", and her request of
+ * 25 Aug 2026 that the site say so where a visitor will actually read it.
+ *
+ * Note this records what the published figures MEAN, not the company's VAT
+ * status, which is a separate question and is not asserted anywhere on the site.
+ *
+ * Two settings of one sentence, never retyped in a component. VAT_LABEL is the
+ * statement PriceNote.astro sets in tracked caps under a price block; VAT_NOTE
+ * is the same words punctuated for running copy.
  */
-export const VAT_NOTE = 'All prices are exclusive of VAT.';
+export const VAT_LABEL = 'All prices exclude VAT';
+
+/** The statement as a sentence, for running copy. */
+export const VAT_NOTE = `${VAT_LABEL}.`;
 
 /** Shown wherever an estimate appears, so no on-screen figure is binding. */
 export const ESTIMATE_NOTE = 'Your final price is confirmed before we book you in.';

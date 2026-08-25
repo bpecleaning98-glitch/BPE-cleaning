@@ -2,7 +2,8 @@
 import Base from '../../layouts/Base.astro';
 import { breadcrumbs, businessRef, graph } from '../../lib/schema';
 import Diamond from '../../components/Diamond.astro';
-import { FIXED, VAT_NOTE, ESTIMATE_NOTE } from '../../data/pricing';
+import { FIXED } from '../../data/pricing';
+import PriceNote from '../../components/PriceNote.astro';
 
 /**
  * Guide: the Airbnb turnover checklist. Evergreen craft content for the
@@ -330,7 +331,7 @@ const inlineLink = 'text-gold-deep underline underline-offset-2 transition-color
             screen, <a href="/quote/" class={inlineLink}>tell us about your property</a> and we
             will send you a price.
           </p>
-          <p class="mt-6 text-xs text-ink/45">{VAT_NOTE} {ESTIMATE_NOTE}</p>
+          <PriceNote class="mt-10" />
         </div>
       </article>
     </div>

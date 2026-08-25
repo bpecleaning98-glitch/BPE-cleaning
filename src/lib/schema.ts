@@ -219,9 +219,9 @@ const SERVICE_RATES: Record<ServiceSlug, readonly Rate[]> = {
  * reads a per hour figure as the price of the whole job. A fixed price per
  * property has no unit and is left as a plain PriceSpecification.
  *
- * valueAddedTaxIncluded is false because pricing.ts says so: the client is not
- * VAT registered on these figures and every price table on the site carries that
- * line.
+ * valueAddedTaxIncluded is false because pricing.ts says so: the published
+ * figures are the cleaning price on its own, and every price block on the site
+ * prints that line beside them.
  *
  * The offers deliberately carry no areaServed of their own. The eight counties
  * are already on the business node and on the Service node, and repeating them

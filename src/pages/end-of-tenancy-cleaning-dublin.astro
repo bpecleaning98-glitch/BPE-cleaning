@@ -9,6 +9,7 @@ import { END_OF_TENANCY_ROOMS, END_OF_TENANCY_PROOF } from '../data/work';
 import { END_OF_TENANCY, SIZE_LABELS, EXTRAS, HOURLY, VAT_NOTE, ESTIMATE_NOTE } from '../data/pricing';
 import { COUNTIES, AREAS_SENTENCE } from '../data/areas';
 import { TESTIMONIALS } from '../data/testimonials';
+import PriceNote from '../components/PriceNote.astro';
 
 /**
  * Highest commercial intent page on the site. The whole argument is deposit
@@ -316,7 +317,7 @@ const jsonLd = serviceGraph('/end-of-tenancy-cleaning-dublin/', faqs, Astro.site
         </div>
       </div>
 
-      <p class="mt-14 text-xs text-cream/40" data-reveal>{VAT_NOTE} {ESTIMATE_NOTE}</p>
+      <PriceNote class="mt-14" tone="dark" />
     </div>
   </section>
 

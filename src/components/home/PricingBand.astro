@@ -1,5 +1,6 @@
 ---
 import { FIXED, HOURLY } from '../../data/pricing';
+import PriceNote from '../PriceNote.astro';
 
 /**
  * Homepage pricing TEASER, light and airy. The full tables live on /prices/
@@ -44,10 +45,17 @@ const figures = [
       ))}
     </div>
 
-    {/* The VAT line lives on /prices/ and on every service page, beside the
-        figures it actually qualifies. Repeating it under a three-number
-        teaser was the fourth time a visitor met it before reaching the
-        pricing page, and the link that followed it is the same trip the
-        three figures above already invite. Both gone. */}
+    {/* The band's own bottom hairline is this note's rule, so PriceNote draws
+        none of its own. An earlier pass dropped the VAT line from the homepage
+        on the grounds that it was the fourth time a visitor met it before
+        reaching /prices/. That was true of the old line and beside the point:
+        these three figures are the only prices on the homepage, and a visitor
+        who reads them and leaves had met it zero times. It reads as a caption
+        to the band rather than as small print under it.
+
+        estimate={false}: the paragraph above the figures already ends on
+        "your final price is always confirmed before we book you in", and the
+        note would have said it again eight lines later. */}
+    <PriceNote class="mt-7" rule={false} estimate={false} />
   </div>
 </section>
