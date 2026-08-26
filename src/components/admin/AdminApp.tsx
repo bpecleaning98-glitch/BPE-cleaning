@@ -182,12 +182,27 @@ function Centered({ children }: { children: React.ReactNode }) {
   );
 }
 
+/**
+ * Password sign-in only, with no self-service reset. The reset button that
+ * used to sit under this form called resetPasswordForEmail, and the emailed
+ * link signed its clicker straight into a live session here. Nothing in this
+ * app ever handled PASSWORD_RECOVERY or called updateUser, so the password
+ * was never actually changed: the flow was not a reset, it was a magic
+ * sign-in link that left the old password standing, reachable by anyone who
+ * could type the owner's address into a public page.
+ *
+ * The two accounts that exist are created by hand and sign-ups are off, so a
+ * forgotten password is an administrator's errand on purpose: Supabase >
+ * Authentication > Users, set a new one. The walkthrough is in
+ * docs/CABINET-RO.md. Removing the button removes the invitation, not the
+ * API: recover stays callable with the public anon key, which is Supabase's
+ * design, and its mail still lands only in the account owner's inbox.
+ */
 function SignIn() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
-  const [sent, setSent] = useState('');
 
   const submit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -197,16 +212,6 @@ function SignIn() {
     const { error: authError } = await supabase.auth.signInWithPassword({ email, password });
     setBusy(false);
     if (authError) setError('That email and password do not match an account.');
-  };
-
-  const reset = async () => {
-    if (!supabase || !email) {
-      setError('Type your email address first, then use this link.');
-      return;
-    }
-    setError('');
-    await supabase.auth.resetPasswordForEmail(email, { redirectTo: `${location.origin}/admin` });
-    setSent('If that address has an account, a reset link is on its way to it.');
   };
 
   return (
@@ -242,18 +247,13 @@ function SignIn() {
             />
           </Field>
           {error && <Notice kind="error">{error}</Notice>}
-          {sent && <Notice kind="ok">{sent}</Notice>}
           <Btn type="submit" disabled={busy}>
             {busy ? 'Signing in' : 'Sign in'}
           </Btn>
-          <button
-            type="button"
-            onClick={reset}
-            className="py-3 text-center font-sans text-[0.68rem] uppercase tracking-[0.18em] text-stone underline-offset-4 hover:text-ink hover:underline"
-          >
-            Forgot the password
-          </button>
         </form>
+        <p className="mt-4 text-center text-[0.72rem] leading-relaxed text-stone">
+          Forgotten the password? Ask the site administrator to set a new one.
+        </p>
       </div>
     </Centered>
   );

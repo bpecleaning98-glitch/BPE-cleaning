@@ -100,20 +100,33 @@ Dacă rămâne pornit, oricine își poate face singur cont pe proiectul tău. N
 pentru că `admin_emails` îl oprește, dar îți umple lista de utilizatori și e o ușă
 deschisă degeaba. Se oprește o dată și gata.
 
-### 2.7 Ca linkul de resetare a parolei să funcționeze
+### 2.7 URL Configuration și parola uitată
 
-**Authentication > URL Configuration**:
+**Authentication > URL Configuration**: Site URL = `https://bpecleaning.ie`. Atât.
+Nu adăuga Redirect URLs: nimic din aplicație nu mai cere vreun redirect de autentificare.
 
-- Site URL: `https://bpecleaning.ie`
-- Redirect URLs: adaugă `https://bpecleaning.ie/admin` și, cât timp lucrezi local, `http://localhost:4380/admin` și `http://localhost:4381/admin`
+Formularul de login NU mai are buton de resetare a parolei, scos deliberat pe 26 aug 2026.
+Ce făcea de fapt: emailul de resetare de la Supabase conținea un link care deschidea direct
+o sesiune în cabinet, iar aplicația nu avea niciun ecran de „setează parola nouă"
+(nu trata evenimentul PASSWORD_RECOVERY și nu chema niciodată updateUser). Adică nu era
+o resetare, era un link magic de intrare care lăsa parola veche neschimbată, și îl putea
+declanșa oricine tasta adresa clientei într-o pagină publică. Cu două conturi făcute de
+mână și înregistrarea închisă, drumul corect e cel de mai jos.
 
-Cabinetul cere resetarea cu redirect către `/admin` pe originea de pe care a fost cerută,
-citită din `location.origin` în `AdminApp.tsx`. Dacă adresa nu e în lista de mai sus,
-Supabase refuză redirectul și clienta ajunge într-o pagină de eroare.
+**Dacă clienta uită parola**, tu (Artiom) o schimbi din Supabase:
 
-Cele două porturi locale nu sunt o greșeală: `npm run dev` pornește pe 4380, iar
-configurația de preview din `.claude/launch.json` pornește serverul pe 4381. Portul din
-listă trebuie să fie exact cel pe care rulează serverul de pe care testezi.
+1. **Authentication > Users**, click pe contul ei.
+2. Meniul cu trei puncte > **Reset password** ca să-i trimită Supabase un email, sau
+   direct **Update user > Password** ca să scrii tu una nouă.
+3. Varianta a doua e cea recomandată aici: generezi o parolă, i-o dai prin WhatsApp și o
+   rogi să o schimbe... nu are unde momentan, deci pur și simplu i-o păstrezi tu în parolar,
+   ca la predare. Emailul de la punctul 2 e de evitat cât timp aplicația nu are ecranul de
+   parolă nouă, din exact motivul din paragraful de mai sus.
+
+De știut, nu de reparat: endpoint-ul public de resetare rămâne apelabil cu cheia anon
+(ăsta e designul Supabase, nu se poate închide din aplicație). E limitat la rată de
+Supabase, mailul ajunge doar în inboxul contului vizat, iar fără buton în interfață nu
+mai există nicio invitație către el.
 
 ---
 
