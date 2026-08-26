@@ -200,10 +200,6 @@ const forceIntroDown = () => {
     el.style.opacity = '';
     el.style.transform = '';
     el.style.filter = '';
-    // The handover wipe clips the header logo down to nothing before it
-    // reveals it. A failsafe firing mid-wipe would otherwise leave the mark
-    // permanently half cut off.
-    el.style.clipPath = '';
   });
 };
 
@@ -518,6 +514,9 @@ async function boot() {
      *    #E6DCC8 over night #14110D comes out |E6DCC8 - 14110D| = #D2CBBB.
      *    Same box, same pixels, a true zero-frame flip.
      */
+    // Read before it is overridden, so the landing can put the header back
+    // where the stylesheet wants it without this file knowing the number.
+    const restingZ = headerEl ? getComputedStyle(headerEl).zIndex : '';
     if (headerEl) {
       headerEl.style.zIndex = '120';
       // It sits above the overlay at opacity 0, and an invisible element is
@@ -689,7 +688,7 @@ async function boot() {
      */
     const OPEN = 1.15;
     const EASE = 'power3.inOut';
-    const WIPE = 0.42;
+    const FADE = 0.6;
 
     tl
       .add('travel', '+=0.15')
@@ -709,43 +708,43 @@ async function boot() {
       // is a settle, not a start.
       .add(() => heroTextIn(OPEN * 0.6), 'travel')
       // THE HANDOVER, on the one frame where the rise and the window both
-      // stop, and no longer hidden by anything: it is WIPED.
+      // stop. It is a DISSOLVE.
       //
-      // A hard cut here would show, because at rest the two do not render
-      // the same colour: the twin is flat, the real logo is the difference
-      // of gold-soft against the photograph behind the header. Nor does a
-      // crossfade work, and the reason is compositing rather than taste. At
-      // fifty percent each, the blended layer contributes a*|C-B| + (1-a)*B
-      // and the flat one lands on top of that, so the mark dips about an
-      // eighth darker halfway through and reads as a flicker.
+      // The two marks do not render the same colour at rest. The twin is
+      // flat #D2CBBB, gold-soft against night, which is what the header
+      // shows while the black screen is still up. Once the window is open
+      // the header is blending against the hero scrim instead, and measured
+      // there it comes out about #ACA697, some sixty units darker, and flat
+      // to within seven units across the whole mark because the scrim under
+      // the header is what makes it flat.
       //
-      // A wipe has no such term. The two lockups sit on identical pixels, so
-      // clipping them complementarily means every column of the mark is
-      // drawn by exactly one of them at full opacity. Whatever the colour
-      // difference is, it resolves as a single edge travelling across the
-      // mark, which is the same wipe the lockup was drawn with on the way
-      // in. If the colours happen to agree, nothing is visible at all.
+      // That difference used to be crossed by a WIPE, two complementary
+      // clip tweens, on the reasoning that a crossfade would dip darker
+      // halfway. It does, but only because of the stacking order: the header
+      // rode ABOVE the overlay, so the blend layer had the twin in its own
+      // backdrop and computed |gold-soft - twin|, which is nearly black.
+      // The wipe avoided that term, and paid for it with a hard edge
+      // crossing the lockup left to right, sixty units of colour step wide.
+      // On a settled logo that edge is the most conspicuous thing on screen.
       //
-      // Two clip tweens rather than one callback writing both: gsap
-      // suppresses onUpdate when a timeline is seeked or scrubbed, so a
-      // callback-driven wipe renders correctly while playing and not at all
-      // under inspection. Sharing a duration and an ease keeps the two edges
-      // in lockstep by construction.
+      // So the order is changed instead of the technique. At the landing
+      // frame the header drops back to its resting z, under the overlay.
+      // Its logo is then blending against the hero, exactly as it will for
+      // the rest of the visit, and the twin is simply lying on top of it.
+      // Fading the twin out is a straight interpolation between two opaque
+      // flat colours, #D2CBBB to #ACA697, with no blend term to dip and no
+      // edge to travel. The mark settles into its tone and nothing moves.
+      //
+      // Nothing is visible at the moment of the swap itself: the twin is
+      // still fully opaque over identical pixels, so the z change and the
+      // header logo coming back to opacity 1 both happen behind it.
+      //
+      // gsap.set rather than a callback: seeking or scrubbing a timeline
+      // suppresses callbacks, so a callback-written z would be right while
+      // playing and absent under inspection.
+      .set(headerEl, { zIndex: restingZ }, `travel+=${OPEN}`)
       .set(headerLogo, { opacity: 1 }, `travel+=${OPEN}`)
-      .fromTo(
-        headerLogo,
-        { clipPath: 'inset(0% 100% 0% 0%)' },
-        { clipPath: 'inset(0% 0% 0% 0%)', duration: WIPE, ease: 'power2.inOut', immediateRender: false },
-        `travel+=${OPEN}`
-      )
-      .fromTo(
-        introLogo,
-        { clipPath: 'inset(0% 0% 0% 0%)' },
-        { clipPath: 'inset(0% 0% 0% 100%)', duration: WIPE, ease: 'power2.inOut', immediateRender: false },
-        `travel+=${OPEN}`
-      )
-      .set(introLogo, { opacity: 0 }, `travel+=${OPEN + WIPE}`)
-      .set(headerLogo, { clearProps: 'clipPath' }, `travel+=${OPEN + WIPE}`)
+      .to(introLogo, { opacity: 0, duration: FADE, ease: 'power1.inOut' }, `travel+=${OPEN}`)
       .to(headerGroups, { opacity: 1, x: 0, duration: 0.6, ease: 'power2.out', stagger: 0.07 }, `travel+=${OPEN}`)
       .add(finishIntro);
     (window as any).__introTl = tl;
