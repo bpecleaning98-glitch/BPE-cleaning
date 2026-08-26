@@ -253,6 +253,26 @@ html:not(.js) #bpe-intro {
     display: none;
   }
 }
+/* The lockup inside the intro is choreographed by GSAP, which arrives in a
+ * dynamically imported chunk. Until that chunk lands, the artwork sits dead
+ * centre at its natural header size with every shape filled, because nothing
+ * has written its opening state yet: motion.ts scales it up, drops the fills
+ * to zero, offsets every outline by its own perimeter and starts the whole
+ * thing from opacity 0. So the first painted frame showed a small, finished
+ * logo, and the chunk then replaced it with an empty stage. That read as the
+ * mark blinking on and off just before the animation began.
+ *
+ * Holding it at opacity 0 from the first frame removes the blink: the tween
+ * writes an inline opacity the moment it is created, which outranks this.
+ *
+ * It cannot strand the lockup invisible. Every route where the timeline never
+ * runs takes #bpe-intro off the page instead: a device that cannot afford the
+ * animation removes it synchronously, a failed import and the six second
+ * failsafe both call forceIntroDown, and without .js or under reduced motion
+ * the two rules above mean the overlay was never shown at all. */
+html.js #bpe-intro .intro-logo {
+  opacity: 0;
+}
 
 /* Services carousel: card transforms are driven by JS setting --tx/--sc. */
 .svc-card {
