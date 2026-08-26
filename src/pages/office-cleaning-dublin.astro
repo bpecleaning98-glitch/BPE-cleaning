@@ -417,29 +417,13 @@ const jsonLd = serviceGraph('/office-cleaning-dublin/', faqs, Astro.site);
 
   {/* Closing: a night band with the ghosted mark low in the corner, mirroring
       the rates band so the page ends on the same dark register it opened on. */}
-  <section class="relative overflow-hidden bg-night py-24 text-cream md:py-36">
-    <Diamond class="pointer-events-none absolute -bottom-48 -left-44 h-[38rem] w-[38rem] opacity-[0.05]" aria-hidden="true" />
-
-    <div class="container-wide relative">
-      <div class="flex flex-col justify-between gap-10 md:flex-row md:items-end">
-        <div>
-          <p class="kicker !text-gold" data-reveal>Book It In</p>
-          <h2 class="display mt-6 max-w-2xl text-[clamp(2.2rem,5vw,4rem)]" data-reveal>
-            <span class="line-mask"><span>Start with a</span></span>
-            <span class="line-mask"><span style="--d: 0.1s">quick <span class="accent-word text-gold-soft">walkthrough</span></span></span>
-          </h2>
-          <p class="mt-8 max-w-xl text-base leading-relaxed text-cream/65" data-reveal style="--d: 0.2s">
-            Send us the address and roughly how often you need the premises cleaned. We arrange a
-            walkthrough, agree the checklist and confirm your price before anything is booked.
-          </p>
-        </div>
-        <div class="flex flex-wrap items-center gap-x-8 gap-y-4" data-reveal style="--d: 0.28s">
-          <a href="/quote/" class="btn-gold">Get my price</a>
-          <a href={SITE.whatsappHref} class="link-caps text-gold-soft" rel="noopener">Or message us on WhatsApp</a>
-        </div>
-      </div>
-
-      <div class="mt-14 flex flex-wrap items-center gap-x-10 gap-y-5 border-t border-cream/15 pt-8" data-reveal>
+  {/* No closing call to action: the footer opens with its own, and two
+      same-sense asks stacked on the way out read as a page that has run out
+      of things to say. Removed on Artiom's instruction, 26 aug, sitewide.
+      The page ends on its related-services index, which is content. */}
+  <section class="bg-night py-14 text-cream md:py-16">
+    <div class="container-wide">
+      <div class="flex flex-wrap items-center gap-x-10 gap-y-5" data-reveal>
         <span class="font-sans text-[0.66rem] font-semibold uppercase tracking-[0.24em] text-cream/50">Related services</span>
         <a href="/after-builders-cleaning-dublin/" class="link-caps text-cream">After builders cleaning</a>
         <a href="/end-of-tenancy-cleaning-dublin/" class="link-caps text-cream">End of tenancy cleaning</a>

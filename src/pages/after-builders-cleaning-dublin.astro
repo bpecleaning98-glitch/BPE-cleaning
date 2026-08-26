@@ -493,33 +493,19 @@ const jsonLd = serviceGraph('/after-builders-cleaning-dublin/', faqs, Astro.site
     </div>
   </section>
 
-  <section class="section-pad bg-night text-cream">
-    <div class="container-wide">
-      <div class="max-w-2xl">
-        <p class="kicker !text-gold" data-reveal>Book It In</p>
-        <h2 class="display mt-6 text-[clamp(2.2rem,5vw,4rem)]" data-reveal>
-          <span class="line-mask"><span>Give us the address</span></span>
-          <span class="line-mask"><span style="--d: 0.1s">and the <span class="accent-word text-gold-soft">handover</span> date</span></span>
-        </h2>
-        <p class="mt-8 text-base leading-relaxed text-cream/70" data-reveal style="--d: 0.2s">
-          Tell us the size of the property and what the works involved, and we will come back with
-          a price. No obligation, and nothing is booked until you say so.
-        </p>
-        <div class="mt-10 flex flex-wrap items-center gap-x-8 gap-y-4" data-reveal style="--d: 0.3s">
-          <a href="/quote/" class="btn-gold">Get my price</a>
-          <a href={SITE.whatsappHref} class="link-caps text-gold-soft" rel="noopener">Or message us on WhatsApp</a>
-        </div>
-      </div>
-
-      <div class="mt-16 border-t border-cream/15 pt-8" data-reveal>
-        <p class="font-sans text-[0.62rem] font-semibold uppercase tracking-[0.26em] text-cream/50">
-          Related services
-        </p>
-        <div class="mt-5 flex flex-wrap gap-x-12 gap-y-5">
-          {related.map((service) => (
-            <a href={service.slug} class="link-caps text-cream/80 hover:text-cream">{service.name}</a>
-          ))}
-        </div>
+  {/* No closing call to action: the footer opens with its own, and two
+      same-sense asks stacked on the way out read as a page that has run out
+      of things to say. Removed on Artiom's instruction, 26 aug, sitewide.
+      The page ends on its related-services index, which is content. */}
+  <section class="bg-night py-14 text-cream md:py-16">
+    <div class="container-wide" data-reveal>
+      <p class="font-sans text-[0.62rem] font-semibold uppercase tracking-[0.26em] text-cream/50">
+        Related services
+      </p>
+      <div class="mt-5 flex flex-wrap gap-x-12 gap-y-5">
+        {related.map((service) => (
+          <a href={service.slug} class="link-caps text-cream/80 hover:text-cream">{service.name}</a>
+        ))}
       </div>
     </div>
   </section>

@@ -8,7 +8,7 @@ import { SITE } from '../data/site';
 import { AIRBNB } from '../data/work';
 import { TESTIMONIALS } from '../data/testimonials';
 import { FIXED, SIZE_LABELS } from '../data/pricing';
-import { AREAS_SENTENCE, COUNTIES } from '../data/areas';
+import { COUNTIES } from '../data/areas';
 // The same photograph the homepage opens on, so the two full-bleed moments on
 // the site speak with one voice. It is atmosphere, not evidence: this band
 // makes no claim about the room, which is why a stock frame belongs here and
@@ -438,26 +438,12 @@ const jsonLd = serviceGraph('/airbnb-cleaning-dublin/', faqs, Astro.site);
   </section>
 
   {/* Close: book it */}
-  <section class="section-pad bg-porcelain">
+  {/* No closing call to action: the footer opens with its own, and two
+      same-sense asks stacked on the way out read as a page that has run out
+      of things to say. Removed on Artiom's instruction, 26 aug, sitewide.
+      The page ends on its related-services index, which is content. */}
+  <section class="bg-porcelain py-14 md:py-16">
     <div class="container-wide">
-      <div class="max-w-2xl">
-        <p class="kicker" data-reveal>Book A Turnover</p>
-        <h2 class="display mt-6 text-[clamp(2.2rem,5vw,4rem)] text-ink" data-reveal>
-          <span class="line-mask"><span>Tell us the address</span></span>
-          <span class="line-mask"><span style="--d: 0.1s">and the <span class="accent-word text-gold-deep">changeover</span></span></span>
-        </h2>
-        <p class="mt-8 text-base leading-relaxed text-ink/70" data-reveal style="--d: 0.2s">
-          Property size, checkout and check in times, how often it turns over. That is all we need to give
-          you a price and a slot. {AREAS_SENTENCE}
-        </p>
-        <div class="mt-10 flex flex-wrap items-center gap-x-8 gap-y-5" data-reveal style="--d: 0.28s">
-          <a href="/quote/" class="btn-primary">Get my price</a>
-          <a href={SITE.whatsappHref} class="link-caps text-gold-deep" rel="noopener">Or message us on WhatsApp</a>
-        </div>
-      </div>
-    </div>
-
-    <div class="container-wide mt-20 border-t border-ink/15 pt-8">
       <p class="font-sans text-[0.66rem] font-semibold uppercase tracking-[0.24em] text-stone" data-reveal>
         Also for short let owners
       </p>

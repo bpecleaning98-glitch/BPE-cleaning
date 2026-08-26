@@ -449,25 +449,13 @@ const jsonLd = serviceGraph('/end-of-tenancy-cleaning-dublin/', faqs, Astro.site
     </div>
   </section>
 
-  <section class="section-pad bg-ivory">
+  {/* No closing call to action: the footer opens with its own, and two
+      same-sense asks stacked on the way out read as a page that has run out
+      of things to say. Removed on Artiom's instruction, 26 aug, sitewide.
+      The page ends on its related-services index, which is content. */}
+  <section class="bg-ivory py-14 md:py-16">
     <div class="container-wide">
-      <div class="max-w-2xl">
-        <p class="kicker" data-reveal>Book Your Clean</p>
-        <h2 class="display mt-6 text-[clamp(2.2rem,5vw,4rem)] text-ink" data-reveal>
-          <span class="line-mask"><span>Tell us your</span></span>
-          <span class="line-mask"><span style="--d: 0.1s">handover <span class="accent-word text-gold-deep">date</span></span></span>
-        </h2>
-        <p class="mt-8 text-base leading-relaxed text-ink/70 md:text-lg" data-reveal style="--d: 0.2s">
-          Send the address, the number of bedrooms and the date the keys go back. You get a price
-          for the whole job, add-ons included, before anything is booked.
-        </p>
-        <div class="mt-10 flex flex-wrap items-center gap-x-10 gap-y-5" data-reveal style="--d: 0.3s">
-          <a href="/quote/" class="btn-primary">Get my price</a>
-          <a href={SITE.whatsappHref} class="link-caps text-gold-deep" rel="noopener">Or message us on WhatsApp</a>
-        </div>
-      </div>
-
-      <div class="mt-16 flex flex-wrap items-center gap-x-10 gap-y-5 border-t border-ink/15 pt-8" data-reveal>
+      <div class="flex flex-wrap items-center gap-x-10 gap-y-5" data-reveal>
         <span class="font-sans text-[0.66rem] font-semibold uppercase tracking-[0.24em] text-stone">Also from BPE</span>
         {related.map((item) => (
           <a href={item.href} class="link-caps text-ink/80 transition-colors duration-300 hover:text-gold-deep">{item.label}</a>

@@ -438,27 +438,13 @@ const jsonLd = serviceGraph('/house-cleaning-dublin/', faqs, Astro.site);
   </section>
 
   {/* Closing CTA */}
-  <section class="relative overflow-hidden bg-night py-20 text-cream md:py-32">
-    <Diamond class="pointer-events-none absolute -right-40 -top-44 h-[38rem] w-[38rem] opacity-[0.05]" aria-hidden="true" />
-
-    <div class="container-wide relative">
-      <div class="max-w-2xl">
-        <p class="kicker !text-gold" data-reveal>Book Your Clean</p>
-        <h2 class="display mt-6 text-[clamp(2.2rem,5vw,4rem)]" data-reveal>
-          <span class="line-mask"><span>Pick a day that</span></span>
-          <span class="line-mask"><span style="--d: 0.1s">actually <span class="accent-word text-gold-soft">suits</span> you</span></span>
-        </h2>
-        <p class="mt-8 max-w-xl text-base leading-relaxed text-cream/70" data-reveal style="--d: 0.2s">
-          Tell us the size of your home and how often you would like us, and we will come back with a
-          price and a time. No obligation, and nothing is booked until you say so.
-        </p>
-        <div class="mt-10 flex flex-wrap items-center gap-x-10 gap-y-5" data-reveal style="--d: 0.3s">
-          <a href="/quote/" class="btn-gold">Get my price</a>
-          <a href={SITE.whatsappHref} rel="noopener" class="link-caps text-gold-soft">Or message us on WhatsApp</a>
-        </div>
-      </div>
-
-      <div class="mt-16 border-t border-cream/15 pt-8" data-reveal>
+  {/* No closing call to action: the footer opens with its own, and two
+      same-sense asks stacked on the way out read as a page that has run out
+      of things to say. Removed on Artiom's instruction, 26 aug, sitewide.
+      The page ends on its related-services index, which is content. */}
+  <section class="bg-night py-14 text-cream md:py-16">
+    <div class="container-wide">
+      <div data-reveal>
         <p class="font-sans text-[0.62rem] font-semibold uppercase tracking-[0.26em] text-cream/50">Also for your home</p>
         <div class="mt-6 flex flex-wrap gap-x-10 gap-y-5">
           {related.map((service) => (
