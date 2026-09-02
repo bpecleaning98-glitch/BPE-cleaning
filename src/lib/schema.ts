@@ -10,8 +10,9 @@
  * this file that states a fact about the company. If a schema.org property needs
  * a fact the repo does not hold, the property is left out rather than guessed.
  * That is why there is no aggregateRating, no reviewCount, no foundingDate, no
- * geo coordinates, no streetAddress and no sameAs. Inventing any of them is the
- * fastest way to get structured data ignored or penalised.
+ * geo coordinates and no streetAddress. Inventing any of them is the fastest
+ * way to get structured data ignored or penalised. sameAs and hasMap carry the
+ * verified Google Business Profile, which is a fact the repo does hold.
  *
  * Node identity: the business is one entity across the whole site, so it always
  * carries the same @id, https://bpecleaning.ie/#business. Pages that describe
@@ -298,6 +299,13 @@ export function localBusiness(site?: URL): JsonLdNode {
     url: abs(PATHS.home, site),
     telephone: PHONE_E164,
     email: SITE.email,
+    /**
+     * The one external identity the repo holds: the verified Google Business
+     * Profile. sameAs ties the entity to it, hasMap gives the map pin. Added the
+     * day the profile was confirmed live, per the note at the top of this file.
+     */
+    sameAs: [SITE.googleMapsUrl],
+    hasMap: SITE.googleMapsUrl,
     image: abs('/og-image.jpg', site),
     logo: {
       '@type': 'ImageObject',

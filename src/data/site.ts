@@ -9,6 +9,15 @@ export const SITE = {
   email: 'bpecleaning98@gmail.com',
   area: 'Dublin, Ireland',
   hours: 'Mon to Sun, 8:00 to 20:00',
+  /**
+   * Google Business Profile, verified on the client's own Google account on
+   * 2 September 2026. The CID is the decimal form of the place's feature id
+   * (0x70ded41ebb73ac50), so the Maps link survives any renaming of the listing.
+   * The review link is the one Google hands out in Business Profile > Ask for
+   * reviews.
+   */
+  googleMapsUrl: 'https://maps.google.com/?cid=8133171205536722000',
+  googleReviewUrl: 'https://g.page/r/CVCsc7se1N5wEBM/review',
 } as const;
 
 // Prices live in ./pricing.ts and areas in ./areas.ts. Both were revised by the
