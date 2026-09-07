@@ -17,8 +17,8 @@ interface Props {
 const { dark = false } = Astro.props;
 
 const field = dark
-  ? 'w-full border-b border-cream/25 bg-transparent py-3 text-cream placeholder:text-cream/35 focus:border-gold focus:outline-none transition-colors'
-  : 'w-full border-b border-ink/25 bg-transparent py-3 text-ink placeholder:text-ink/35 focus:border-gold-deep focus:outline-none transition-colors';
+  ? 'w-full border-b border-cream/25 bg-transparent py-3 text-cream placeholder:text-cream/60 focus:border-gold focus:outline-none transition-colors'
+  : 'w-full border-b border-ink/25 bg-transparent py-3 text-ink placeholder:text-ink/60 focus:border-gold-deep focus:outline-none transition-colors';
 const label = dark
   ? 'block font-sans text-[0.62rem] font-semibold uppercase tracking-[0.24em] text-cream/60'
   : 'block font-sans text-[0.62rem] font-semibold uppercase tracking-[0.24em] text-stone';
@@ -82,7 +82,7 @@ const label = dark
   </div>
   <div class="flex flex-wrap items-center gap-6 sm:col-span-2">
     <button type="submit" class={dark ? 'btn-gold' : 'btn-primary'}>Send my request</button>
-    <p class={`text-xs ${dark ? 'text-cream/45' : 'text-ink/45'}`}>
+    <p class={`text-xs ${dark ? 'text-cream/60' : 'text-ink/65'}`}>
       Opens WhatsApp with your details filled in, ready to send to {SITE.phoneDisplay}. A copy of
       the request is kept so we can price it. <a
         href="/privacy/"
@@ -149,6 +149,11 @@ const label = dark
       list.id = `${select.id}-list`;
       list.className = 'qfs-list';
       list.setAttribute('role', 'listbox');
+      // role="listbox" is a named widget in its own right. Without a name a
+      // screen reader announces it as an anonymous list of options, with no
+      // hint of which field it belongs to, so it borrows the field's own
+      // visible label rather than inventing a second wording.
+      if (lbl?.id) list.setAttribute('aria-labelledby', lbl.id);
       btn.setAttribute('aria-controls', list.id);
 
       // Index of the first real option. The empty placeholder holds the

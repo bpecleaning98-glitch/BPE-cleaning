@@ -133,7 +133,7 @@ const jsonLd = serviceGraph('/end-of-tenancy-cleaning-dublin/', faqs, Astro.site
   description={`Landlord-ready end of tenancy cleaning in Dublin. Fixed prices by property size from €${END_OF_TENANCY['1bed']}. Move out with your deposit intact.`}
   jsonLd={jsonLd}
 >
-  <section class="bg-night pt-40 pb-20 text-cream md:pt-48 md:pb-24">
+  <section data-first-screen class="bg-night pt-40 pb-20 text-cream md:pt-48 md:pb-24">
     <div class="container-wide">
       <p class="kicker !text-gold" data-reveal>Moving Out</p>
       <h1 class="display-caps mt-6 text-[clamp(2.6rem,7vw,5.5rem)]" data-reveal>
@@ -199,7 +199,7 @@ const jsonLd = serviceGraph('/end-of-tenancy-cleaning-dublin/', faqs, Astro.site
                 src={roomsLead.src}
                 alt={roomsLead.alt}
                 class="aspect-[16/10] w-full scale-110 object-cover"
-                widths={[768, 1080, 1440]}
+                widths={[480, 768, 1080, 1440]}
                 sizes="(min-width: 768px) 74vw, 100vw"
                 format="webp"
                 quality={78}
@@ -207,7 +207,7 @@ const jsonLd = serviceGraph('/end-of-tenancy-cleaning-dublin/', faqs, Astro.site
             </div>
           </div>
           <figcaption class="mt-4 flex items-center gap-4">
-            <span class="font-sans text-xs text-ink/55">{roomsLead.caption ?? roomsLead.alt}</span>
+            <span class="font-sans text-xs text-ink/65">{roomsLead.caption ?? roomsLead.alt}</span>
           </figcaption>
         </figure>
       )}

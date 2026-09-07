@@ -135,7 +135,7 @@ const jsonLd = graph(breadcrumbs([{ name: 'Get a Quote', path: PATHS.quote }], A
   description="See our prices by property size and service, then call or WhatsApp to confirm yours. Homes, offices and Airbnb across Dublin."
   jsonLd={jsonLd}
 >
-  <section class="bg-night pt-40 pb-20 text-cream md:pt-48 md:pb-24">
+  <section data-first-screen class="bg-night pt-40 pb-20 text-cream md:pt-48 md:pb-24">
     <div class="container-wide">
       <p class="kicker !text-gold" data-reveal>Get A Quote</p>
       <h1 class="display-caps mt-6 text-[clamp(2.6rem,7vw,5.5rem)]" data-reveal>
@@ -223,12 +223,12 @@ const jsonLd = graph(breadcrumbs([{ name: 'Get a Quote', path: PATHS.quote }], A
                 </div>
               ))}
             </dl>
-            <p class="mt-5 text-sm leading-relaxed text-ink/55">{table.note}</p>
+            <p class="mt-5 text-sm leading-relaxed text-ink/65">{table.note}</p>
           </div>
         ))}
       </div>
 
-      <p class="mt-12 max-w-2xl text-sm leading-relaxed text-ink/55" data-reveal>
+      <p class="mt-12 max-w-2xl text-sm leading-relaxed text-ink/65" data-reveal>
         Studios and properties larger than 4 bedrooms are not in the tables. Ring us with the room
         count and we will price it on the call.
       </p>
@@ -241,7 +241,7 @@ const jsonLd = graph(breadcrumbs([{ name: 'Get a Quote', path: PATHS.quote }], A
               <div class="flex flex-wrap items-baseline justify-between gap-x-8 gap-y-1 border-b border-ink/15 py-5">
                 <dt class="text-sm text-ink/75">
                   {row.label}
-                  <span class="mt-1 block text-sm text-ink/45">{row.note}</span>
+                  <span class="mt-1 block text-sm text-ink/65">{row.note}</span>
                 </dt>
                 <dd class="font-sans font-medium tracking-[-0.01em] text-lg text-ink [font-variant-numeric:tabular-nums] md:text-xl">{row.value}</dd>
               </div>
@@ -259,7 +259,7 @@ const jsonLd = graph(breadcrumbs([{ name: 'Get a Quote', path: PATHS.quote }], A
               </div>
             ))}
           </dl>
-          <p class="mt-5 text-sm leading-relaxed text-ink/55">
+          <p class="mt-5 text-sm leading-relaxed text-ink/65">
             Added to any clean. Tell us which ones you want and they go into the quote before you book.
           </p>
         </div>

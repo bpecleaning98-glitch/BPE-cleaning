@@ -107,7 +107,7 @@ const isHome = Astro.url.pathname === '/';
     </div>
   </div>
   <div class="border-t border-cream/12">
-    <div class="container-wide flex flex-col items-center justify-between gap-2 py-6 text-xs text-cream/40 md:flex-row">
+    <div class="container-wide flex flex-col items-center justify-between gap-2 py-6 text-xs text-cream/60 md:flex-row">
       <p>
         &copy; {year} BPE Cleaning Services. All rights reserved.
         <a href="/privacy/" class="ml-3 transition-colors hover:text-gold-soft">Privacy</a>
@@ -126,7 +126,10 @@ const isHome = Astro.url.pathname === '/';
     a.href = `mailto:${addr}`;
     a.textContent = 'Email us';
     a.className = 'block py-1.5 transition-colors hover:text-gold-soft';
-    a.setAttribute('aria-label', `Email ${addr}`);
+    // The accessible name has to CONTAIN the visible words, or a voice user
+    // saying "click Email us" hits a control the browser knows by another
+    // name. So the address is appended to the label, never substituted for it.
+    a.setAttribute('aria-label', `Email us at ${addr}`);
     el.replaceWith(a);
   }
 </script>

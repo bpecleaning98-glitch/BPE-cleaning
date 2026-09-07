@@ -12,15 +12,67 @@
   --color-ink: #191512;
   --color-night: #14110D;
   --color-cream: #EFEAE0;
-  --color-stone: #857D70;
+  /* stone and gold-deep carry the site's micro-labels: kickers, step numbers,
+   * "from" prefixes, table headings, all set between 9.6 and 11.2 pixels.
+   * At that size WCAG asks for 4.5:1 and the previous values gave 3.6 to 4.4
+   * on the porcelain and ivory surfaces they actually sit on, so every one of
+   * them failed. Both were darkened along their own hue, not renamed and not
+   * replaced: stone stays the warm grey, gold-deep stays the bronze.
+   *   stone     #857D70 -> #706859   3.64 -> 4.93 on porcelain
+   *   gold-deep #8C6F45 -> #846439   4.20 -> 4.87 on porcelain
+   * Neither is used as light-on-dark text; the dark bands use gold (5.63 on
+   * night) and cream alphas instead. */
+  --color-stone: #706859;
   --color-gold: #A8875A;
-  --color-gold-deep: #8C6F45;
+  --color-gold-deep: #846439;
   --color-gold-soft: #E6DCC8;
 
   --font-display: "Fraunces Variable", Georgia, "Times New Roman", serif;
   --font-sans: "Manrope Variable", ui-sans-serif, system-ui, sans-serif;
 
   --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/*
+ * Fraunces italic, cut down to the letters this site actually sets in it.
+ *
+ * The italic face is the heaviest single file on the site, 81.5 KB, and it
+ * exists to carry one lowercase word inside a headline: the price you were
+ * quoted, every job finished. Eighty one kilobytes for eighty odd words.
+ * Dropping the face entirely measured 600ms off First Contentful Paint in a
+ * throttled Lighthouse run, which is the size of the problem.
+ *
+ * So the headline word gets its own family, cut to exactly the characters
+ * those words use: 22.4 KB instead of 81.5. A separate family, not a second
+ * @font-face under the same name with a narrower unicode-range, because that
+ * trick depends on which rule the browser sees last, and the two rules do not
+ * live in the same place: Astro inlines the Fontsource faces into every
+ * page's head while this file is served as an external stylesheet. A named
+ * family says what it means and does not care about the order.
+ *
+ * .accent-word therefore asks for the cut first and the full Fontsource
+ * italic second. Anything the cut is missing, an accented letter or a digit,
+ * falls through per character to the full face exactly as it always did, and
+ * blog articles, whose italics are typed by the client and can hold anything,
+ * never touch the cut at all.
+ *
+ * W is kept although .accent-word lowercases what it renders: the brand line
+ * "Where clean meets perfection" is one of these words, and the range should
+ * not depend on a text-transform staying where it is.
+ *
+ * Regenerate after any @fontsource-variable/fraunces upgrade:
+ *   python3 -m fontTools.subset \
+ *     node_modules/@fontsource-variable/fraunces/files/fraunces-latin-opsz-italic.woff2 \
+ *     --unicodes="U+0020,U+0027,U+002C-002E,U+0057,U+0061-007A,U+2019" \
+ *     --flavor=woff2 --layout-features='*' \
+ *     --output-file=src/assets/fonts/fraunces-accent-italic.woff2
+ */
+@font-face {
+  font-family: 'Fraunces Accent';
+  font-style: italic;
+  font-display: swap;
+  font-weight: 100 900;
+  src: url('../assets/fonts/fraunces-accent-italic.woff2') format('woff2-variations');
 }
 
 @layer base {
@@ -85,6 +137,7 @@
   /* The lowercase italic word inside an uppercase headline, the Elicyon move */
   .accent-word {
     @apply font-display lowercase italic font-[320] tracking-normal;
+    font-family: 'Fraunces Accent', var(--font-display);
   }
 
   .h-serif {
@@ -217,6 +270,76 @@ html.js .line-mask > span {
 html.js .in .line-mask > span,
 html.js .line-mask.in > span {
   transform: translateY(0);
+}
+
+/*
+ * The first screen does not wait for JavaScript.
+ *
+ * Everything below the fold earns its entrance from the IntersectionObserver
+ * in Base.astro, which is right: it should animate when it is reached. The
+ * opening section is different. It is on screen from the first frame, yet it
+ * was starting at opacity 0 and staying there until the observer module had
+ * been fetched, parsed and run, which on a throttled phone is the better part
+ * of a second and a half. Measured on the live site, the hero paragraph was
+ * the Largest Contentful Paint element on thirteen pages, and 1.5 of its 2.2
+ * seconds was pure render delay, waiting for that class.
+ *
+ * So [data-first-screen] replays exactly the same entrance from CSS, which
+ * the browser can start the moment the stylesheet lands: same 0.9s and 1.05s
+ * durations, same easing, same 26px rise, same --d stagger. The observer
+ * still adds .in afterwards and lands on the identical values, so nothing
+ * fights and nothing looks different. The homepage is deliberately not in
+ * this set: its hero is choreographed by the intro timeline in GSAP, and a
+ * filling CSS animation would outrank the inline styles GSAP writes.
+ */
+@keyframes reveal-rise {
+  from { opacity: 0; transform: translateY(26px); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes reveal-fade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes line-rise {
+  from { transform: translateY(112%); }
+  to   { transform: translateY(0); }
+}
+html.js [data-first-screen] [data-reveal] {
+  animation: reveal-rise 0.9s var(--ease-out-soft) var(--d, 0s) both;
+}
+html.js [data-first-screen] [data-reveal='fade'] {
+  animation-name: reveal-fade;
+}
+html.js [data-first-screen] .line-mask > span {
+  animation: line-rise 1.05s var(--ease-out-soft) var(--d, 0s) both;
+}
+
+/*
+ * Two pages open on a porcelain band instead of the night one every other
+ * page starts with, and that is the one place where the header's
+ * mix-blend-mode: difference tells the truth to the eye and a lie to the
+ * stylesheet. On screen it renders |#E6DCC8 - #F5F2EC| = #0F2024, a near
+ * black at about 16:1. In the CSS it is still the pale gold-soft sitting on
+ * porcelain, which is what an audit, a forced-colours mode or anything else
+ * reading the declaration rather than the pixels will believe: 1.2:1.
+ *
+ * So on exactly those pages the header states the colour it actually paints
+ * and steps out of the blend, until the first scroll hands the blend back.
+ * The handover is invisible: data-scrolled arrives at 28px, where the header
+ * is still over the same porcelain, so difference produces the identical
+ * colour on the identical pixels.
+ */
+html:has([data-first-screen='light']) #site-header:not([data-scrolled]) {
+  mix-blend-mode: normal;
+  color: #0f2024;
+}
+
+/* The timer failsafe in Base.astro reveals the page in one go. Nothing in
+ * that set is on screen, so it arrives, it does not animate. */
+html.revealed-all [data-reveal],
+html.revealed-all .line-mask > span,
+html.revealed-all .media-zoom img {
+  transition: none;
 }
 
 /* Media reveal: image de-zooms as its frame fades in */
@@ -396,9 +519,13 @@ html.js #bpe-intro .intro-logo {
   color: var(--color-gold-deep);
   font-weight: 600;
 }
-/* Nothing chosen yet: the button reads as quietly as a field placeholder. */
+/* Nothing chosen yet: the button reads as quietly as a field placeholder,
+ * but a placeholder is still text a person has to read before they can act on
+ * it, so it carries a real 4.87:1 rather than the 2.2:1 it used to. What
+ * separates it from a chosen value is now weight and the gold dash, not
+ * how faint it is. */
 .qfs[data-empty] .qfs-btn > span {
-  color: color-mix(in srgb, var(--color-ink) 35%, transparent);
+  color: color-mix(in srgb, var(--color-ink) 62%, transparent);
 }
 
 /*
@@ -565,7 +692,7 @@ html.js #bpe-intro .intro-logo {
 }
 .qfd[data-dark] .qfd-dow,
 .qfd[data-dark] .qfd-txt {
-  color: color-mix(in srgb, var(--color-cream) 45%, transparent);
+  color: color-mix(in srgb, var(--color-cream) 60%, transparent);
 }
 .qfd[data-dark] .qfd-day {
   color: color-mix(in srgb, var(--color-cream) 75%, transparent);
@@ -595,7 +722,7 @@ html.js #bpe-intro .intro-logo {
   color: var(--color-cream);
 }
 .qfs[data-dark][data-empty] .qfs-btn > span {
-  color: color-mix(in srgb, var(--color-cream) 35%, transparent);
+  color: color-mix(in srgb, var(--color-cream) 60%, transparent);
 }
 .qfs[data-dark].open .qfs-btn,
 .qfs[data-dark] .qfs-btn:focus-visible {
@@ -694,5 +821,6 @@ html.js #bpe-intro .intro-logo {
     opacity: 1 !important;
     transform: none !important;
     transition: none !important;
+    animation: none !important;
   }
 }

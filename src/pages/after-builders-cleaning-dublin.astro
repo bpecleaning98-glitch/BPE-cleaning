@@ -141,7 +141,7 @@ const jsonLd = serviceGraph('/after-builders-cleaning-dublin/', faqs, Astro.site
   description={`After builders cleaning in Dublin from €${FIXED.afterBuilders['1bed']}. Construction dust, paint spots and residue removed, your new space ready to live in.`}
   jsonLd={jsonLd}
 >
-  <section class="bg-night pt-40 pb-20 text-cream md:pt-48 md:pb-24">
+  <section data-first-screen class="bg-night pt-40 pb-20 text-cream md:pt-48 md:pb-24">
     <div class="container-wide">
       <p class="kicker !text-gold" data-reveal>Post Construction</p>
       <h1 class="display-caps mt-6 text-[clamp(2.6rem,7vw,5.5rem)]" data-reveal>
@@ -313,14 +313,14 @@ const jsonLd = serviceGraph('/after-builders-cleaning-dublin/', faqs, Astro.site
               src={leadShot.src}
               alt={leadShot.alt}
               class="aspect-[16/10] w-full scale-110 object-cover"
-              widths={[768, 1080, 1440]}
+              widths={[480, 768, 1080, 1440]}
               sizes="(min-width: 768px) 74vw, 100vw"
               format="webp"
               quality={78}
             />
           </div>
         </div>
-        <p class="mt-4 font-sans text-xs text-ink/55">{leadShot.caption}</p>
+        <p class="mt-4 font-sans text-xs text-ink/65">{leadShot.caption}</p>
       </div>
 
       <div class="mt-16 md:mt-20" data-reveal>

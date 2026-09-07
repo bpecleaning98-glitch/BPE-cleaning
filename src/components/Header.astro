@@ -89,6 +89,7 @@ const nav = [
   id="menu-overlay"
   class="pointer-events-none fixed inset-0 z-[60] -translate-y-full overflow-y-auto overscroll-contain bg-night pb-10 text-cream transition-transform duration-700 [transition-timing-function:cubic-bezier(0.16,1,0.3,1)] data-[open]:pointer-events-auto data-[open]:translate-y-0"
   aria-hidden="true"
+  inert
   data-lenis-prevent
 >
   {/* pt clears the real header, which is floating over this curtain rather
@@ -157,6 +158,12 @@ const nav = [
     if (!overlay || !toggle) return;
     overlay.toggleAttribute('data-open', open);
     overlay.setAttribute('aria-hidden', String(!open));
+    // aria-hidden alone was a lie the keyboard could disprove: the curtain
+    // was only pointer-events-none, so its ten links stayed in the tab order
+    // while the page swore they were not there. inert removes them from both
+    // the accessibility tree and the focus order, and hands them back
+    // together when the curtain comes down.
+    overlay.toggleAttribute('inert', !open);
     toggle.setAttribute('aria-expanded', String(open));
     toggle.classList.toggle('cube-turned', open);
     toggle.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');

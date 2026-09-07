@@ -164,7 +164,17 @@ const ogImage = new URL(image, Astro.site);
       // Scroll reveals. IntersectionObserver where it works, and a hard
       // timer fallback because the in-app Browser pane never fires IO.
       const targets = document.querySelectorAll<HTMLElement>('[data-reveal]');
-      const revealAll = () => targets.forEach((el) => el.classList.add('in'));
+      // The failsafe is a rescue, not a performance. It drops the whole page
+      // into its revealed state at once, and every one of those elements is
+      // off screen when it happens, so animating them buys the reader
+      // nothing: it only leaves a few hundred pieces of text sitting at a
+      // fraction of their own colour for the length of the fade. That is a
+      // genuine contrast dip, and it is what an automated audit sees when it
+      // samples the page a moment later. So the rescue lands instantly.
+      const revealAll = () => {
+        document.documentElement.classList.add('revealed-all');
+        targets.forEach((el) => el.classList.add('in'));
+      };
 
       if ('IntersectionObserver' in window) {
         const io = new IntersectionObserver(

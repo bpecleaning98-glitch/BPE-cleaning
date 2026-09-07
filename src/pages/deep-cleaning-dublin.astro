@@ -165,7 +165,7 @@ const jsonLd = serviceGraph('/deep-cleaning-dublin/', faqs, Astro.site);
   description={`Once-off deep cleaning in Dublin with fixed prices by property size, from €${deepFrom} for a 1 bedroom to €${deepTop} for a 4 bedroom.`}
   jsonLd={jsonLd}
 >
-  <section class="bg-night pt-40 pb-20 text-cream md:pt-48 md:pb-24">
+  <section data-first-screen class="bg-night pt-40 pb-20 text-cream md:pt-48 md:pb-24">
     <div class="container-wide">
       <p class="kicker !text-gold" data-reveal>Residential</p>
       <h1 class="display-caps mt-6 text-[clamp(2.6rem,7vw,5.5rem)]" data-reveal>
@@ -235,7 +235,7 @@ const jsonLd = serviceGraph('/deep-cleaning-dublin/', faqs, Astro.site);
         src={bandPhoto.src}
         alt=""
         class="h-full w-full object-cover"
-        widths={[1080, 1600, 2000]}
+        widths={[640, 1080, 1600, 2000]}
         sizes="100vw"
         format="webp"
         quality={72}
@@ -341,7 +341,7 @@ const jsonLd = serviceGraph('/deep-cleaning-dublin/', faqs, Astro.site);
             Option one &middot; Fixed price
           </p>
           <p class="mt-6 flex items-baseline gap-3">
-            <span class="font-sans text-[0.62rem] font-semibold uppercase tracking-[0.22em] text-ink/45">From</span>
+            <span class="font-sans text-[0.62rem] font-semibold uppercase tracking-[0.22em] text-ink/65">From</span>
             <span class="font-sans font-medium tracking-[-0.01em] text-[3.4rem] leading-none text-ink [font-variant-numeric:tabular-nums]">
               <span class="text-gold">€</span>{deepFrom}
             </span>
@@ -424,7 +424,7 @@ const jsonLd = serviceGraph('/deep-cleaning-dublin/', faqs, Astro.site);
                   src={photo.src}
                   alt={photo.alt}
                   class="aspect-[16/10] w-full scale-110 object-cover"
-                  widths={[768, 1080, 1440]}
+                  widths={[480, 768, 1080, 1440]}
                   sizes="(min-width: 768px) 74vw, 100vw"
                   format="webp"
                   quality={78}

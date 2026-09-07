@@ -53,7 +53,7 @@ const jsonLd = graph(
 >
   {/* Headline straight into the form, no kicker and no buttons above it.
       pt-36 clears the fixed header without the old hero's dead band. */}
-  <section class="bg-porcelain pb-20 pt-36 md:pb-28 md:pt-44">
+  <section data-first-screen="light" class="bg-porcelain pb-20 pt-36 md:pb-28 md:pt-44">
     <div class="container-wide">
       <h1 class="display-caps max-w-3xl text-[clamp(2.3rem,6.4vw,4.6rem)] leading-[1.06] text-ink">
         Every clean begins <span class="accent-word text-[0.78em] text-gold-deep">with a</span> conversation
@@ -80,7 +80,7 @@ const jsonLd = graph(
       <div class="mx-auto mt-14 flex max-w-md flex-col gap-10">
         {channels.map((channel) => (
           <div>
-            <p class="font-sans text-[0.62rem] font-semibold uppercase tracking-[0.24em] text-cream/45">
+            <p class="font-sans text-[0.62rem] font-semibold uppercase tracking-[0.24em] text-cream/60">
               {channel.label}
             </p>
             {channel.href ? (
