@@ -19,11 +19,24 @@ const nav = [
     over dark sections it shows warm gold-soft and over light ones it
     re-colours itself dark automatically, wherever it happens to overlap.
     Scrolling DOWN slides it away gently; scrolling UP brings it back. */}
-{/* data-scrolled adds a soft backdrop blur, so when the bar reappears over
-    section text mid-page the two never garble into each other. */}
+{/* data-scrolled used to add a soft backdrop blur here, to stop the bar
+    garbling into section text when it came back mid-page. It is gone, and
+    it is not coming back on this element: backdrop-filter and
+    mix-blend-mode on the SAME element is broken in WebKit. The blur paints
+    the blurred backdrop inside the header box, difference then subtracts
+    the unblurred backdrop from it, and over any flat stretch the two are
+    equal, so the result is zero: a solid black slab. On an iPhone, and
+    inside the Instagram browser, that slab snapped in the instant you
+    scrolled past 28px. Chrome isolates the two layers and looked fine,
+    which is the only reason it survived this long; Safari on a Mac showed
+    it too.
+
+    The blend alone was always doing the real work, so nothing was lost.
+    data-scrolled stays on the element, because the light-page rule in
+    global.css reads it to decide when to hand the blend back. */}
 <header
   id="site-header"
-  class="fixed inset-x-0 top-0 z-[70] mix-blend-difference text-gold-soft transition-transform duration-700 [transition-timing-function:cubic-bezier(0.22,1,0.36,1)] data-[hidden]:-translate-y-full data-[scrolled]:backdrop-blur-md"
+  class="fixed inset-x-0 top-0 z-[70] mix-blend-difference text-gold-soft transition-transform duration-700 [transition-timing-function:cubic-bezier(0.22,1,0.36,1)] data-[hidden]:-translate-y-full"
 >
   <div class="container-wide grid h-[84px] grid-cols-[1fr_auto_1fr] items-center md:h-[88px]">
     <nav class="hidden items-center gap-8 lg:flex" aria-label="Main">
