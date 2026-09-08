@@ -9,6 +9,10 @@ import { SIZE_LABELS } from '../data/pricing';
  * her bookings today. The same request is also posted to /api/lead, so the
  * cabinet can report which campaign produced a real enquiry rather than only
  * a visit. That save is never allowed to delay the hand off to WhatsApp.
+ *
+ * The form asks for only what a quote needs (name, phone, service, size,
+ * date, area, an optional note) and does not send until the consent line is
+ * ticked; see the note above that checkbox for why it exists.
  */
 interface Props {
   /** Dark sections pass true to switch the field palette. */
@@ -79,6 +83,30 @@ const label = dark
   <div class="absolute left-[-9999px] top-0 h-px w-px overflow-hidden" aria-hidden="true">
     <label for="qf-hp">Leave this field empty</label>
     <input id="qf-hp" name="hp_reference" type="text" tabindex="-1" autocomplete="off" aria-hidden="true" />
+  </div>
+  {/*
+    The consent line. Not what makes the processing lawful, that is the
+    request itself (Article 6(1)(b), the steps a person asks for before a
+    contract), but nobody should send their name and number without knowing
+    where they go, so the form will not send until it is ticked. The native
+    checkbox keeps the keyboard and screen reader behaviour; global.css only
+    repaints it in the form's hairline language.
+  */}
+  <div class="sm:col-span-2">
+    <label class="qf-consent" for="qf-consent">
+      <input class="qf-check" id="qf-consent" name="consent" type="checkbox" value="yes" />
+      <span>
+        I have read the <a href="/privacy/">privacy policy</a> and agree to BPE Cleaning Services using
+        these details to answer my request and to contact me about it.
+      </span>
+    </label>
+    <p
+      id="qf-consent-error"
+      role="alert"
+      class={`mt-3 hidden font-sans text-xs ${dark ? 'text-gold' : 'text-gold-deep'}`}
+    >
+      Please tick the box so we know you are happy for us to use your details.
+    </p>
   </div>
   <div class="flex flex-wrap items-center gap-6 sm:col-span-2">
     <button type="submit" class={dark ? 'btn-gold' : 'btn-primary'}>Send my request</button>
@@ -427,9 +455,25 @@ const label = dark
   // the worst case is a lost row, never a lost booking. The tab that will
   // carry the visitor to WhatsApp is already open by then, so the cap only
   // decides how long it sits blank, never whether it opens at all.
+  //
+  // The campaign the visit came from is worked out on the server, from the
+  // pages this visit already opened (src/lib/session.ts), so nothing about
+  // it has to be kept in the browser. What travels with the request is only
+  // what THIS page can see for itself: its own address, its own query string
+  // and the site that linked to it. The server uses that only when it has no
+  // record of the visit, for instance a person who landed straight on the
+  // form and sent it before the page view was written.
   const saveLead = (data: FormData) => {
-    const attr = (window as unknown as { __bpeAttr?: Record<string, string | null> }).__bpeAttr ?? {};
     const val = (key: string) => String(data.get(key) || '').trim();
+    const q = new URLSearchParams(location.search);
+    let ref: string | null = null;
+    try {
+      const bare = (host: string) => host.replace(/^www\./, '');
+      const host = document.referrer ? bare(new URL(document.referrer).hostname) : '';
+      ref = host && host !== bare(location.hostname) ? host : null;
+    } catch {
+      ref = null;
+    }
     const send = fetch('/api/lead', {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
@@ -443,13 +487,12 @@ const label = dark
         area: val('area'),
         notes: val('notes'),
         hp: val('hp_reference'),
-        us: attr.us ?? null,
-        um: attr.um ?? null,
-        uc: attr.uc ?? null,
-        code: attr.code ?? null,
-        ref: attr.ref ?? null,
-        landing: attr.landing ?? null,
-        sid: attr.sid ?? null,
+        us: q.get('utm_source'),
+        um: q.get('utm_medium'),
+        uc: q.get('utm_campaign'),
+        code: q.get('k'),
+        ref,
+        landing: location.pathname,
       }),
     }).catch(() => {});
     const giveUp = new Promise<void>((resolve) => setTimeout(resolve, 1200));
@@ -481,6 +524,17 @@ const label = dark
       return;
     }
     notice?.classList.add('hidden');
+    // Nothing leaves the page until the consent line is ticked. The message
+    // is the site's own, in place of the browser's bubble, because the form
+    // is novalidate for exactly that reason.
+    const consent = document.getElementById('qf-consent') as HTMLInputElement | null;
+    const consentNotice = document.getElementById('qf-consent-error');
+    if (consent && !consent.checked) {
+      consentNotice?.classList.remove('hidden');
+      consent.focus();
+      return;
+    }
+    consentNotice?.classList.add('hidden');
     const lines = [
       'New quote request from the website',
       part('Name', 'name'),

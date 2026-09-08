@@ -824,3 +824,92 @@ html.js #bpe-intro .intro-logo {
     animation: none !important;
   }
 }
+
+/*
+ * Legal pages. Paragraphs there carry the odd inline link to a sister page or
+ * to a regulator; underlined so it reads as a link inside running text, in
+ * the ink of the paragraph until hovered.
+ */
+.legal-copy a {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-color: color-mix(in srgb, var(--color-ink) 35%, transparent);
+  transition: color 0.3s, text-decoration-color 0.3s;
+}
+.legal-copy a:hover {
+  color: var(--color-gold-deep);
+  text-decoration-color: currentColor;
+}
+
+/*
+ * The consent line under the quote form. A native checkbox is a blue system
+ * control from Apple or Google dropped into a hairline form, so it is drawn
+ * here instead: a square in the field's own hairline, filled with a smaller
+ * gold square when ticked, which is the brand's diamond language squared off.
+ * The input stays a real checkbox for the keyboard, the screen reader and
+ * the submit handler; only its paint is replaced.
+ */
+.qf-consent {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.85rem;
+  cursor: pointer;
+  font-size: 0.8125rem;
+  line-height: 1.6;
+  color: color-mix(in srgb, var(--color-ink) 75%, transparent);
+}
+.qf-consent a {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  transition: color 0.3s;
+}
+.qf-consent a:hover {
+  color: var(--color-gold-deep);
+}
+.qf-check {
+  appearance: none;
+  -webkit-appearance: none;
+  flex: none;
+  display: grid;
+  place-content: center;
+  width: 1.05rem;
+  height: 1.05rem;
+  margin-top: 0.2rem;
+  border: 1px solid color-mix(in srgb, var(--color-ink) 40%, transparent);
+  background: transparent;
+  cursor: pointer;
+  transition: border-color 0.3s;
+}
+.qf-check::before {
+  content: '';
+  width: 0.5rem;
+  height: 0.5rem;
+  background: var(--color-gold-deep);
+  transform: scale(0);
+  transition: transform 0.2s var(--ease-out-soft);
+}
+.qf-check:checked {
+  border-color: var(--color-gold-deep);
+}
+.qf-check:checked::before {
+  transform: scale(1);
+}
+.qf-check:focus-visible {
+  outline: 2px solid var(--color-gold);
+  outline-offset: 2px;
+}
+form[data-dark] .qf-consent {
+  color: color-mix(in srgb, var(--color-cream) 70%, transparent);
+}
+form[data-dark] .qf-consent a:hover {
+  color: var(--color-gold-soft);
+}
+form[data-dark] .qf-check {
+  border-color: color-mix(in srgb, var(--color-cream) 40%, transparent);
+}
+form[data-dark] .qf-check::before {
+  background: var(--color-gold);
+}
+form[data-dark] .qf-check:checked {
+  border-color: var(--color-gold);
+}

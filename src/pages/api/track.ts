@@ -12,9 +12,9 @@ import {
   rateLimit,
   readJson,
   tagOrNull,
-  uuidOrNull,
   visitorHash,
 } from '../../lib/request';
+import { currentSession } from '../../lib/session';
 
 export const prerender = false;
 
@@ -31,7 +31,10 @@ export const prerender = false;
  *
  * Everything a client sends is treated as a claim, not as a fact. The only
  * values that reach the database unquestioned are the ones derived here from
- * headers: the device, the browser, the place and the visitor hash.
+ * headers: the device, the browser, the place, the visitor hash, and now the
+ * visit itself. The browser no longer names its session: it is looked up
+ * from the visitor hash and a 30 minute rule (src/lib/session.ts), so the
+ * device stores nothing and the number cannot be forged from outside.
  */
 const ok = (body: Record<string, unknown> = {}) =>
   new Response(JSON.stringify({ ok: true, ...body }), {
@@ -56,8 +59,8 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
   // A view payload is a few hundred bytes and an exit beacon is under a
   // hundred. Four kilobytes is already generous. Nothing our own script sends
   // can go over that, so a body that does is a script of somebody else's, and
-  // an empty object is the right thing to carry on with: it names no session
-  // and no path, so it falls out below as 'invalid' and no row is written.
+  // an empty object is the right thing to carry on with: it names no path, so
+  // it falls out below as 'invalid' and no row is written.
   const body = (await readJson(request, 4 * 1024)) ?? {};
   if (!dbAdmin) return ok({ skipped: 'not-configured' });
 
@@ -72,6 +75,8 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
   const ip = clientIp(request, clientAddress);
   if (!(await rateLimit('track', ip, LIMIT, WINDOW_MS))) return ok({ skipped: 'rate' });
 
+  const hash = await visitorHash(ip, ua);
+
   // Leaving a page: only ever raise the recorded time, because a tab can be
   // hidden and shown again and each hide sends its own total.
   if (body.t === 'exit') {
@@ -80,14 +85,12 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
     if (!Number.isSafeInteger(id) || id <= 0 || ms <= 0) return ok({ skipped: 'noop' });
 
     // The row id is a plain counter, so a client can name a row that is not
-    // its own. Two things keep that cheap and dull. The time can only go up
-    // and only to an hour, so the worst a forged beacon does is inflate one
-    // page's dwell; and only views from the last few hours can be touched at
-    // all, so yesterday's numbers cannot be rewritten. The real fix is the
-    // session check below: the moment the exit beacon in src/scripts/track.ts
-    // carries its `sid` like the view does, a client can only raise rows that
-    // belong to a session it already knows, and guessing that is guessing a
-    // uuid. Until then this stays optional, so nothing regresses today.
+    // its own. The row is therefore only touched if it carries the visitor
+    // code of the request asking, which a stranger cannot know or forge:
+    // it is made here, from their address, not ours. Where no code exists
+    // (no salt configured) the two older guards still apply: the time can
+    // only go up and only to an hour, and only views from the last few
+    // hours can be touched at all.
     const since = new Date(Date.now() - DWELL_WINDOW_MS).toISOString();
     let update = dbAdmin
       .from('page_views')
@@ -95,17 +98,21 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
       .eq('id', id)
       .lt('dwell_ms', ms)
       .gte('created_at', since);
-
-    const owner = uuidOrNull(body.sid);
-    if (owner) update = update.eq('session_id', owner);
+    if (hash) update = update.eq('visitor_hash', hash);
 
     await update;
     return ok();
   }
 
-  const sessionId = uuidOrNull(body.sid);
   const path = pathOrNull(body.path);
-  if (!sessionId || !path) return ok({ skipped: 'invalid' });
+  if (!path) return ok({ skipped: 'invalid' });
+
+  // The visit this page belongs to, from our own records. A page inside the
+  // gap joins the visit already under way; anything else starts a new one,
+  // and the first page of a visit is its entry, which is what the cabinet's
+  // "where do visits come from" is counted on.
+  const existing = await currentSession(dbAdmin, hash);
+  const sessionId = existing ?? crypto.randomUUID();
 
   const { country, city } = placeOf(request.headers);
 
@@ -113,7 +120,7 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
     .from('page_views')
     .insert({
       session_id: sessionId,
-      visitor_hash: await visitorHash(ip, ua),
+      visitor_hash: hash,
       path,
       referrer_host: hostOrNull(body.ref),
       utm_source: tagOrNull(body.us, 80),
@@ -124,7 +131,7 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
       browser: browserOf(ua),
       country,
       city,
-      is_entry: body.entry === true,
+      is_entry: !existing,
       lang: langOrNull(body.lang),
     })
     .select('id')

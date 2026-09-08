@@ -1,8 +1,13 @@
 ---
 import BpeLogo from './brand/BpeLogo.astro';
-import { SITE, SERVICES } from '../data/site';
+import { SITE, SERVICES, legalParticulars } from '../data/site';
 import { AREAS_SENTENCE } from '../data/areas';
+import { LEGAL_PAGES } from '../lib/schema';
 const year = new Date().getFullYear();
+// Registered name, company number and registered office, once the owner has
+// supplied them (data/site.ts, LEGAL). The Companies Act 2014 wants them in a
+// prominent, easily accessible place on the website: the foot of every page.
+const particulars = legalParticulars();
 
 /**
  * The homepage closes on its own card, "Let's begin", which asks for exactly
@@ -107,12 +112,18 @@ const isHome = Astro.url.pathname === '/';
     </div>
   </div>
   <div class="border-t border-cream/12">
-    <div class="container-wide flex flex-col items-center justify-between gap-2 py-6 text-xs text-cream/60 md:flex-row">
-      <p>
-        &copy; {year} BPE Cleaning Services. All rights reserved.
-        <a href="/privacy/" class="ml-3 transition-colors hover:text-gold-soft">Privacy</a>
-      </p>
-      <p>Website by <a href="https://artiomotion.com" class="transition-colors hover:text-gold-soft" rel="noopener">ArtioMotion</a></p>
+    <div class="container-wide flex flex-col items-center justify-between gap-4 py-6 text-xs text-cream/60 md:flex-row md:items-start">
+      <div class="text-center md:text-left">
+        <p>&copy; {year} BPE Cleaning Services. All rights reserved.</p>
+        {/* The four policies, block + py so each is a real tap target on a phone. */}
+        <nav class="mt-1 flex flex-wrap justify-center gap-x-5 md:justify-start" aria-label="Legal">
+          {LEGAL_PAGES.map((page) => (
+            <a href={page.path} class="block py-1.5 transition-colors hover:text-gold-soft">{page.label}</a>
+          ))}
+        </nav>
+        {particulars && <p class="mt-1 max-w-xl text-cream/60">{particulars}</p>}
+      </div>
+      <p class="md:pt-0">Website by <a href="https://artiomotion.com" class="transition-colors hover:text-gold-soft" rel="noopener">ArtioMotion</a></p>
     </div>
   </div>
 </footer>

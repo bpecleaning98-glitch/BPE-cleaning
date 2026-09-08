@@ -256,7 +256,7 @@ function html(lead: LeadMail): string {
 /** Plain text twin. Some phones show it, and every spam filter reads it. */
 function text(lead: LeadMail): string {
   const lines = [
-    'NEW REQUEST — BPE Cleaning Services',
+    'NEW REQUEST, BPE Cleaning Services',
     stamp(),
     '',
     `Name:  ${lead.name || 'not given'}`,

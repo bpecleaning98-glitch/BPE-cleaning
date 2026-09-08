@@ -53,7 +53,22 @@ export const PATHS = {
   about: '/about/',
   contact: '/contact/',
   privacy: '/privacy/',
+  cookies: '/cookies/',
+  terms: '/terms/',
+  refunds: '/refunds/',
 } as const;
+
+/**
+ * The four legal pages, in the order a visitor is likely to need them. The
+ * footer, the sitemap and the cross links at the foot of each page all read
+ * this list, so adding a policy is a one line change.
+ */
+export const LEGAL_PAGES = [
+  { label: 'Privacy', path: PATHS.privacy },
+  { label: 'Cookies', path: PATHS.cookies },
+  { label: 'Terms', path: PATHS.terms },
+  { label: 'Cancellations and refunds', path: PATHS.refunds },
+] as const;
 
 function abs(path: string, site?: URL): string {
   return new URL(path, site ?? PRODUCTION_ORIGIN).href;

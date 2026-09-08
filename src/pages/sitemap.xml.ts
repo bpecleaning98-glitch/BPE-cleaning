@@ -38,6 +38,9 @@ const STATIC_PAGES: StaticPage[] = [
   { path: '/guides/airbnb-turnover-checklist/', changefreq: 'yearly', priority: '0.6' },
   { path: '/guides/after-builders-cleaning-guide/', changefreq: 'yearly', priority: '0.6' },
   { path: '/privacy/', changefreq: 'yearly', priority: '0.3' },
+  { path: '/cookies/', changefreq: 'yearly', priority: '0.3' },
+  { path: '/terms/', changefreq: 'yearly', priority: '0.3' },
+  { path: '/refunds/', changefreq: 'yearly', priority: '0.3' },
 ];
 
 function esc(value: unknown): string {

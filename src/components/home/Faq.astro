@@ -1,4 +1,7 @@
 ---
+// Unused since PASS 12 (FAQs live on the service pages), kept in sync with
+// pricing.ts anyway so a stale figure can never be reinstated by accident.
+import { HOURLY, ESTIMATE_NOTE } from '../../data/pricing';
 const faqs = [
   {
     q: 'Are you insured?',
@@ -14,7 +17,7 @@ const faqs = [
   },
   {
     q: 'How is the price calculated?',
-    a: 'We work from a published price list. Regular cleaning is charged hourly, from €25 per hour with a minimum of 3 hours. Deep cleans, after builders cleans and Airbnb cleans have fixed prices based on the size of the property. The final price is always confirmed before you book.',
+    a: `We work from a published price list. Regular cleaning is charged hourly, ${HOURLY.regular.label} with a minimum of ${HOURLY.regular.minHours} hours. Deep cleans, after builders cleans and Airbnb cleans have fixed prices based on the size of the property. ${ESTIMATE_NOTE}`,
   },
   {
     q: 'Do you bring products and equipment?',
@@ -22,7 +25,7 @@ const faqs = [
   },
   {
     q: 'Which areas do you cover?',
-    a: 'We cover Dublin and the surrounding County Dublin areas. If you are not sure, send us your Eircode and we will confirm straight away.',
+    a: 'We cover Dublin and the surrounding County Dublin areas. If you are not sure, send us your Eircode and we will confirm whether we cover you.',
   },
 ];
 ---

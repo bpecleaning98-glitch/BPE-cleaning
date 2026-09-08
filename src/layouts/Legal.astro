@@ -1,0 +1,108 @@
+---
+import Base from './Base.astro';
+import Diamond from '../components/Diamond.astro';
+import { SITE, LEGAL } from '../data/site';
+import { LEGAL_PAGES, breadcrumbs, graph } from '../lib/schema';
+
+/**
+ * The shell shared by the four legal pages: privacy, cookies, terms, and
+ * cancellations and refunds. One layout so they read as one document set,
+ * and so a change to the anatomy (the numbered index, the contact row, the
+ * "last updated" line, the cross links) lands on all four at once.
+ *
+ * Paragraphs are trusted HTML written in this repository, never anything a
+ * visitor typed: the only markup they carry is the odd inline link to a
+ * sister page or to a regulator, which plain text could not express.
+ */
+export interface LegalSection {
+  title: string;
+  /** Paragraphs. May carry inline <a> links; nothing else. */
+  body: string[];
+  /** Optional hairline list under the paragraphs. */
+  list?: string[];
+  /** Optional boxed block, one line per entry: the model cancellation form. */
+  block?: string[];
+}
+
+interface Props {
+  title: string;
+  description: string;
+  /** Tracked caps label above the headline. */
+  kicker: string;
+  /** The two headline lines; the second carries the lowercase italic word. */
+  headline: { line1: string; pre: string; accent: string; post: string };
+  /** The "short version" under the headline. */
+  intro: string;
+  sections: LegalSection[];
+  /** The page's own canonical path, for the breadcrumb and the cross links. */
+  path: string;
+  crumb: string;
+}
+
+const { title, description, kicker, headline, intro, sections, path, crumb } = Astro.props;
+
+const others = LEGAL_PAGES.filter((page) => page.path !== path);
+const jsonLd = graph(breadcrumbs([{ name: crumb, path }], Astro.site));
+---
+<Base title={title} description={description} jsonLd={jsonLd}>
+  <section data-first-screen class="bg-night pt-40 pb-20 text-cream md:pt-48 md:pb-24">
+    <div class="container-wide">
+      <p class="kicker !text-gold" data-reveal>{kicker}</p>
+      <h1 class="display-caps mt-6 text-[clamp(2.4rem,6.5vw,5rem)]" data-reveal>
+        <span class="line-mask"><span>{headline.line1}</span></span>
+        <span class="line-mask"><span style="--d: 0.1s">{headline.pre ? `${headline.pre} ` : ''}<span class="accent-word text-gold-soft">{headline.accent}</span>{headline.post ? ` ${headline.post}` : ''}</span></span>
+      </h1>
+      <p class="mt-8 max-w-xl text-base leading-relaxed text-cream/70" data-reveal style="--d: 0.2s">
+        {intro}
+      </p>
+    </div>
+  </section>
+
+  <section class="section-pad relative overflow-hidden bg-porcelain">
+    <Diamond class="pointer-events-none absolute -right-40 -top-44 h-[38rem] w-[38rem] opacity-[0.05]" aria-hidden="true" />
+    <div class="container-x relative">
+      {sections.map((section, i) => (
+        <article class="border-t border-ink/12 py-10 first:border-t-0 first:pt-0 md:grid md:grid-cols-[6rem_1fr] md:gap-10" data-reveal>
+          <p class="font-sans text-[0.7rem] font-medium tabular-nums text-gold-deep">
+            {String(i + 1).padStart(2, '0')}
+          </p>
+          <div class="legal-copy">
+            <h2 class="h-serif text-2xl text-ink md:text-[1.75rem]">{section.title}</h2>
+            {section.body.map((paragraph) => (
+              <p class="mt-5 max-w-2xl text-base leading-relaxed text-ink/75" set:html={paragraph} />
+            ))}
+            {section.list && (
+              <ul class="mt-6 max-w-2xl border-t border-ink/12">
+                {section.list.map((item) => (
+                  <li class="border-b border-ink/12 py-4 text-base leading-relaxed text-ink/75" set:html={item} />
+                ))}
+              </ul>
+            )}
+            {section.block && (
+              <div class="mt-6 max-w-2xl border border-ink/15 bg-ivory px-6 py-6 font-sans text-sm leading-relaxed text-ink/80 md:px-8">
+                {section.block.map((line) => (
+                  <p class="mt-3 first:mt-0" set:html={line} />
+                ))}
+              </div>
+            )}
+          </div>
+        </article>
+      ))}
+
+      <div class="mt-12 border-t border-ink/12 pt-10" data-reveal>
+        <p class="kicker">Questions about any of this</p>
+        <div class="mt-5 flex flex-wrap items-center gap-4">
+          <a href={SITE.phoneHref} class="btn-primary">Call {SITE.phoneDisplay}</a>
+          <a href={SITE.whatsappHref} class="btn-outline text-ink" rel="noopener">WhatsApp us</a>
+          <a href={`mailto:${SITE.email}`} class="link-caps text-gold-deep">{SITE.email}</a>
+        </div>
+        <p class="mt-10 font-sans text-xs text-ink/65">Last updated {LEGAL.updated}.</p>
+        <nav class="mt-4 flex flex-wrap gap-x-6 gap-y-3" aria-label="Other policies">
+          {others.map((page) => (
+            <a href={page.path} class="link-caps text-ink/70 hover:text-ink">{page.label}</a>
+          ))}
+        </nav>
+      </div>
+    </div>
+  </section>
+</Base>

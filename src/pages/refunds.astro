@@ -1,0 +1,91 @@
+---
+import Legal, { type LegalSection } from '../layouts/Legal.astro';
+import { PATHS } from '../lib/schema';
+import { SITE, LEGAL } from '../data/site';
+
+/**
+ * Cancellations and refunds, written as the plain English form of Part 5 of
+ * the Consumer Rights Act 2022:
+ *
+ *   s.112, s.113   the 14 day right to cancel a distance contract, counted
+ *                  from the day the contract is concluded
+ *   s.115          how it is exercised, by any unequivocal statement
+ *   s.117          reimbursement within 14 days, by the same means of payment
+ *   s.119          work that starts inside the 14 days only on the customer's
+ *                  express request, paid in proportion if cancelled mid-way,
+ *                  and the right lost once the service is fully performed
+ *   s.85 to s.90   the remedies for a service that is not as agreed
+ *   Schedule 4     the model cancellation form, reproduced at the foot
+ *
+ * The one policy choice on this page that is the owner's rather than the
+ * law's is that no cancellation fee is charged. None has ever been set, so
+ * saying so is the truth today; if she ever sets one, it has to be agreed
+ * before booking and written here first.
+ */
+const sections: LegalSection[] = [
+  {
+    title: 'Your right to cancel a booking made at a distance',
+    body: [
+      'Every booking with us is made by phone, WhatsApp, email or through this website, which the law calls a distance contract. That gives you the right to cancel within 14 days of the day the booking was confirmed, without giving any reason. This is section 112 of the Consumer Rights Act 2022, and it applies to you as a consumer whatever else is agreed.',
+      `To cancel, tell us before the 14 days are up. A phone call to ${SITE.phoneDisplay}, a WhatsApp message to the same number or an email to ${SITE.email} is enough, as long as it says clearly that you are cancelling. You may use the form at the foot of this page, but you do not have to. If you cancel in writing we confirm receipt the same way.`,
+    ],
+  },
+  {
+    title: 'When the clean happens inside those 14 days',
+    body: [
+      'Most of our bookings do. The law allows the work to go ahead inside the cancellation period only if you ask for it expressly, so when you confirm a date that falls within 14 days of booking, we ask you to reply that you want the clean to go ahead on that date and understand that once it is fully done, the right to cancel has been used up. Your reply is kept with the booking.',
+      'If you cancel after we have started but before we have finished, you pay for the share of the work done up to the moment you told us, worked out from the agreed price. If we have not started, you pay nothing.',
+    ],
+  },
+  {
+    title: 'Moving a booking, or cancelling later on',
+    body: [
+      'You can move a booking to another day, or cancel it after the 14 days, by phone or WhatsApp. We do not charge a fee for either. We only ask that you tell us as soon as you know, because a cancelled morning is a morning the team could have given to someone else.',
+      'If we have to move a booking, for illness or an emergency elsewhere, we tell you as soon as we know and offer the next date that suits you. If none does, anything you have paid is refunded in full.',
+    ],
+  },
+  {
+    title: 'If a clean is not right',
+    body: [
+      'Tell us as soon as you can, ideally on the day, and send a photo if you have one. We come back and put right anything that was missed, free of charge, within a reasonable time and at a time that does not put you out. Where that is impossible, or the same problem is still there after we have tried, you are entitled to a proportionate reduction in the price, refunded to you, or, if the shortfall is serious, to a full refund. These are the remedies in sections 85 to 89 of the Consumer Rights Act 2022, and nothing on this page limits them.',
+    ],
+  },
+  {
+    title: 'How a refund is paid',
+    body: [
+      'A refund is paid without undue delay and at the latest 14 days after the day you tell us you are cancelling, or the day a refund is agreed. It goes back by the same method you paid with, at no cost to you, unless you ask for a different one. If you paid in cash, we agree with you whether it comes back in cash or by bank transfer.',
+    ],
+  },
+  {
+    title: 'Where to turn if we get it wrong',
+    body: [
+      'Contact us first, and give us the chance to fix it. If that fails, the Competition and Consumer Protection Commission at <a href="https://www.ccpc.ie" rel="noopener">ccpc.ie</a> explains your rights in plain terms, and a claim of up to €2,000 can be brought through the small claims procedure of the District Court without a solicitor.',
+    ],
+  },
+  {
+    title: 'Model cancellation form',
+    body: [
+      'This is the form provided by Schedule 4 of the Consumer Rights Act 2022. Complete and send it only if you wish to cancel; any other clear statement that you are cancelling works just as well. Copy the lines into a WhatsApp message or an email, or print them.',
+    ],
+    block: [
+      `To ${SITE.name}, ${LEGAL.registeredOffice ?? SITE.area}, ${SITE.email}:`,
+      'I hereby give notice that I cancel my contract for the provision of the following service: ____________________',
+      'Ordered on: ____________________',
+      'Name of consumer: ____________________',
+      'Address of consumer: ____________________',
+      'Signature of consumer (only if this form is sent on paper): ____________________',
+      'Date: ____________________',
+    ],
+  },
+];
+---
+<Legal
+  title="Cancellations and Refunds | BPE Cleaning Services"
+  description="How to cancel or move a booking with BPE Cleaning Services, your 14 day right to cancel, what happens if a clean is not right, and how refunds are paid."
+  kicker="Cancellations and refunds"
+  headline={{ line1: 'Changing', pre: 'your', accent: 'mind', post: '' }}
+  intro="Short version: you can cancel a booking, you pay nothing for work that has not been done, a refund that is due reaches you within 14 days, and a clean that is not right is put right for free. The details, and the form the law provides, are below."
+  sections={sections}
+  path={PATHS.refunds}
+  crumb="Cancellations and refunds"
+/>

@@ -95,6 +95,11 @@ create policy "admins read page_views"
 create index if not exists page_views_created_idx on public.page_views (created_at desc);
 create index if not exists page_views_session_idx on public.page_views (session_id);
 create index if not exists page_views_path_idx on public.page_views (path);
+-- Adaugat 8 sep 2026: serverul cauta ultima vizualizare a aceluiasi cod de
+-- vizitator din ultimele 30 de minute ca sa lege paginile intr-o vizita
+-- (src/lib/session.ts), pentru ca browserul nu mai pastreaza niciun numar de
+-- sesiune. Ruleaza linia asta in SQL Editor daca schema a fost deja aplicata.
+create index if not exists page_views_visitor_idx on public.page_views (visitor_hash, created_at desc);
 
 -- ---------------------------------------------------------------------------
 -- 3. Linkuri de campanie

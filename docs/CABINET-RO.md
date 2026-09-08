@@ -288,37 +288,33 @@ bani cu adevărat.
 Ce nu face site-ul:
 
 - **fără cookies**, niciunul, nici măcar ale noastre
+- **fără nimic stocat în browser** pentru statistici: nici localStorage, nici sessionStorage, nici amprentă (din 8 sep 2026, vezi mai jos de ce)
 - **fără Google Analytics**
 - **fără pixel de Facebook** și fără niciun alt script de la terți
 - **nu se salvează adrese IP**, nicăieri, în nicio tabelă
 
 Ce face în schimb:
 
-- Fiecare vizită primește un număr aleatoriu care trăiește doar în tabul deschis (`sessionStorage`) și dispare când tabul se închide. Nu se scrie nimic pe disc.
-- Vizitatorii unici se numără printr-un hash zilnic, calculat din ziua curentă, IP, user agent și un secret. Hashul se schimbă la fiecare miez de noapte, deci nu poate urmări pe nimeni de la o zi la alta. IP-ul intră în calcul, dar nu se salvează niciodată.
+- Vizitatorii unici se numără printr-un hash zilnic, calculat din ziua curentă, IP, user agent și un secret (`ANALYTICS_SALT`). Hashul se schimbă la fiecare miez de noapte, deci nu poate urmări pe nimeni de la o zi la alta. IP-ul intră în calcul, dar nu se salvează niciodată.
+- **Vizitele (sesiunile) se reconstruiesc pe server**, nu în browser: două pagini cu același hash zilnic la mai puțin de 30 de minute una de alta sunt aceeași vizită (`src/lib/session.ts`). Până pe 8 sep 2026 browserul păstra un număr de sesiune în `sessionStorage`; Regulamentul 5(3) din S.I. 336/2011 acoperă orice informație stocată pe dispozitiv, iar un număr pentru statisticile noastre nu e „strict necesar” pentru nimic cerut de vizitator, deci ar fi cerut banner de consimțământ. Am scos numărul, nu am pus banner.
+- Singurul lucru care mai atinge `sessionStorage` e cuvântul `bpeSkipIntro`: se scrie când omul apasă pe logo și se șterge la următoarea încărcare, ca să nu se reia animația de intro. Nu e identificator, nu pleacă nicăieri, și e exact excepția „strict necesar pentru ce a cerut utilizatorul” din lege. E declarat pe `/cookies/`.
+- Cererea de ofertă e creditată campaniei tot pe server: din hash se găsește vizita în curs, iar prima pagină a vizitei spune de unde a venit omul. Browserul trimite doar ce vede pagina curentă (query string, referrer, path), folosit numai când nu există vizită înregistrată.
+- **Consecință practică: `ANALYTICS_SALT` trebuie setat pe Vercel.** Fără el nu există hash, deci fiecare pagină e propria ei vizită (sesiuni = vizualizări în cabinet) și nicio cerere nu poate fi creditată unei campanii.
 - Din adresa de proveniență se păstrează doar domeniul, de exemplu `facebook.com`, niciodată adresa completă a paginii de unde a venit omul.
 - Țara și orașul vin din headerele rețelei Vercel, aproximativ, și atât.
-- Semnalul **Global Privacy Control** e respectat: dacă browserul cuiva îl trimite, scriptul de tracking nu pornește deloc.
+- Semnalul **Global Privacy Control** e respectat: dacă browserul cuiva îl trimite, scriptul de tracking nu pornește deloc, serverul refuză și el, iar cererea de ofertă se salvează fără sesiune și fără campanie.
 - Boții sunt filtrați și nu ajung în cifre.
 
-**Concluzia practică:** nu e nevoie de banner de cookies, pentru că nu există cookies și nu
-există niciun terț. E un avantaj real, banner-ul strică prima impresie pe toate site-urile
-concurenței.
+**Concluzia practică:** nu e nevoie de banner de cookies, pentru că nu se stochează nimic care să ceară consimțământ. E un avantaj real, banner-ul strică prima impresie pe toate site-urile concurenței.
 
-**Pagina de politică de confidențialitate există** și spune exact asta:
-`src/pages/privacy.astro`, cu link discret în footer (`src/components/Footer.astro`). E
-scrisă după cod, nu după un șablon: ce se măsoară și cum (fără cookies, hash zilnic, fără IP
-stocat), faptul că formularul salvează nume, telefon, serviciu, zonă, dată dorită și
-notițele, în Supabase, de ce, cine are acces la ele, și cum se cere o copie sau ștergerea,
-prin telefon sau WhatsApp. Comentariul din capul fișierului listează sursele pe care se
-sprijină fiecare afirmație, deci dacă se schimbă `track.ts`, `api/track.ts` sau
-`api/lead.ts`, pagina se schimbă odată cu ele.
+**Cele patru pagini legale** sunt pe același layout (`src/layouts/Legal.astro`), cu link în footer pe fiecare pagină și în sitemap:
 
-Un singur lucru îi lipsește: **perioada de păstrare**. GDPR cere să scrie cât timp se țin
-datele, iar pagina nu spune nimic despre asta. Stabilește un termen cu clienta, de exemplu
-24 de luni pentru cereri, și scrie-l în secțiunea "Your requests".
+- `/privacy/`: scrisă după cod, nu după șablon. Fiecare afirmație e verificabilă în fișierele listate în comentariul din capul lui `src/pages/privacy.astro`. Numește cei trei împuterniciți (Supabase în UE, Vercel din UE, Resend în SUA sub Data Privacy Framework + clauze contractuale standard), Gmail-ul clientei ca destinatar al notificării, perioadele de păstrare (13 luni statistici, 24 luni cereri), lista drepturilor și DPC.
+- `/cookies/`: spune că nu există cookies, explică `bpeSkipIntro`, numărarea fără cookies, harta Google și video-urile din blog ca singurele locuri unde apare un terț.
+- `/terms/`: cine e firma, prețuri și oferte (TVA-ul conform `pricing.ts`), cum se face o rezervare, ce avem nevoie de la client, plata, anularea (dreptul legal de 14 zile + fără taxă de anulare), standardul și remedierea (Consumer Rights Act 2022 s.85-89), fotografiile, site-ul, reclamații și lege aplicabilă.
+- `/refunds/`: anulări și rambursări, forma în engleză simplă a Părții a 5-a din Consumer Rights Act 2022, cu formularul-model de anulare din Schedule 4.
 
----
+**Formularul de ofertă** cere doar nume, telefon, serviciu, mărime, dată, zonă și o notă opțională, și nu trimite până nu e bifată linia de acord (link la `/privacy/`). Temeiul legal rămâne Art. 6(1)(b) GDPR (pașii ceruți de om înaintea unui contract); bifa există ca nimeni să nu-și trimită datele fără să știe unde ajung.
 
 ## 6b. Protecția datelor, ce trebuie să știi ca să nu strici promisiunea
 
@@ -348,6 +344,31 @@ Dacă proiectul ajunge din greșeală într-o regiune din SUA, afirmația devine
 falsă și trebuie fie mutat proiectul, fie rescrisă pagina.
 
 ---
+
+## 6c. Ce trebuie să dea clienta ca paginile legale să fie complete
+
+Nimic din lista asta nu se ghicește și nu se completează „aproximativ”. Până vin răspunsurile, câmpurile respective pur și simplu nu se afișează.
+
+1. **Datele de înregistrare ale firmei**, de pe certificatul CRO: denumirea exactă, forma juridică (societate cu răspundere limitată sau nume comercial de persoană fizică), numărul CRO, sediul social. Se completează în `LEGAL` din `src/data/site.ts` și apar automat în footer, pe `/terms/` și pe `/privacy/`. Le cere Companies Act 2014 s.151(4) (pentru societăți) și E-Commerce Regulations S.I. 68/2003 Reg. 7 (pentru oricine vinde online). Formularul-model de anulare de pe `/refunds/` are nevoie și el de adresa geografică.
+2. **TVA: e sau nu înregistrată în scopuri de TVA?** Site-ul spune peste tot „All prices exclude VAT”. Dacă NU e înregistrată, fraza sugerează că se adaugă TVA când nu se adaugă, și trebuie înlocuită cu „These are the full prices, no VAT is added”. Dacă ESTE înregistrată, prețurile afișate consumatorilor trebuie să fie cu TVA inclus (Consumer Rights Act 2022, Schedule 3 lit. (f): „total price inclusive of taxes”), iar numărul de TVA trebuie pe site (Reg. 7(1)(h) S.I. 68/2003). `/terms/` spune deocamdată că „whether VAT applies is stated in your quote”, ceea ce e adevărat în ambele cazuri, dar nu rezolvă afișarea prețurilor.
+3. **Asigurarea**: ce poliță are (public liability? ce sumă?). Site-ul spune „fully insured” din fluturașul ei; fără poliță în mână e o afirmație pe care nimeni nu o poate susține dacă un client întreabă. Dacă nu are poliță, „fully insured” trebuie scos de pe toate paginile (grep `insured`).
+4. **Taxa de anulare**: `/terms/` și `/refunds/` spun că NU se percepe taxă de anulare, pentru că nu a fost stabilită niciodată una. Dacă vrea una (de exemplu pentru anulări în ziua respectivă), trebuie stabilită înainte de rezervare, scrisă pe ambele pagini și în mesajul de confirmare. Fără asta, legal, oricum nu ar putea-o percepe.
+5. **Scrisoarea EEM Building Solutions**: primul rând recomandă „E&J Spotless Services”, restul numește BPE. Trebuie confirmat în scris că scrisoarea a fost emisă pentru ea (de exemplu numele vechi sub care lucra). Dacă a fost refolosită de la altă firmă, iese de pe site (`src/data/testimonials.ts`, și cade automat de pe about, deep, after-builders, office, prices).
+6. **Mesajul de confirmare a rezervării** (WhatsApp sau email), pe care trebuie să-l trimită la FIECARE rezervare, pentru că legea cere confirmare pe suport durabil (s.109), informarea despre dreptul de anulare (s.106, Schedule 3 lit. (m)) și cererea expresă de a începe lucrarea în cele 14 zile (s.119). Fără cererea expresă clientul poate anula și după ce curățenia s-a făcut și nu datorează nimic (s.119(5)). Șablon în engleză:
+
+```
+Booking confirmed: [service], [property size], [address or Eircode],
+[date and time], [price] ([VAT: not applicable / included]).
+Payment: [method], [when].
+
+Because you booked at a distance, you can cancel within 14 days of today
+without giving a reason: bpecleaning.ie/refunds. As the clean is inside
+those 14 days, please reply YES to confirm you want us to go ahead on that
+date and understand that once the clean is fully done the right to cancel
+no longer applies. Terms: bpecleaning.ie/terms
+```
+
+7. **Fotografiile**: cine le face (angajat sau subcontractor). Drepturile de autor pe o fotografie făcută de un subcontractor rămân ale lui dacă nu sunt cesionate în scris (Copyright and Related Rights Act 2000 s.23). Un rând semnat de fiecare persoană care fotografiază lucrări pentru site rezolvă definitiv.
 
 ## 7. Ce a rămas de făcut
 

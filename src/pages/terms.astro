@@ -1,0 +1,111 @@
+---
+import Legal, { type LegalSection } from '../layouts/Legal.astro';
+import { PATHS } from '../lib/schema';
+import { SITE, legalParticulars } from '../data/site';
+import { VAT_NOTE, ESTIMATE_NOTE } from '../data/pricing';
+
+/**
+ * Terms for a cleaning company that books by phone and WhatsApp. Two rules
+ * governed every line:
+ *
+ *   1. Nothing here may take away a right the Consumer Rights Act 2022 gives
+ *      the customer, so the sections on cancelling (Part 5, sections 112 to
+ *      119) and on putting a clean right (sections 78 to 90) RESTATE the law
+ *      in plain English rather than narrowing it.
+ *   2. Nothing here may promise more than the owner has actually decided.
+ *      There is no cancellation fee because none has ever been set; there is
+ *      no payment deadline because payment is agreed per booking; the VAT
+ *      line says only what pricing.ts says. Anything the owner later decides
+ *      goes in here AND in the booking confirmation, never in one alone.
+ *
+ * The business particulars come from LEGAL in data/site.ts and render only
+ * once they are filled in; the trading name, area and contact details are
+ * always shown, which is what the E-Commerce Regulations require at minimum.
+ */
+const particulars = legalParticulars();
+
+const sections: LegalSection[] = [
+  {
+    title: 'Who you are dealing with',
+    body: [
+      `You are dealing with ${SITE.name}, a cleaning company based in ${SITE.area}, reachable on ${SITE.phoneDisplay}, on WhatsApp at the same number, and at ${SITE.email}, ${SITE.hours}.${particulars ? ` ${particulars}` : ''}`,
+      'These terms apply to every booking made through this website, by phone, by WhatsApp or by email, and to your use of the website itself. By booking, you agree to them. Where anything here and consumer law disagree, the law wins, and you keep every right the Consumer Rights Act 2022 gives you whatever this page says.',
+    ],
+  },
+  {
+    title: 'Prices and quotes',
+    body: [
+      'Every price on this site comes from our published <a href="/prices/">price list</a>. Hourly services are charged by the hour, with the minimum booking stated beside them. Deep cleans, end of tenancy cleans, after builders cleans and Airbnb turnovers are charged at a fixed price set by the number of bedrooms. A figure marked "from" is the lowest price for that service, not a promise that yours will be that figure.',
+      `${VAT_NOTE} Whether VAT applies to your booking, and the total you will actually pay, is stated in your quote before you confirm. Extras such as the oven, the fridge, interior windows or carpets are priced separately and are added only when you ask for them.`,
+      `${ESTIMATE_NOTE} A price we have confirmed to you in writing is the price you pay. It changes only if the property turns out to be materially different from what was described, for instance more rooms or a condition that needs far longer, and in that case we tell you before we start, not afterwards, so that you can decide.`,
+    ],
+  },
+  {
+    title: 'How a booking is made',
+    body: [
+      'A booking exists once we have confirmed the service, the property, the date and the price to you in writing, by WhatsApp, email or text message. That confirmation is your record of what was agreed, so keep it. Sending the request form, or asking for a price by phone, is not yet a booking and commits you to nothing.',
+      'Because bookings are made at a distance rather than face to face, you have a legal right to cancel within 14 days of the confirmation, explained in section 06 and on the <a href="/refunds/">cancellations and refunds page</a>. Most cleans happen inside those 14 days, so when you confirm a date we will ask you to say, in the same message, that you want the work to go ahead before the 14 days are up.',
+    ],
+  },
+  {
+    title: 'What we need from you',
+    body: [
+      'Access to the property at the agreed time, whether you are there, leave a key or share an entry code. Access arrangements are agreed in advance, keys and codes are used only for your booking and handed back or forgotten afterwards, and we never pass them to anyone else.',
+      'Working water and electricity, and a word in advance about anything we should know: pets, alarms, fragile items, surfaces that need a particular product, anything you would rather we did not touch or move. The more we know before we arrive, the better the clean, and it also means nothing is done that you did not want.',
+      'For an end of tenancy or after builders clean, the property should be empty of belongings and rubble before we arrive unless we have agreed otherwise. Clearing a property is not part of a clean, and if it turns out to be needed it is priced with you on the day before any of it is done.',
+    ],
+  },
+  {
+    title: 'Payment',
+    body: [
+      'How and when you pay is agreed with you when the booking is confirmed and written in the confirmation. This website takes no payments and stores no card details. Never send card details over WhatsApp or email, and we will never ask you to.',
+    ],
+  },
+  {
+    title: 'Cancelling or moving a booking',
+    body: [
+      'You can cancel a booking made at a distance within 14 days of the day it was confirmed, without giving a reason, by telling us by phone, WhatsApp or email. If you asked us to carry out the clean inside those 14 days and cancel after we have started, you pay for the part of the work done; once a clean is finished it can no longer be cancelled, though the guarantee in the next section still applies. If you cancel before we start, nothing is owed and anything you have paid is refunded within 14 days.',
+      'Outside that period, or when you simply need a different day, tell us as early as you can. We do not charge a cancellation fee. The full procedure, including the cancellation form the law provides, is on the <a href="/refunds/">cancellations and refunds page</a>.',
+      'We may need to move a booking ourselves, for illness or an emergency on another job. If that happens we tell you as soon as we know, offer the next date that suits you, and if none does, refund anything you have paid in full.',
+    ],
+  },
+  {
+    title: 'Our standard, and putting things right',
+    body: [
+      'We carry out every clean with reasonable care and skill, as the law requires, and to the description of the service on this site and in your confirmation. Walk through the finished property with us where you can. If you cannot, look as soon as you are back and tell us about anything missed as quickly as possible, ideally the same day, while it can still be seen.',
+      'Anything missed is put right free of charge, within a reasonable time and without significant inconvenience to you. If it cannot be put right, or the second attempt fails, you are entitled to a proportionate reduction in the price or, where the failure is serious, to a refund. Those are your rights under sections 85 to 89 of the Consumer Rights Act 2022, and they are what the words "put right" on this site mean.',
+      'BPE Cleaning Services is insured. If anything is damaged during a clean, tell us straight away and we deal with it with you, through our insurance where it applies. Ask us and we will send the details of our cover.',
+    ],
+  },
+  {
+    title: 'Photographs of our work',
+    body: [
+      'We photograph finished work for this website and for our own records. Photographs never show an address, a person, or anything that identifies whose property it is, and if you would rather we did not photograph your property at all, say so and we will not.',
+      'Every photograph of a clean on this site is a real BPE job. The one exception is the interior on the homepage, the Airbnb page and the contact page, which is a licensed stock photograph used as a backdrop and is never presented as our work.',
+    ],
+  },
+  {
+    title: 'This website',
+    body: [
+      'The text, photographs and logo on this site belong to BPE Cleaning Services and may not be copied for commercial use without permission. The prices on it are correct on the day they are published and are checked against our list; if a figure has changed, your written quote is what counts. The guides and articles are general advice for cleaning your own home and are not a promise about any particular job. Links to other websites, including WhatsApp and Google Maps, lead to services run by other companies under their own terms.',
+    ],
+  },
+  {
+    title: 'Complaints, law and disputes',
+    body: [
+      `Tell us first. Most things can be fixed with one call to ${SITE.phoneDisplay} or one message, and we would rather hear it than have you leave unhappy. If you feel we have not resolved it, the Competition and Consumer Protection Commission at <a href="https://www.ccpc.ie" rel="noopener">ccpc.ie</a> explains your rights, and a claim of up to €2,000 can be brought through the small claims procedure of the District Court without a solicitor.`,
+      'These terms are governed by the law of Ireland, and any dispute belongs to the Irish courts. If one line of them turns out to be unenforceable, the rest stand. Our privacy practices are on the <a href="/privacy/">privacy page</a> and cookies on the <a href="/cookies/">cookies page</a>, and both form part of these terms.',
+    ],
+  },
+];
+---
+<Legal
+  title="Terms | BPE Cleaning Services"
+  description="How bookings, prices, cancellations and putting things right work at BPE Cleaning Services, in plain English. Nothing here takes away a right Irish consumer law gives you."
+  kicker="Terms of service"
+  headline={{ line1: 'Plain terms,', pre: 'no', accent: 'small', post: 'print' }}
+  intro="Short version: the price we confirm is the price you pay, you can cancel or move a booking, and if a clean is not right we come back and put it right. Everything below is written to be read in one sitting, and none of it takes away a right the law already gives you."
+  sections={sections}
+  path={PATHS.terms}
+  crumb="Terms"
+/>

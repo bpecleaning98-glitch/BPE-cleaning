@@ -1,0 +1,77 @@
+---
+import Legal, { type LegalSection } from '../layouts/Legal.astro';
+import { PATHS } from '../lib/schema';
+
+/**
+ * The cookies page of a site that sets none. It exists because Regulation 5
+ * of S.I. 336 of 2011 asks for "clear and comprehensive information" about
+ * anything stored on or read from a visitor's device, and a page that says
+ * "nothing, and here is the one exception" is that information.
+ *
+ * Checked against: src/scripts/track.ts (stores nothing), src/scripts/motion.ts
+ * (the one sessionStorage word, written on a logo tap and consumed on the next
+ * load), src/pages/contact.astro (the Google map), src/pages/blog/[slug].astro
+ * (YouTube no-cookie and Vimeo embeds), vercel.json (the frame-src list, which
+ * is the complete set of outside hosts allowed to render anything here).
+ */
+const sections: LegalSection[] = [
+  {
+    title: 'What the law asks, and why there is no banner',
+    body: [
+      'Irish law, Regulation 5 of the ePrivacy Regulations of 2011, says a website may not store information on your device, or read information already there, without your consent, unless the storage is strictly necessary to provide something you have explicitly asked for. That covers cookies and every cousin of theirs: local storage, session storage, pixels and fingerprints. It is the reason most websites open with a banner.',
+      'This site does not open with one because it stores nothing that needs your consent. Visits are counted on our server without placing anything on your device, and no advertising, analytics or social media company is given a way to place anything either. A banner here would be asking permission for something that does not happen.',
+    ],
+  },
+  {
+    title: 'The one thing kept, for one page',
+    body: [
+      'When you tap the logo to return to the homepage, the site writes a single note, "skip the intro", into your browser\'s session storage, so that the homepage you are about to see does not replay the opening animation. The next page reads the note and deletes it in the same moment. It contains no identifier, it is never sent to us or to anyone else, it dies with the tab, and it exists only to carry out the navigation you asked for, which is exactly the exemption the law allows.',
+    ],
+  },
+  {
+    title: 'How visits are counted without cookies',
+    body: [
+      'The server makes a one way code from the day, your IP address, your browser type and a secret, and uses it to tell repeat pages from repeat people. The code changes every midnight, the address itself is never written down, and pages from one code within 30 minutes of each other count as one visit. Nothing about that lives on your device. The <a href="/privacy/">privacy page</a> describes what is recorded, what is not, and how long it is kept.',
+      'If your browser sends the Global Privacy Control signal, the counting is switched off entirely, in the browser and again on the server.',
+    ],
+  },
+  {
+    title: 'Outside companies that can set their own cookies',
+    body: [
+      'Two things on this site are loaded from other companies, and each can set cookies that belong to that company, under its own policy rather than ours.',
+    ],
+    list: [
+      'The map on the <a href="/contact/">contact page</a> comes from Google Maps. It loads only when you scroll down to it, and from then on <a href="https://policies.google.com/privacy" rel="noopener">Google\'s privacy policy</a> applies to what Google receives.',
+      'An article on the blog may carry a video from YouTube, embedded in its privacy enhanced mode so that nothing is set until you press play, or from Vimeo. <a href="https://policies.google.com/privacy" rel="noopener">Google\'s policy</a> covers YouTube and <a href="https://vimeo.com/privacy" rel="noopener">Vimeo\'s policy</a> covers Vimeo.',
+    ],
+  },
+  {
+    title: 'Links that leave the site',
+    body: [
+      'Links that take you to WhatsApp, to Google Maps or to any other website leave this site, and the site you land on sets its own cookies by its own rules. Nothing is set here on the way out, and nothing here is told where you went.',
+    ],
+  },
+  {
+    title: 'If you would rather block even that',
+    body: [
+      'Your browser can refuse third party cookies, which stops the map and any video from setting anything and leaves the rest of the site working as normal. Turning on Global Privacy Control in a browser that offers it also stops the visit counting described above. None of the site\'s pages, prices or forms depend on cookies, so nothing breaks when you do either.',
+    ],
+  },
+  {
+    title: 'When this page changes',
+    body: [
+      'If the site ever starts using cookies, or adds a service that does, this page will say so before it happens, and the consent the law requires will be asked for at that point, not assumed. The date at the foot of the page is the date it was last checked against the code.',
+    ],
+  },
+];
+---
+<Legal
+  title="Cookies | BPE Cleaning Services"
+  description="This website sets no cookies and stores no identifier on your device. What it keeps for one page load, how visits are counted without cookies, and the two outside services that can set their own."
+  kicker="Cookies"
+  headline={{ line1: 'Nothing kept', pre: 'in', accent: 'your', post: 'browser' }}
+  intro="Short version: this site sets no cookies, keeps no identifier on your device and loads nothing from an advertising network, which is why it never asks you to accept anything. What it does keep, for the length of one tap, and which outside companies can appear, is all below."
+  sections={sections}
+  path={PATHS.cookies}
+  crumb="Cookies"
+/>

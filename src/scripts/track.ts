@@ -1,32 +1,24 @@
 /**
- * First-party traffic tracking, ~1 KB, no cookies, no third party.
+ * First-party traffic tracking, under 1 KB, no cookies, no third party, and
+ * nothing stored on the device at all.
  *
- * What it sends: the page opened, where the visit came from the first time
- * it landed, and how long each page stayed on screen. Nothing that
- * identifies a person, nothing stored on the device beyond the tab session,
- * no request to any domain other than this one. That is what keeps the site
- * free of a cookie banner.
+ * What it sends: the page opened, the site that linked to it, any campaign
+ * tags in the address bar, the browser language, and later how long the page
+ * stayed on screen. Nothing that identifies a person, and no request to any
+ * domain other than this one.
+ *
+ * What it deliberately does NOT do any more: keep a visit number or the
+ * campaign the visit arrived from in sessionStorage. Regulation 5(3) of
+ * S.I. 336/2011 covers anything stored on a visitor's device, session
+ * storage included, and a visit number for our own statistics is not
+ * "strictly necessary" for anything the visitor asked for, so keeping one
+ * would have needed a consent banner. Instead the server groups pages into
+ * visits itself, from its daily visitor code and a 30 minute rule
+ * (src/lib/session.ts), and works out a request's campaign the same way.
+ * The browser keeps nothing, so there is nothing to ask consent for.
  *
  * Everything is wrapped so a failure here can never break a page.
  */
-
-type Attribution = {
-  us: string | null;
-  um: string | null;
-  uc: string | null;
-  code: string | null;
-  ref: string | null;
-  landing: string;
-};
-
-declare global {
-  interface Window {
-    __bpeAttr?: Attribution & { sid: string };
-  }
-}
-
-const KEY_SID = 'bpe_sid';
-const KEY_ATTR = 'bpe_attr';
 
 function start() {
   // Global Privacy Control is a real opt-out signal, so it is honoured.
@@ -34,53 +26,28 @@ function start() {
   // The cabinet is not part of the traffic it reports on.
   if (location.pathname.startsWith('/admin')) return;
 
-  // One session per tab, gone when the tab closes. Never written to disk.
-  let sid = sessionStorage.getItem(KEY_SID);
-  const isEntry = !sid;
-  if (!sid) {
-    sid = crypto.randomUUID();
-    sessionStorage.setItem(KEY_SID, sid);
+  const q = new URLSearchParams(location.search);
+  // Only the hostname ever leaves the browser. The full referring address
+  // can carry a search query or a private group path, and the answer the
+  // cabinet needs is just "which website sent this person".
+  let ref: string | null = null;
+  try {
+    const bare = (host: string) => host.replace(/^www\./, '');
+    const host = document.referrer ? bare(new URL(document.referrer).hostname) : '';
+    ref = host && host !== bare(location.hostname) ? host : null;
+  } catch {
+    ref = null;
   }
-
-  // Attribution is captured once, on the page the visit started at, and then
-  // reused for the rest of the session. Otherwise every internal click would
-  // overwrite "came from Facebook" with "came from our own homepage".
-  let attr: Attribution;
-  const stored = sessionStorage.getItem(KEY_ATTR);
-  if (stored) {
-    attr = JSON.parse(stored) as Attribution;
-  } else {
-    const q = new URLSearchParams(location.search);
-    // Only the hostname ever leaves the browser. The full referring address
-    // can carry a search query or a private group path, and the answer the
-    // cabinet needs is just "which website sent this person".
-    let ref: string | null = null;
-    try {
-      const bare = (host: string) => host.replace(/^www\./, '');
-      const host = document.referrer ? bare(new URL(document.referrer).hostname) : '';
-      ref = host && host !== bare(location.hostname) ? host : null;
-    } catch {
-      ref = null;
-    }
-    attr = {
-      us: q.get('utm_source'),
-      um: q.get('utm_medium'),
-      uc: q.get('utm_campaign'),
-      code: q.get('k'),
-      ref,
-      landing: location.pathname,
-    };
-    sessionStorage.setItem(KEY_ATTR, JSON.stringify(attr));
-  }
-  window.__bpeAttr = { ...attr, sid };
 
   const payload = {
     t: 'view',
-    sid,
     path: location.pathname,
-    entry: isEntry,
     lang: navigator.language,
-    ...attr,
+    ref,
+    us: q.get('utm_source'),
+    um: q.get('utm_medium'),
+    uc: q.get('utm_campaign'),
+    code: q.get('k'),
   };
 
   let viewId: number | null = null;
@@ -116,6 +83,9 @@ function start() {
     const ms = Math.round(total);
     if (!viewId || ms < 1000 || ms - sent < 1000) return;
     sent = ms;
+    // The row id lives only in this closure, in memory, for the life of the
+    // page. The server checks the beacon against its own visitor code, so a
+    // stranger guessing an id cannot rewrite somebody else's row.
     const body = JSON.stringify({ t: 'exit', id: viewId, ms });
     // sendBeacon survives the page going away; fetch would be cancelled.
     if (navigator.sendBeacon) navigator.sendBeacon('/api/track', body);
@@ -137,9 +107,8 @@ function start() {
 /**
  * WHEN this runs matters as much as what it does. The module is deferred, so
  * it used to fire its POST while the browser was still decoding the hero
- * image and swapping in the webfonts: a request, a JSON parse and a
- * sessionStorage round trip competing with the first paint, for a number
- * nobody reads in real time.
+ * image and swapping in the webfonts: a request and a JSON parse competing
+ * with the first paint, for a number nobody reads in real time.
  *
  * So it waits for the page to be interactive (the load event), and then for
  * the first gap in the main thread. requestIdleCallback carries a timeout,
@@ -178,5 +147,5 @@ document.addEventListener('visibilitychange', () => {
 });
 
 // This file is loaded for its side effect only. The empty export makes it a
-// module, which is what lets the `declare global` block above be legal.
+// module.
 export {};

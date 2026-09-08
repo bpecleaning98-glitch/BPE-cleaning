@@ -12,8 +12,9 @@ import {
   rateLimit,
   readJson,
   tagOrNull,
-  uuidOrNull,
+  visitorHash,
 } from '../../lib/request';
+import { NO_ATTRIBUTION, currentSession, entryOf, type Attribution } from '../../lib/session';
 
 export const prerender = false;
 
@@ -32,6 +33,11 @@ export const prerender = false;
  * Everything below only ever decides whether a row is written. It can never
  * decide whether the visitor reaches WhatsApp, because that already happened
  * in the browser before this request was sent.
+ *
+ * What is stored is only what the form asks for (name, phone, service, size,
+ * preferred date, area, an optional note), plus the campaign the visit is
+ * credited to. The form does not ask for an email address and this route
+ * would not keep one; the `email` column in the table stays empty.
  */
 
 /**
@@ -106,13 +112,38 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
     if (shortFields.some(looksInjected)) return answer({ skipped: 'junk' });
     if ((notes?.match(/https?:\/\//gi) || []).length >= 3) return answer({ skipped: 'junk' });
 
-    // The campaign fields are written by our own script from the address
-    // bar, so they are still only a claim from the browser's side.
-    const source = tagOrNull(body.us, 80);
-    const campaign = tagOrNull(body.uc, 120);
-    const linkCode = tagOrNull(body.code, 60);
-    const referrer = hostOrNull(body.ref);
-    const landing = pathOrNull(body.landing);
+    // Which campaign this request is credited to. The answer comes from the
+    // server's own record of the visit: the visitor code made from this
+    // request's address and browser finds the visit under way, and the
+    // FIRST page of that visit says where it came from (src/lib/session.ts).
+    // Nothing about it was ever stored in the browser.
+    //
+    // The browser still sends what its own page can see, the query string,
+    // the referrer and the path, and that is used only when there is no
+    // recorded visit to read from: no salt configured, or a person who
+    // landed straight on the form and sent it before the page view landed.
+    // Either way it is a claim from the browser's side and is validated as
+    // such. With Global Privacy Control on, nothing about the visit is
+    // recorded at all, so nothing is credited either; the request itself is
+    // still written, because the visitor asked for it.
+    const gpc = request.headers.get('sec-gpc') === '1';
+    const hash = gpc ? null : await visitorHash(ip, ua);
+    const sessionId = dbAdmin && hash ? await currentSession(dbAdmin, hash) : null;
+    const recorded = dbAdmin && sessionId ? await entryOf(dbAdmin, sessionId) : null;
+    const claimed: Attribution = {
+      utm_source: tagOrNull(body.us, 80),
+      utm_medium: tagOrNull(body.um, 80),
+      utm_campaign: tagOrNull(body.uc, 120),
+      link_code: tagOrNull(body.code, 60),
+      referrer_host: hostOrNull(body.ref),
+      landing_path: pathOrNull(body.landing),
+    };
+    const attribution = gpc ? NO_ATTRIBUTION : (recorded ?? claimed);
+    const source = attribution.utm_source;
+    const campaign = attribution.utm_campaign;
+    const linkCode = attribution.link_code;
+    const referrer = attribution.referrer_host;
+    const landing = attribution.landing_path;
 
     // Both at once, because they have nothing to say to each other and the
     // visitor's browser stops waiting after 1.2s either way. Neither can
@@ -131,12 +162,12 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
               area,
               notes,
               utm_source: source,
-              utm_medium: tagOrNull(body.um, 80),
+              utm_medium: attribution.utm_medium,
               utm_campaign: campaign,
               link_code: linkCode,
               referrer_host: referrer,
               landing_path: landing,
-              session_id: uuidOrNull(body.sid),
+              session_id: gpc ? null : sessionId,
             })
             .then(({ error }) => (error ? 'error' : 'ok'))
         : Promise.resolve('not-configured' as const),

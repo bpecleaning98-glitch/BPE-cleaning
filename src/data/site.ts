@@ -64,3 +64,58 @@ export const SERVICES = [
     blurb: 'Fast, guest-ready turnovers with linen change and restocking. Fixed prices per property size.',
   },
 ] as const;
+
+/**
+ * The legal identity behind the trading name, read by the footer, the terms
+ * and the privacy page. Irish law wants these in a prominent place on the
+ * website itself: section 151(4) of the Companies Act 2014 for a company
+ * (name and legal form, place and number of registration, registered office)
+ * and Regulation 7 of the E-Commerce Regulations, S.I. 68 of 2003, for any
+ * business trading online (name, geographic address, email, the register it
+ * is in and its number there, and the VAT number where it is VAT registered).
+ *
+ * Every field is null until it has been read off the CRO certificate or
+ * confirmed by the owner in writing. A null field is simply not rendered.
+ * Nothing here is guessed: a wrong company number on a website is worse
+ * than a missing one, and the missing ones are listed in docs/CABINET-RO.md
+ * as things the owner has to supply.
+ */
+export const LEGAL: {
+  /** Exactly as it appears on the CRO certificate, e.g. "BPE Cleaning Services Limited". */
+  registeredName: string | null;
+  /** "a private company limited by shares", or for a sole trader "a business name registered by <owner>". */
+  legalForm: string | null;
+  /** The CRO company number, or the business name registration number. */
+  croNumber: string | null;
+  /** The registered office, or the business address for a sole trader. */
+  registeredOffice: string | null;
+  /** Only if the business is registered for VAT. */
+  vatNumber: string | null;
+  /** When the four legal pages were last checked against the code and the law. */
+  updated: string;
+} = {
+  registeredName: null,
+  legalForm: null,
+  croNumber: null,
+  registeredOffice: null,
+  vatNumber: null,
+  updated: '8 September 2026',
+};
+
+/**
+ * The particulars as one sentence, or null while none are known. The footer
+ * and the legal pages all read this one function, so the wording cannot
+ * drift between them.
+ */
+export function legalParticulars(): string | null {
+  const parts: string[] = [];
+  if (LEGAL.registeredName) {
+    parts.push(
+      `Registered in Ireland as ${LEGAL.registeredName}${LEGAL.legalForm ? `, ${LEGAL.legalForm}` : ''}`
+    );
+  }
+  if (LEGAL.croNumber) parts.push(`${parts.length ? 'company' : 'Company'} number ${LEGAL.croNumber}`);
+  if (LEGAL.registeredOffice) parts.push(`${parts.length ? 'registered' : 'Registered'} office ${LEGAL.registeredOffice}`);
+  if (LEGAL.vatNumber) parts.push(`${parts.length ? 'VAT' : 'VAT'} number ${LEGAL.vatNumber}`);
+  return parts.length ? `${parts.join(', ')}.` : null;
+}
