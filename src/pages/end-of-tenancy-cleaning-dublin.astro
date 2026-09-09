@@ -10,6 +10,8 @@ import { END_OF_TENANCY, SIZE_LABELS, EXTRAS, HOURLY, VAT_NOTE, ESTIMATE_NOTE } 
 import { COUNTIES, AREAS_SENTENCE } from '../data/areas';
 import { TESTIMONIALS } from '../data/testimonials';
 import PriceNote from '../components/PriceNote.astro';
+import HeroPhoto from '../components/HeroPhoto.astro';
+import heroPhoto from '../assets/ai/hero-end-of-tenancy.jpg';
 
 /**
  * Highest commercial intent page on the site. The whole argument is deposit
@@ -134,19 +136,23 @@ const jsonLd = serviceGraph('/end-of-tenancy-cleaning-dublin/', faqs, Astro.site
   jsonLd={jsonLd}
 >
   <section data-first-screen class="bg-night pt-40 pb-20 text-cream md:pt-48 md:pb-24">
-    <div class="container-wide">
-      <p class="kicker !text-gold" data-reveal>Moving Out</p>
-      <h1 class="display-caps mt-6 text-[clamp(2.6rem,7vw,5.5rem)]" data-reveal>
-        <span class="line-mask"><span>End of Tenancy</span></span>
-        <span class="line-mask"><span style="--d: 0.1s">Cleaning <span class="accent-word text-[0.62em] text-gold-soft">in</span> Dublin</span></span>
-      </h1>
-      <p class="mt-8 max-w-xl text-base leading-relaxed text-cream/70" data-reveal style="--d: 0.2s">
-        A landlord-ready clean for apartments and houses, so you move out with your deposit intact.
-      </p>
-      <div class="mt-10 flex flex-wrap items-center gap-4" data-reveal style="--d: 0.3s">
-        <a href="/quote/" class="btn-gold">Get my price</a>
-        <a href={SITE.phoneHref} class="btn-outline text-cream">Call {SITE.phoneDisplay}</a>
+    <div class="container-wide grid items-center gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.92fr)] lg:gap-16">
+      <div>
+        <p class="kicker !text-gold" data-reveal>Moving Out</p>
+        <h1 class="display-caps mt-6 text-[clamp(2.6rem,7vw,5.5rem)] lg:text-[clamp(2.6rem,4.6vw,4.4rem)]" data-reveal>
+          <span class="line-mask"><span>End of Tenancy</span></span>
+          <span class="line-mask"><span style="--d: 0.1s">Cleaning <span class="accent-word text-[0.62em] text-gold-soft">in</span> Dublin</span></span>
+        </h1>
+        <p class="mt-8 max-w-xl text-base leading-relaxed text-cream/70" data-reveal style="--d: 0.2s">
+          A landlord-ready clean for apartments and houses, so you move out with your deposit intact.
+        </p>
+        <div class="mt-10 flex flex-wrap items-center gap-4" data-reveal style="--d: 0.3s">
+          <a href="/quote/" class="btn-gold">Get my price</a>
+          <a href={SITE.phoneHref} class="btn-outline text-cream">Call {SITE.phoneDisplay}</a>
+        </div>
       </div>
+
+      <HeroPhoto src={heroPhoto} alt="An empty room at handover, bare floorboards and a rectangle of light from a sash window" position="58% 50%" />
     </div>
   </section>
 

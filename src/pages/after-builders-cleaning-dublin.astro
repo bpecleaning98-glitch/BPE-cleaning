@@ -11,6 +11,8 @@ import { BUILDERS_PAIR, END_OF_TENANCY_ROOMS, DEEP_CLEAN } from '../data/work';
 import { TESTIMONIALS } from '../data/testimonials';
 import { COUNTIES, AREAS_SENTENCE } from '../data/areas';
 import PriceNote from '../components/PriceNote.astro';
+import HeroPhoto from '../components/HeroPhoto.astro';
+import heroPhoto from '../assets/ai/hero-after-builders.jpg';
 
 /** Fixed prices, straight from pricing.ts. Studio is deliberately omitted: the
  *  studio figure mirrors 1 bedroom in the data but the client has not confirmed
@@ -142,19 +144,23 @@ const jsonLd = serviceGraph('/after-builders-cleaning-dublin/', faqs, Astro.site
   jsonLd={jsonLd}
 >
   <section data-first-screen class="bg-night pt-40 pb-20 text-cream md:pt-48 md:pb-24">
-    <div class="container-wide">
-      <p class="kicker !text-gold" data-reveal>Post Construction</p>
-      <h1 class="display-caps mt-6 text-[clamp(2.6rem,7vw,5.5rem)]" data-reveal>
-        <span class="line-mask"><span>After Builders</span></span>
-        <span class="line-mask"><span style="--d: 0.1s">Cleaning <span class="accent-word text-[0.62em] text-gold-soft">in</span> Dublin</span></span>
-      </h1>
-      <p class="mt-8 max-w-xl text-base leading-relaxed text-cream/70" data-reveal style="--d: 0.2s">
-        Construction dust, paint spots and residue removed, your new space ready to live in.
-      </p>
-      <div class="mt-10 flex flex-wrap items-center gap-4" data-reveal style="--d: 0.3s">
-        <a href="/quote/" class="btn-gold">Get my price</a>
-        <a href={SITE.phoneHref} class="btn-outline text-cream">Call {SITE.phoneDisplay}</a>
+    <div class="container-wide grid items-center gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.92fr)] lg:gap-16">
+      <div>
+        <p class="kicker !text-gold" data-reveal>Post Construction</p>
+        <h1 class="display-caps mt-6 text-[clamp(2.6rem,7vw,5.5rem)] lg:text-[clamp(2.6rem,4.6vw,4.4rem)]" data-reveal>
+          <span class="line-mask"><span>After Builders</span></span>
+          <span class="line-mask"><span style="--d: 0.1s">Cleaning <span class="accent-word text-[0.62em] text-gold-soft">in</span> Dublin</span></span>
+        </h1>
+        <p class="mt-8 max-w-xl text-base leading-relaxed text-cream/70" data-reveal style="--d: 0.2s">
+          Construction dust, paint spots and residue removed, your new space ready to live in.
+        </p>
+        <div class="mt-10 flex flex-wrap items-center gap-4" data-reveal style="--d: 0.3s">
+          <a href="/quote/" class="btn-gold">Get my price</a>
+          <a href={SITE.phoneHref} class="btn-outline text-cream">Call {SITE.phoneDisplay}</a>
+        </div>
       </div>
+
+      <HeroPhoto src={heroPhoto} alt="A newly finished room, fresh plaster and a new floor with every trace of dust gone" position="60% 50%" />
     </div>
   </section>
 

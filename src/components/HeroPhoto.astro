@@ -1,0 +1,62 @@
+---
+import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+
+/**
+ * The picture that sits beside a page headline.
+ *
+ * Every interior page opened on the same bare night band: a kicker, a
+ * headline, a paragraph and two buttons, with the right half of the screen
+ * empty and, on a phone, nothing above the fold but type. This is the frame
+ * that fills it.
+ *
+ * It is a normal grid cell, NOT a backdrop behind the words. That is the
+ * whole point of the choice: cream type over a pale interior photograph
+ * needs a heavy scrim to keep its contrast, the scrim greys the photograph
+ * out, and the gold kicker drops from 5.5:1 to under 3:1 on the way. Beside
+ * the text, both keep what they had.
+ *
+ * On a phone it falls under the copy and runs the full width; from lg it is
+ * the right-hand column. No data-drift here on purpose: that hook pulls
+ * GSAP and ScrollTrigger onto pages that currently download neither.
+ */
+interface Props {
+  src: ImageMetadata;
+  alt: string;
+  /** object-position, for frames whose subject is not where the crop lands. */
+  position?: string;
+  /** Set false on the rare page where this is not the first screen. */
+  eager?: boolean;
+}
+
+const { src, alt, position = '62% 50%', eager = true } = Astro.props;
+---
+{/* The hero photograph is the largest element on the first screen, so it is
+    the LCP candidate on every page that uses it: eager, high priority, and
+    a plain fade rather than the 26px rise the text gets, so it is painted
+    the moment it arrives instead of being animated into place. */}
+<div
+  class="relative aspect-[16/10] overflow-hidden border border-cream/10 lg:aspect-[16/11]"
+  data-reveal="fade"
+>
+  <Image
+    src={src}
+    alt={alt}
+    class="h-full w-full object-cover"
+    style={`object-position: ${position}`}
+    widths={[480, 760, 1024, 1240]}
+    sizes="(min-width: 1024px) 620px, calc(100vw - 2.5rem)"
+    format="webp"
+    quality={76}
+    loading={eager ? 'eager' : 'lazy'}
+    fetchpriority={eager ? 'high' : 'auto'}
+    decoding={eager ? 'sync' : 'async'}
+  />
+  {/* A quiet ink veil at the foot only. These interiors are pale and warm and
+      the band behind them is near black; without it the frame reads as a
+      bright rectangle pasted onto the page rather than as part of it. */}
+  <div
+    class="pointer-events-none absolute inset-0 bg-gradient-to-t from-night/35 via-night/5 to-transparent"
+    aria-hidden="true"
+  ></div>
+</div>
