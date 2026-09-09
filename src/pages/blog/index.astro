@@ -8,7 +8,18 @@ import { businessRef } from '../../lib/schema';
 import { getPublishedPosts, postDate, postIso, postSummary, readingMinutes } from '../../lib/posts';
 import type { Post } from '../../lib/types';
 import HeroPhoto from '../../components/HeroPhoto.astro';
-import heroPhoto from '../../assets/ai/hero-blog.jpg';
+
+// The header photograph, as ready-made files rather than an astro:assets
+// import. This page is server rendered (see prerender above), and on such a
+// page <Image> points at the runtime endpoint /_image, which answers 404 on
+// Vercel: the header showed its alt text instead of the room. The set is
+// written by scripts/build-hero-static.mjs from src/assets/ai/hero-blog.jpg.
+const heroPhoto = {
+  src: '/hero/blog-1280.webp',
+  srcset: [480, 768, 1280, 1600].map((w) => `/hero/blog-${w}.webp ${w}w`).join(', '),
+  width: 1600,
+  height: 900,
+};
 
 /**
  * The blog index, server rendered on every request.

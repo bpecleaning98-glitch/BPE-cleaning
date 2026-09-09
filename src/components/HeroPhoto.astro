@@ -36,8 +36,21 @@ import type { ImageMetadata } from 'astro';
  * No data-drift on purpose: that hook pulls GSAP and ScrollTrigger onto
  * pages that currently download neither.
  */
+/**
+ * A ready-made responsive set under public/, for pages astro:assets cannot
+ * serve. A server-rendered page (prerender = false) gets no image files at
+ * build time; <Image> there points at the runtime endpoint /_image, which
+ * answers 404 on Vercel. scripts/build-hero-static.mjs writes the set.
+ */
+export interface StaticHero {
+  src: string;
+  srcset: string;
+  width: number;
+  height: number;
+}
+
 interface Props {
-  src: ImageMetadata;
+  src: ImageMetadata | StaticHero;
   alt: string;
   /**
    * object-position. On a phone the frame is a narrow vertical slice of a
@@ -48,24 +61,41 @@ interface Props {
 }
 
 const { src, alt, position = '70% 50%' } = Astro.props;
+const isStatic = 'srcset' in src;
 ---
 {/* The largest element on the first screen, so the LCP candidate on every
     page that uses it: eager, high priority, and a plain fade rather than a
     rise, so it is painted the moment it arrives. */}
 <div class="absolute inset-0" data-reveal="fade">
-  <Image
-    src={src}
-    alt={alt}
-    class="h-full w-full object-cover"
-    style={`object-position: ${position}`}
-    widths={[480, 768, 1280, 1600]}
-    sizes="100vw"
-    format="webp"
-    quality={76}
-    loading="eager"
-    fetchpriority="high"
-    decoding="sync"
-  />
+  {isStatic ? (
+    <img
+      src={src.src}
+      srcset={src.srcset}
+      sizes="100vw"
+      width={src.width}
+      height={src.height}
+      alt={alt}
+      class="h-full w-full object-cover"
+      style={`object-position: ${position}`}
+      loading="eager"
+      fetchpriority="high"
+      decoding="sync"
+    />
+  ) : (
+    <Image
+      src={src}
+      alt={alt}
+      class="h-full w-full object-cover"
+      style={`object-position: ${position}`}
+      widths={[480, 768, 1280, 1600]}
+      sizes="100vw"
+      format="webp"
+      quality={76}
+      loading="eager"
+      fetchpriority="high"
+      decoding="sync"
+    />
+  )}
   <div
     class="absolute inset-0 bg-gradient-to-b from-night/25 via-night/86 via-28% to-night/96 md:from-night/45 md:via-night/55 md:via-50% md:to-night/88"
     aria-hidden="true"
