@@ -137,35 +137,32 @@ const jsonLd = graph(breadcrumbs([{ name: 'Get a Quote', path: PATHS.quote }], A
   description="See our prices by property size and service, then call or WhatsApp to confirm yours. Homes, offices and Airbnb across Dublin."
   jsonLd={jsonLd}
 >
-  <section data-first-screen class="bg-night pt-40 pb-20 text-cream md:pt-48 md:pb-24">
-    <div class="container-wide grid items-center gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.92fr)] lg:gap-16">
-      <div>
-        <p class="kicker !text-gold" data-reveal>Get A Quote</p>
-        <h1 class="display-caps mt-6 text-[clamp(2.6rem,7vw,5.5rem)] lg:text-[clamp(2.6rem,4.6vw,4.4rem)]" data-reveal>
-          <span class="line-mask"><span>Your price,</span></span>
-          <span class="line-mask"><span style="--d: 0.1s">no <span class="accent-word text-gold-soft">guesswork</span></span></span>
-        </h1>
-        <p class="mt-8 max-w-xl text-base leading-relaxed text-cream/70" data-reveal style="--d: 0.2s">
-          Tell us your property size and the service you want, and we price it on the call. Homes,
-          offices and Airbnb across Dublin.
-        </p>
-        <div class="mt-10 flex flex-wrap items-center gap-4" data-reveal style="--d: 0.3s">
-          <a href={SITE.phoneHref} class="btn-gold">
-            <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M3 5a2 2 0 0 1 2-2h2l2 5-2 1.5a12 12 0 0 0 5.5 5.5L14 13l5 2v2a2 2 0 0 1-2 2A16 16 0 0 1 3 5Z" />
-            </svg>
-            Call {SITE.phoneDisplay}
-          </a>
-          <a href={SITE.whatsappHref} class="btn-outline text-cream">
-            <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 0 1-13.4 7.8L3 21l1.2-4.6A9 9 0 1 1 21 12Z" />
-            </svg>
-            WhatsApp us
-          </a>
-        </div>
+  <section data-first-screen class="relative flex min-h-[88svh] flex-col justify-end overflow-hidden bg-night pt-40 pb-16 text-cream md:min-h-[40rem] md:pt-48 md:pb-20 lg:min-h-[44rem]">
+    <HeroPhoto src={heroPhoto} alt="A kitchen corner in warm neutral tones, the worktop wiped clear and lit by a side window" position="78% 50%" />
+    <div class="container-wide relative">
+      <p class="kicker !text-gold" data-reveal>Get A Quote</p>
+      <h1 class="display-caps mt-6 text-[clamp(2.6rem,7vw,5.5rem)]" data-reveal>
+        <span class="line-mask"><span>Your price,</span></span>
+        <span class="line-mask"><span style="--d: 0.1s">no <span class="accent-word text-gold-soft">guesswork</span></span></span>
+      </h1>
+      <p class="mt-8 max-w-xl text-base leading-relaxed text-cream/70" data-reveal style="--d: 0.2s">
+        Tell us your property size and the service you want, and we price it on the call. Homes,
+        offices and Airbnb across Dublin.
+      </p>
+      <div class="mt-10 flex flex-wrap items-center gap-4" data-reveal style="--d: 0.3s">
+        <a href={SITE.phoneHref} class="btn-gold">
+          <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3 5a2 2 0 0 1 2-2h2l2 5-2 1.5a12 12 0 0 0 5.5 5.5L14 13l5 2v2a2 2 0 0 1-2 2A16 16 0 0 1 3 5Z" />
+          </svg>
+          Call {SITE.phoneDisplay}
+        </a>
+        <a href={SITE.whatsappHref} class="btn-outline text-cream">
+          <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 0 1-13.4 7.8L3 21l1.2-4.6A9 9 0 1 1 21 12Z" />
+          </svg>
+          WhatsApp us
+        </a>
       </div>
-
-      <HeroPhoto src={heroPhoto} alt="A kitchen corner in warm neutral tones, the worktop wiped clear and lit by a side window" position="62% 50%" />
     </div>
   </section>
 

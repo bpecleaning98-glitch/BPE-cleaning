@@ -44,5 +44,8 @@ part of why the brief kept people out of every frame.
 | `hero-after-builders.jpg` | `/after-builders-cleaning-dublin/` |
 | `hero-office.jpg` | `/office-cleaning-dublin/` |
 
-They are placed by `src/components/HeroPhoto.astro`, which explains why the
-picture sits beside the headline rather than behind it.
+They are placed by `src/components/HeroPhoto.astro`, full bleed behind the
+headline under three ink veils, the way the homepage hero is built. A first
+version put the picture beside the text as a grid cell; Artiom turned it down,
+the phone version in particular, so the component's comment records both the
+layout and the veil weights that keep the copy legible over it.

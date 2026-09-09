@@ -127,24 +127,21 @@ const jsonLd = serviceGraph('/airbnb-cleaning-dublin/', faqs, Astro.site);
   description={`Airbnb turnover cleaning in Dublin from €${turnoverFrom} with linen change, restocking and guest-ready presentation. Fixed prices per property size.`}
   jsonLd={jsonLd}
 >
-  <section data-first-screen class="bg-night pt-40 pb-20 text-cream md:pt-48 md:pb-24">
-    <div class="container-wide grid items-center gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.92fr)] lg:gap-16">
-      <div>
-        <p class="kicker !text-gold" data-reveal>Short Lets</p>
-        <h1 class="display-caps mt-6 text-[clamp(2.6rem,7vw,5.5rem)] lg:text-[clamp(2.6rem,4.6vw,4.4rem)]" data-reveal>
-          <span class="line-mask"><span>Airbnb Cleaning</span></span>
-          <span class="line-mask"><span style="--d: 0.1s"><span class="accent-word text-[0.62em] text-gold-soft">and</span> Turnovers in Dublin</span></span>
-        </h1>
-        <p class="mt-8 max-w-xl text-base leading-relaxed text-cream/70" data-reveal style="--d: 0.2s">
-          Fast, guest-ready turnovers with linen change and restocking, at fixed prices per property size.
-        </p>
-        <div class="mt-10 flex flex-wrap items-center gap-4" data-reveal style="--d: 0.3s">
-          <a href="/quote/" class="btn-gold">Get my price</a>
-          <a href={SITE.phoneHref} class="btn-outline text-cream">Call {SITE.phoneDisplay}</a>
-        </div>
+  <section data-first-screen class="relative flex min-h-[88svh] flex-col justify-end overflow-hidden bg-night pt-40 pb-16 text-cream md:min-h-[40rem] md:pt-48 md:pb-20 lg:min-h-[44rem]">
+    <HeroPhoto src={heroPhoto} alt="A short-let bedroom made up for arrival, bedding pulled tight and towels folded at the foot" position="60% 50%" />
+    <div class="container-wide relative">
+      <p class="kicker !text-gold" data-reveal>Short Lets</p>
+      <h1 class="display-caps mt-6 text-[clamp(2.6rem,7vw,5.5rem)]" data-reveal>
+        <span class="line-mask"><span>Airbnb Cleaning</span></span>
+        <span class="line-mask"><span style="--d: 0.1s"><span class="accent-word text-[0.62em] text-gold-soft">and</span> Turnovers in Dublin</span></span>
+      </h1>
+      <p class="mt-8 max-w-xl text-base leading-relaxed text-cream/70" data-reveal style="--d: 0.2s">
+        Fast, guest-ready turnovers with linen change and restocking, at fixed prices per property size.
+      </p>
+      <div class="mt-10 flex flex-wrap items-center gap-4" data-reveal style="--d: 0.3s">
+        <a href="/quote/" class="btn-gold">Get my price</a>
+        <a href={SITE.phoneHref} class="btn-outline text-cream">Call {SITE.phoneDisplay}</a>
       </div>
-
-      <HeroPhoto src={heroPhoto} alt="A short-let bedroom made up for arrival, bedding pulled tight and towels folded at the foot" position="55% 50%" />
     </div>
   </section>
 

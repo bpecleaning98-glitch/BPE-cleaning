@@ -143,24 +143,21 @@ const jsonLd = serviceGraph('/after-builders-cleaning-dublin/', faqs, Astro.site
   description={`After builders cleaning in Dublin from €${FIXED.afterBuilders['1bed']}. Construction dust, paint spots and residue removed, your new space ready to live in.`}
   jsonLd={jsonLd}
 >
-  <section data-first-screen class="bg-night pt-40 pb-20 text-cream md:pt-48 md:pb-24">
-    <div class="container-wide grid items-center gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.92fr)] lg:gap-16">
-      <div>
-        <p class="kicker !text-gold" data-reveal>Post Construction</p>
-        <h1 class="display-caps mt-6 text-[clamp(2.6rem,7vw,5.5rem)] lg:text-[clamp(2.6rem,4.6vw,4.4rem)]" data-reveal>
-          <span class="line-mask"><span>After Builders</span></span>
-          <span class="line-mask"><span style="--d: 0.1s">Cleaning <span class="accent-word text-[0.62em] text-gold-soft">in</span> Dublin</span></span>
-        </h1>
-        <p class="mt-8 max-w-xl text-base leading-relaxed text-cream/70" data-reveal style="--d: 0.2s">
-          Construction dust, paint spots and residue removed, your new space ready to live in.
-        </p>
-        <div class="mt-10 flex flex-wrap items-center gap-4" data-reveal style="--d: 0.3s">
-          <a href="/quote/" class="btn-gold">Get my price</a>
-          <a href={SITE.phoneHref} class="btn-outline text-cream">Call {SITE.phoneDisplay}</a>
-        </div>
+  <section data-first-screen class="relative flex min-h-[88svh] flex-col justify-end overflow-hidden bg-night pt-40 pb-16 text-cream md:min-h-[40rem] md:pt-48 md:pb-20 lg:min-h-[44rem]">
+    <HeroPhoto src={heroPhoto} alt="A newly finished room, fresh plaster and a new floor with every trace of dust gone" position="74% 50%" />
+    <div class="container-wide relative">
+      <p class="kicker !text-gold" data-reveal>Post Construction</p>
+      <h1 class="display-caps mt-6 text-[clamp(2.6rem,7vw,5.5rem)]" data-reveal>
+        <span class="line-mask"><span>After Builders</span></span>
+        <span class="line-mask"><span style="--d: 0.1s">Cleaning <span class="accent-word text-[0.62em] text-gold-soft">in</span> Dublin</span></span>
+      </h1>
+      <p class="mt-8 max-w-xl text-base leading-relaxed text-cream/70" data-reveal style="--d: 0.2s">
+        Construction dust, paint spots and residue removed, your new space ready to live in.
+      </p>
+      <div class="mt-10 flex flex-wrap items-center gap-4" data-reveal style="--d: 0.3s">
+        <a href="/quote/" class="btn-gold">Get my price</a>
+        <a href={SITE.phoneHref} class="btn-outline text-cream">Call {SITE.phoneDisplay}</a>
       </div>
-
-      <HeroPhoto src={heroPhoto} alt="A newly finished room, fresh plaster and a new floor with every trace of dust gone" position="60% 50%" />
     </div>
   </section>
 
