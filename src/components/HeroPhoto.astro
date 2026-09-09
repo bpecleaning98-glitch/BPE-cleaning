@@ -20,9 +20,11 @@ import type { ImageMetadata } from 'astro';
  * a pale interior asks for different weights in different places.
  *
  *   base   on a phone the copy sits at the FOOT of a tall band (the section
- *          is flex, justify-end, min-h 88svh), so the veil is light at the
- *          top where the room shows and gathers to near-opaque from 45%
- *          down, which is where the gold kicker begins. From md the copy is
+ *          is flex, justify-end, min-h 76svh), so the veil is light at the
+ *          top where the room shows and gathers to near-opaque from 28%
+ *          down, which is where the gold kicker begins. The band was 88svh
+ *          first; Artiom found the top empty and the copy crammed at the
+ *          foot, so it shortened and the copy rose with it. From md the copy is
  *          at the foot of a shorter band and the vertical veil relaxes.
  *   left   md and up only: the headline's own shadow. The copy never
  *          leaves the left half on a desktop, and every frame in
@@ -65,7 +67,7 @@ const { src, alt, position = '70% 50%' } = Astro.props;
     decoding="sync"
   />
   <div
-    class="absolute inset-0 bg-gradient-to-b from-night/20 via-night/86 via-45% to-night/96 md:from-night/45 md:via-night/55 md:via-50% md:to-night/88"
+    class="absolute inset-0 bg-gradient-to-b from-night/25 via-night/86 via-28% to-night/96 md:from-night/45 md:via-night/55 md:via-50% md:to-night/88"
     aria-hidden="true"
   ></div>
   <div
