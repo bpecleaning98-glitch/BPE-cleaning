@@ -8,6 +8,7 @@ import Traffic from './Traffic';
 import Links from './Links';
 import Blog from './Blog';
 import Requests from './Requests';
+import Security, { MfaChallenge } from './Security';
 
 /**
  * The client's cabinet.
@@ -27,6 +28,7 @@ const TABS = [
   { id: 'links', label: 'Campaign links' },
   { id: 'blog', label: 'Blog' },
   { id: 'requests', label: 'Requests' },
+  { id: 'security', label: 'Security' },
 ] as const;
 
 type TabId = (typeof TABS)[number]['id'];
@@ -37,6 +39,10 @@ export default function AdminApp() {
   const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
   const [tab, setTab] = useState<TabId>('dashboard');
   const [days, setDays] = useState<number>(30);
+  // Null while we do not know yet, so the cabinet never flashes on screen a
+  // moment before it asks for the code. 'ask' means the password went through
+  // but the account has a confirmed factor and the session is still aal1.
+  const [gate, setGate] = useState<'unknown' | 'ask' | 'open'>('unknown');
 
   useEffect(() => {
     if (!supabase) {
@@ -51,8 +57,38 @@ export default function AdminApp() {
     return () => sub.subscription.unsubscribe();
   }, []);
 
+  // The level of the session, read again on every session change. When the
+  // account carries a confirmed factor, nextLevel becomes aal2 and
+  // currentLevel stays aal1 until the code from the phone is verified.
   useEffect(() => {
     if (!supabase || !session) {
+      setGate('unknown');
+      return;
+    }
+    let cancelled = false;
+    supabase.auth.mfa
+      .getAuthenticatorAssuranceLevel()
+      .then(({ data }) => {
+        if (cancelled) return;
+        const needed = data?.nextLevel === 'aal2' && data?.currentLevel !== 'aal2';
+        setGate(needed ? 'ask' : 'open');
+      })
+      .catch(() => {
+        // If the level cannot be read, the cabinet opens instead of hanging on
+        // a spinner. Nothing is given away: the barrier is is_admin() in the
+        // database, so an aal1 session sees empty panels, not data.
+        if (!cancelled) setGate('open');
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [session]);
+
+  // Deliberately waits for the gate. Under the aal2 rule this very query is
+  // the one the database refuses first, and an aal1 session asking it would be
+  // told it has no access at all instead of being asked for its code.
+  useEffect(() => {
+    if (!supabase || !session || gate !== 'open') {
       setIsAdmin(null);
       return;
     }
@@ -67,7 +103,7 @@ export default function AdminApp() {
     return () => {
       cancelled = true;
     };
-  }, [session]);
+  }, [session, gate]);
 
   const signOut = useCallback(() => {
     supabase?.auth.signOut();
@@ -76,6 +112,13 @@ export default function AdminApp() {
   if (!configured) return <Unconfigured />;
   if (checking) return <Centered><Spinner label="Checking your session" /></Centered>;
   if (!session) return <SignIn />;
+  if (gate === 'unknown') return <Centered><Spinner label="Checking your session" /></Centered>;
+  if (gate === 'ask')
+    return (
+      <Centered>
+        <MfaChallenge brand={<BrandMark />} onPassed={() => setGate('open')} onSignOut={signOut} />
+      </Centered>
+    );
   if (isAdmin === null) return <Centered><Spinner label="Opening the cabinet" /></Centered>;
   if (!isAdmin) return <NotAllowed email={session.user.email || ''} onSignOut={signOut} />;
 
@@ -152,6 +195,7 @@ export default function AdminApp() {
         {tab === 'links' && <Links />}
         {tab === 'blog' && <Blog />}
         {tab === 'requests' && <Requests />}
+        {tab === 'security' && <Security />}
       </main>
     </div>
   );

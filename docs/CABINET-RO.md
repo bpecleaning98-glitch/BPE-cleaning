@@ -89,8 +89,9 @@ Fără pasul ăsta, omul se loghează și vede ecranul "No access". Așa și tre
 ### 2.5 Conturile
 
 **Authentication > Users > Add user**, pentru fiecare adresă de mai sus: email și parolă,
-cu **Auto Confirm User** bifat. Parola clientei o generezi tu și i-o dai prin WhatsApp, iar
-ea și-o poate schimba după, prin linkul "Forgot the password" din ecranul de login.
+cu **Auto Confirm User** bifat. Parola clientei o generezi tu și i-o dai prin WhatsApp.
+Schimbarea ei se face tot din Supabase, vezi 2.7: butonul "Forgot the password" din ecranul
+de login a fost scos pe 26 august 2026 și nu se pune înapoi.
 
 ### 2.6 OBLIGATORIU: închide înregistrarea publică
 
@@ -127,6 +128,46 @@ De știut, nu de reparat: endpoint-ul public de resetare rămâne apelabil cu ch
 (ăsta e designul Supabase, nu se poate închide din aplicație). E limitat la rată de
 Supabase, mailul ajunge doar în inboxul contului vizat, iar fără buton în interfață nu
 mai există nicio invitație către el.
+
+---
+
+### 2.8 Verificarea în doi pași (12 septembrie 2026)
+
+Cabinetul are acum un tab **Security**, unde fiecare cont își pornește singur codul din
+telefon. E TOTP, standardul pe care îl citesc Google Authenticator, Microsoft Authenticator,
+1Password, Authy, oricare.
+
+**Se aplică pe cont, nu pe site.** Conturile din 2.4 sunt două, al clientei și al tău, deci
+fiecare își pornește verificarea pe telefonul lui. Dacă ea o pornește pe al ei, tu intri mai
+departe cu parola ta, și invers.
+
+**Cum o pornește clienta**, în cuvintele ei:
+
+1. Instalează Google Authenticator din App Store sau Google Play.
+2. Intră în cabinet, tab **Security**, apasă **Switch it on**.
+3. Deschide aplicația din telefon, alege să adauge un cont, scanează pătratul de pe ecran.
+   Dacă nu vrea camera, are și codul scris dedesubt, de tastat.
+4. Scrie cele șase cifre pe care i le arată aplicația și apasă **Confirm**.
+
+De aici înainte, la fiecare intrare: parola, apoi șase cifre.
+
+**RULEAZĂ DIN NOU `supabase/schema.sql`** (2.3). Ecranul din cabinet nu e bariera, e doar
+ecranul. Bariera adevărată e în `is_admin()`, care din 12 septembrie cere `aal2`, adică o
+sesiune care a trecut prin cod, din clipa în care contul are un factor confirmat. Fără SQL-ul
+rulat, cine știe parola poate lovi direct API-ul cu cheia anon, care e publică prin design,
+și citește tot, indiferent ce arată ecranul.
+
+Cât timp contul NU are niciun factor confirmat, parola rămâne de ajuns. Altfel nimeni nu ar
+mai putea intra ca să pornească verificarea.
+
+**Telefon nou:** întâi îl pornește pe cel nou (**Set up a new phone**), abia apoi îl oprește
+pe cel vechi. Invers rămâne o clipă fără niciun factor, iar politicile care cer `aal2` închid
+panoul în mijlocul operațiunii.
+
+**Telefon pierdut**, singura cale de recuperare, și e a ta: **Supabase > Authentication >
+Users**, contul ei, **Remove MFA factors** (sau ștergi factorul din listă). După aia intră cu
+parola și pornește din nou de pe telefonul nou. Ștergerea aplicației de pe telefon NU scoate
+factorul de pe server: contul rămâne cerând un cod pe care nu îl mai are nimeni.
 
 ---
 
@@ -372,16 +413,36 @@ no longer applies. Terms: bpecleaning.ie/terms
 
 ## 7. Ce a rămas de făcut
 
-Lista sinceră, verificată în cod pe 18 august 2026:
+Lista sinceră, verificată în cod și pe live pe 12 septembrie 2026. Ce era aici pe 18 august
+(proiectul Supabase, importul în Vercel, domeniul) s-a făcut între timp: situl e live pe
+`https://bpecleaning.ie` din 21 august, Supabase e legat, domeniul e cumpărat de clientă pe
+Dynadot și fiecare push în `main` publică singur.
 
-1. **Proiectul Supabase nu e creat.** Tot capitolul 2 e de făcut de la zero, iar `.env` nu există încă.
-2. **Importul în Vercel.** Repo-ul există pe GitHub; ce lipsește e proiectul Vercel legat de el și variabilele de mediu din capitolul 3.
-3. **Domeniul nu e legat.** Trebuie clarificat cu clienta unde e înregistrat `bpecleaning.ie` și cine are acces la DNS.
-4. **Perioada de păstrare a datelor nu e scrisă nicăieri.** Pagina `/privacy` acoperă tot restul, dar nu spune cât timp se țin cererile. Stabilește un termen cu clienta și adaugă-l acolo.
-5. **Regenerarea logourilor**, dacă designerul livrează vreodată o versiune nouă: pui SVG-urile noi peste cele din `brand/svg/`, apoi `node scripts/build-marks.mjs` (rescrie `src/data/marks.ts`) și `node scripts/build-icons.mjs` (rescrie favicon, icoanele de app și cardul social). Ambele scripturi citesc din repo, nu de pe disc.
-6. **Google Business Profile și Search Console**, după lansare.
-7. **Testează pe telefon.** Cabinetul se deschide cel mai des de pe telefon.
+1. **Rulează din nou `supabase/schema.sql`** (2.3), pentru clauza `aal2` din `is_admin()`.
+   Până atunci tabul Security arată bine și chiar pornește codul, dar baza de date nu îl cere
+   nimănui, deci parola singură rămâne suficientă pentru cine lovește API-ul direct.
+2. **Înrolarea propriu-zisă**, pe telefonul clientei și pe al tău (2.8). Codul nu se poate
+   porni în locul altcuiva: secretul se naște în telefonul lui.
+3. **Verifică `RESEND_API_KEY` pe Vercel** (capitolul 3). Local există, pe proiectul din
+   Vercel nu a confirmat-o nimeni niciodată. Fără ea cererea din formular se salvează și
+   WhatsApp-ul se deschide la fel, doar că telefonul nu sună și emailul de notificare nu
+   pleacă. Se vede din Vercel > Settings > Environment Variables, fără să trimiți nimic.
+4. **Răspunsurile clientei** din 6c: datele CRO, TVA, asigurarea, taxa de anulare, scrisoarea
+   EEM, șablonul de confirmare a rezervării, drepturile pe fotografii. Nimic din ele nu se
+   ghicește, iar până vin, câmpurile respective pur și simplu nu se afișează.
+5. **Google Business Profile**: pozele (profilul are zero), primele recenzii, transferul de
+   proprietar principal pe contul ei. Profilul există și e curat, restul e muncă de mână în
+   contul Google.
+6. **Linkul de campanie pentru Google** (`/go/gmb`, tabul Campaign links), ca vizitele venite
+   din fișa Google să se vadă separat în Overview. Se creează din cabinet, nu din cod.
+7. **Regenerarea logourilor**, dacă designerul livrează vreodată o versiune nouă: pui SVG-urile
+   noi peste cele din `brand/svg/`, apoi `node scripts/build-marks.mjs` (rescrie
+   `src/data/marks.ts`) și `node scripts/build-icons.mjs` (rescrie favicon, icoanele de app și
+   cardul social). Ambele scripturi citesc din repo, nu de pe disc.
+8. **Codurile QR pentru cărți de vizită** se generează cu `node scripts/build-qr.mjs`, care
+   scrie în `brand/qr/`. Trei variante, plus PNG de tipar la 2048px. Fișierele nu stau în repo,
+   se fac la nevoie.
 
-Codul propriu-zis e complet: cele cinci taburi ale cabinetului, blogul public cu `/blog`,
-`/blog/[slug]` și feedul RSS, `sitemap.xml`, `robots.txt` și pagina de confidențialitate
-există toate în `src/pages` și `src/components/admin`.
+Codul propriu-zis e complet: cele șase taburi ale cabinetului, blogul public cu `/blog`,
+`/blog/[slug]` și feedul RSS, `sitemap.xml`, `robots.txt`, paginile legale și verificarea în
+doi pași există toate în `src/pages` și `src/components/admin`.

@@ -5,7 +5,9 @@
 -- Poate fi rulat de mai multe ori fara probleme (totul e idempotent).
 --
 -- Ce contine:
---   1. admin_emails    cine are voie in cabinet (nu e destul sa fii logat)
+--   1. admin_emails    cine are voie in cabinet (nu e destul sa fii logat,
+--                      iar daca are verificare in doi pasi nu e destul nici
+--                      sa stii parola)
 --   2. page_views      traficul site-ului, fara cookies si fara IP-uri
 --   3. link_campaigns  linkurile de campanie (Facebook, flyere, QR)
 --   4. link_clicks     fiecare click pe un link de campanie
@@ -33,6 +35,18 @@ alter table public.admin_emails enable row level security;
 
 -- security definer: functia trebuie sa poata citi tabelul chiar si pentru un
 -- utilizator care nu are voie sa il citeasca direct.
+--
+-- ADAUGAT 12.09.2026, verificarea in doi pasi.
+--
+-- Ecranul din cabinet nu e o bariera. /admin e o pagina publica, iar cheia anon
+-- e publica prin design, deci cine stie parola poate lovi direct API-ul si sare
+-- peste orice gard scris in React. Bariera e aici: din clipa in care contul are
+-- un factor CONFIRMAT, sesiunea trebuie sa fie aal2, adica sa fi trecut prin
+-- codul din telefon.
+--
+-- Cat timp contul nu are niciun factor confirmat, aal1 ramane de ajuns. Altfel
+-- nimeni nu ar mai putea intra ca sa porneasca verificarea, iar cabinetul s-ar
+-- inchide singur cu proprietarul pe dinafara.
 create or replace function public.is_admin()
 returns boolean
 language sql
@@ -40,11 +54,20 @@ stable
 security definer
 set search_path = public
 as $$
-  select exists (
-    select 1
-    from public.admin_emails
-    where lower(email) = lower(coalesce(auth.jwt() ->> 'email', ''))
-  );
+  select
+    exists (
+      select 1
+      from public.admin_emails
+      where lower(email) = lower(coalesce(auth.jwt() ->> 'email', ''))
+    )
+    and (
+      coalesce(auth.jwt() ->> 'aal', 'aal1') = 'aal2'
+      or not exists (
+        select 1
+        from auth.mfa_factors f
+        where f.user_id = auth.uid() and f.status = 'verified'
+      )
+    );
 $$;
 
 drop policy if exists "admins read admin_emails" on public.admin_emails;
