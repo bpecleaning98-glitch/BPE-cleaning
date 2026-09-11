@@ -30,3 +30,8 @@ dist/
 PLAN.md
 mesaj-clienta.md
 mesaj-clienta-2.md
+mesaj-clienta-3.md
+
+# Generated print artwork. Rebuilt by scripts/build-qr.mjs whenever it is needed,
+# so a QR picture in the repo can never outlive the address it points at.
+brand/qr/
