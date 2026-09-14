@@ -1,0 +1,38 @@
+---
+import { Image } from 'astro:assets';
+import cookieIcon from '../assets/cookie-consent.png';
+const measurementId = import.meta.env.PUBLIC_GA_MEASUREMENT_ID || 'G-HN2411LNWT';
+---
+<section id="cookie-banner" class="cookie-banner" aria-labelledby="cookie-title" hidden data-ga-id={measurementId}>
+  <div class="cookie-heading"><Image src={cookieIcon} alt="" width={56} height={56} widths={[56, 112]} sizes="56px" format="webp" /><p>Your privacy, your choice</p></div>
+  <h2 id="cookie-title">A little clarity on cookies.</h2>
+  <p>With your permission, we use Google Analytics cookies to understand visits and improve our website. Optional analytics stays off until you accept. You can change your choice at any time.</p>
+  <div class="cookie-actions">
+    <button type="button" data-consent="denied">Necessary only</button>
+    <button type="button" data-consent="granted">Accept analytics</button>
+  </div>
+  <div class="cookie-links"><a href="/cookies/">Cookie policy</a><a href="/privacy/">Privacy policy</a><button type="button" id="cookie-dismiss" hidden>Keep current choice</button></div>
+  <p id="cookie-storage-error" role="status" hidden>Your browser could not save this choice. Analytics remains off.</p>
+  <p id="cookie-gpc" hidden>Your browser’s Global Privacy Control is enabled. Analytics will remain off.</p>
+</section>
+<button type="button" class="cookie-settings" id="cookie-settings" aria-controls="cookie-banner" aria-expanded="false" hidden>Cookie settings</button>
+<script>
+  import '../scripts/consent';
+</script>
+<style>
+  .cookie-banner[hidden], .cookie-settings[hidden], [hidden] { display: none !important; }
+  .cookie-banner { position: fixed; z-index: 10000; bottom: 24px; left: 24px; width: min(480px, calc(100vw - 48px)); padding: 28px; background: #faf8f4; color: #191512; border: 1px solid #d8cdbd; box-shadow: 0 12px 60px #19151226; max-height: calc(100dvh - 48px); overflow-y: auto; }
+  .cookie-heading { display: flex; align-items: center; gap: 10px; color: #846439; }
+  .cookie-heading img { width: 56px; height: 56px; flex: 0 0 56px; object-fit: contain; }
+  .cookie-heading p { font-size: 10px; text-transform: uppercase; letter-spacing: .14em; font-weight: 700; }
+  h2 { font-family: var(--font-display); font-size: 28px; line-height: 1.2; margin: 12px 0; }
+  .cookie-banner > p { font-size: 13px; line-height: 1.7; }
+  .cookie-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 22px 0 16px; }
+  .cookie-actions button { padding: 13px 8px; border: 1px solid #191512; background: #191512; color: #faf8f4; font-size: 12px; font-weight: 600; min-height: 44px; cursor: pointer; }
+  .cookie-actions button:hover { background: #493b2b; }
+  .cookie-links { display: flex; flex-wrap: wrap; gap: 16px; font-size: 11px; }
+  .cookie-links a, .cookie-links button { text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+  .cookie-settings { position: fixed; left: 16px; bottom: 12px; z-index: 9998; padding: 10px 14px; background: #faf8f4; color: #191512; border: 1px solid #d8cdbd; font-size: 11px; cursor: pointer; min-height: 44px; }
+  button:focus-visible, a:focus-visible { outline: 3px solid #846439; outline-offset: 4px; }
+  @media(max-width: 520px) { .cookie-banner { left: 12px; bottom: 12px; width: calc(100% - 24px); padding: 22px; } h2 { font-size: 25px; } }
+</style>

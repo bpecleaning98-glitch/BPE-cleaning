@@ -32,6 +32,7 @@ import manropeLatin from '@fontsource-variable/manrope/files/manrope-latin-wght-
 
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
+import CookieConsent from '../components/CookieConsent.astro';
 
 interface Props {
   title: string;
@@ -102,6 +103,7 @@ const ogImage = new URL(image, Astro.site);
     <Header />
     <main><slot /></main>
     <Footer />
+    <CookieConsent />
 
     <script>
       // GSAP + Lenis signature motion (hero clip opening, pinned manifesto,

@@ -71,7 +71,8 @@ function prepareBody(html: string): string {
     // cookies land until the reader presses play. The CSP only allows that
     // host, so without this rewrite a plain youtube.com embed would not be
     // blocked half-visibly at the browser, it would simply never render.
-    .replace(/(<iframe[^>]+src="https?:\/\/)(?:www\.)?youtube\.com\//g, '$1www.youtube-nocookie.com/');
+    .replace(/(<iframe[^>]+src="https?:\/\/)(?:www\.)?youtube\.com\//g, '$1www.youtube-nocookie.com/')
+    .replace(/(<iframe\b[^>]*?)\ssrc=/gi, '$1 data-external-src=');
 }
 
 const body = prepareBody(renderMarkdown(article.content));
