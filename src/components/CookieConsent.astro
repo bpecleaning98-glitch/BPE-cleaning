@@ -4,7 +4,7 @@ import cookieIcon from '../assets/cookie-consent.png';
 const measurementId = import.meta.env.PUBLIC_GA_MEASUREMENT_ID || 'G-HN2411LNWT';
 ---
 <section id="cookie-banner" class="cookie-banner" aria-labelledby="cookie-title" hidden data-ga-id={measurementId}>
-  <div class="cookie-heading"><Image src={cookieIcon} alt="" width={56} height={56} widths={[56, 112]} sizes="56px" format="webp" /><p>Your privacy, your choice</p></div>
+  <div class="cookie-heading"><Image src={cookieIcon} alt="" width={72} height={72} widths={[72, 144]} sizes="72px" format="webp" /><p>Your privacy, your choice</p></div>
   <h2 id="cookie-title">A little clarity on cookies.</h2>
   <p>With your permission, we use Google Analytics cookies to understand visits and improve our website. Optional analytics stays off until you accept. You can change your choice at any time.</p>
   <div class="cookie-actions">
@@ -23,7 +23,7 @@ const measurementId = import.meta.env.PUBLIC_GA_MEASUREMENT_ID || 'G-HN2411LNWT'
   .cookie-banner[hidden], .cookie-settings[hidden], [hidden] { display: none !important; }
   .cookie-banner { position: fixed; z-index: 10000; bottom: 24px; left: 24px; width: min(480px, calc(100vw - 48px)); padding: 28px; background: #faf8f4; color: #191512; border: 1px solid #d8cdbd; box-shadow: 0 12px 60px #19151226; max-height: calc(100dvh - 48px); overflow-y: auto; }
   .cookie-heading { display: flex; align-items: center; gap: 10px; color: #846439; }
-  .cookie-heading img { width: 56px; height: 56px; flex: 0 0 56px; object-fit: contain; }
+  .cookie-heading img { width: 72px; height: 72px; flex: 0 0 72px; object-fit: contain; }
   .cookie-heading p { font-size: 10px; text-transform: uppercase; letter-spacing: .14em; font-weight: 700; }
   h2 { font-family: var(--font-display); font-size: 28px; line-height: 1.2; margin: 12px 0; }
   .cookie-banner > p { font-size: 13px; line-height: 1.7; }
