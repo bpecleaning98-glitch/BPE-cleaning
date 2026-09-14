@@ -15,12 +15,11 @@ const measurementId = import.meta.env.PUBLIC_GA_MEASUREMENT_ID || 'G-HN2411LNWT'
   <p id="cookie-storage-error" role="status" hidden>Your browser could not save this choice. Analytics remains off.</p>
   <p id="cookie-gpc" hidden>Your browser’s Global Privacy Control is enabled. Analytics will remain off.</p>
 </section>
-<button type="button" class="cookie-settings" id="cookie-settings" aria-controls="cookie-banner" aria-expanded="false" hidden>Cookie settings</button>
 <script>
   import '../scripts/consent';
 </script>
 <style>
-  .cookie-banner[hidden], .cookie-settings[hidden], [hidden] { display: none !important; }
+  [hidden] { display: none !important; }
   .cookie-banner { position: fixed; z-index: 10000; bottom: 24px; left: 24px; width: min(480px, calc(100vw - 48px)); padding: 28px; background: #faf8f4; color: #191512; border: 1px solid #d8cdbd; box-shadow: 0 12px 60px #19151226; max-height: calc(100dvh - 48px); overflow-y: auto; }
   .cookie-heading { display: flex; align-items: center; gap: 10px; color: #846439; }
   .cookie-heading img { width: 72px; height: 72px; flex: 0 0 72px; object-fit: contain; }
@@ -32,7 +31,6 @@ const measurementId = import.meta.env.PUBLIC_GA_MEASUREMENT_ID || 'G-HN2411LNWT'
   .cookie-actions button:hover { background: #493b2b; }
   .cookie-links { display: flex; flex-wrap: wrap; gap: 16px; font-size: 11px; }
   .cookie-links a, .cookie-links button { text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
-  .cookie-settings { position: fixed; left: 16px; bottom: 12px; z-index: 9998; padding: 10px 14px; background: #faf8f4; color: #191512; border: 1px solid #d8cdbd; font-size: 11px; cursor: pointer; min-height: 44px; }
   button:focus-visible, a:focus-visible { outline: 3px solid #846439; outline-offset: 4px; }
   @media(max-width: 520px) { .cookie-banner { left: 12px; bottom: 12px; width: calc(100% - 24px); padding: 22px; } h2 { font-size: 25px; } }
 </style>

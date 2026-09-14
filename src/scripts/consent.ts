@@ -63,8 +63,8 @@ function show(open: boolean) {
 }
 show(!choice);
 settings.addEventListener('click', () => { show(true); banner.querySelector<HTMLButtonElement>('[data-consent]')?.focus(); });
-dismiss.addEventListener('click', () => { show(false); settings.focus(); });
-banner.addEventListener('keydown', event => { if (event.key === 'Escape' && choice) { show(false); settings.focus(); } });
+dismiss.addEventListener('click', () => { show(false); settings.focus({ preventScroll: true }); });
+banner.addEventListener('keydown', event => { if (event.key === 'Escape' && choice) { show(false); settings.focus({ preventScroll: true }); } });
 banner.querySelectorAll<HTMLButtonElement>('[data-consent]').forEach(button => button.addEventListener('click', () => {
   const analytics = button.dataset.consent as Choice['analytics'];
   const next: Choice = { version: 1, analytics, expires: Date.now() + MAX_AGE };
@@ -72,7 +72,7 @@ banner.querySelectorAll<HTMLButtonElement>('[data-consent]').forEach(button => b
   catch { document.querySelector<HTMLElement>('#cookie-storage-error')!.hidden = false; return; }
   choice = next;
   show(false);
-  settings.focus();
+  settings.focus({ preventScroll: true });
   if (analytics === 'granted') enableAnalytics();
   else {
     globals['ga-disable-' + id] = true;

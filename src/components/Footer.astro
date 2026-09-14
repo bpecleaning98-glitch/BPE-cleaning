@@ -120,6 +120,7 @@ const isHome = Astro.url.pathname === '/';
           {LEGAL_PAGES.map((page) => (
             <a href={page.path} class="block py-1.5 transition-colors hover:text-gold-soft">{page.label}</a>
           ))}
+          <button type="button" id="cookie-settings" class="py-1.5 cursor-pointer transition-colors hover:text-gold-soft" aria-controls="cookie-banner" aria-expanded="false" hidden>Cookie settings</button>
         </nav>
         {particulars && <p class="mt-1 max-w-xl text-cream/60">{particulars}</p>}
       </div>

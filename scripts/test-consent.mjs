@@ -8,7 +8,7 @@ const now = Date.now();
 const saved = analytics => JSON.stringify({ version: 1, analytics, expires: now + 86400000 });
 function run({ value = null, gpc = false, hostname = 'bpecleaning.ie', unavailable = false } = {}) {
   const handlers = new Map(); const appended = []; const deleted = [];
-  const element = (dataset = {}) => ({ dataset, hidden: true, setAttribute() {}, focus() {}, addEventListener(name, fn) { this[name] = fn; }, append() {}, before() {}, remove() {} });
+  const element = (dataset = {}) => ({ dataset, hidden: true, setAttribute() {}, focus(options) { this.focusOptions = options; }, addEventListener(name, fn) { this[name] = fn; }, append() {}, before() {}, remove() {} });
   const accept = element({ consent: 'granted' }); const refuse = element({ consent: 'denied' });
   const banner = element({ gaId: 'G-TEST123' });
   banner.querySelectorAll = () => [accept, refuse]; banner.querySelector = () => refuse;
@@ -46,6 +46,7 @@ first.accept.click();
 assert.equal(JSON.parse(first.storage.value).analytics, 'granted');
 assert.equal(first.location.reloaded, undefined);
 assert.equal(first.banner.hidden, true);
+assert.equal(first.settings.focusOptions.preventScroll, true, 'acceptance must not scroll the page to the footer');
 assert.equal(first.appended.length, 1);
 first.settings.click(); first.accept.click();
 assert.equal(first.appended.length, 1, 'repeated acceptance must not load Analytics twice');
