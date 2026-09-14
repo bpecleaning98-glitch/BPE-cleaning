@@ -758,7 +758,7 @@ html.js #bpe-intro .intro-logo {
   position: fixed;
   left: 0;
   top: 0;
-  z-index: 9999;
+  z-index: 10001; /* Keep the cursor above the cookie banner (10000). */
   pointer-events: none;
   mix-blend-mode: difference;
   opacity: 0;
