@@ -29,8 +29,10 @@ function removeAnalyticsCookies() {
     for (const domain of domains) document.cookie = `${name}=; Max-Age=0; Path=/;${domain ? ` Domain=${domain};` : ''} SameSite=Lax`;
   }
 }
+let analyticsStarted = false;
 function enableAnalytics() {
-  if (!/^G-[A-Z0-9]+$/.test(id) || gpc || !['bpecleaning.ie', 'www.bpecleaning.ie'].includes(location.hostname)) return;
+  if (analyticsStarted || !/^G-[A-Z0-9]+$/.test(id) || gpc || !['bpecleaning.ie', 'www.bpecleaning.ie'].includes(location.hostname)) return;
+  analyticsStarted = true;
   globals['ga-disable-' + id] = false;
   gtag('consent', 'update', { analytics_storage: 'granted' });
   gtag('js', new Date());
@@ -68,10 +70,16 @@ banner.querySelectorAll<HTMLButtonElement>('[data-consent]').forEach(button => b
   const next: Choice = { version: 1, analytics, expires: Date.now() + MAX_AGE };
   try { localStorage.setItem(KEY, JSON.stringify(next)); }
   catch { document.querySelector<HTMLElement>('#cookie-storage-error')!.hidden = false; return; }
-  globals['ga-disable-' + id] = true;
-  if (analytics === 'denied') removeAnalyticsCookies();
-  // Reload unloads any already-running Google code on withdrawal, including queued events.
-  location.reload();
+  choice = next;
+  show(false);
+  settings.focus();
+  if (analytics === 'granted') enableAnalytics();
+  else {
+    globals['ga-disable-' + id] = true;
+    removeAnalyticsCookies();
+    // Only withdrawal needs to unload an already-running Google tag.
+    if (analyticsStarted) location.reload();
+  }
 }));
 
 // External embeds have no src until an informed click, including when JavaScript is off.
