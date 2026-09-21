@@ -1,6 +1,6 @@
 # Analytics and cookie consent — 14 September 2026
 
-Artiom accepted Google's terms himself on 14 September. Account 407951331, property 554083321, web stream 15775408148, measurement ID G-HN2411LNWT. Enhanced measurement off; Google signals and user-provided data off; granular location/device collection off. User and event retention both 2 months; reset on new activity off. Preparing production release from origin/main, excluding the two unrelated local MFA/QR commits.
+Artiom accepted Google's terms himself on 14 September. Account 407951331, property 554083321, web stream 15775408148, measurement ID G-HN2411LNWT. Enhanced measurement off; Google signals and user-provided data off; granular location/device collection off. User and event retention both 2 months; reset on new activity off.
 
 Local preview: http://127.0.0.1:4380/
 
@@ -25,7 +25,7 @@ The icon at src/assets/cookie-consent.png was created with the built-in image ge
 2. Create web stream for https://bpecleaning.ie. Disable enhanced measurement (especially form interactions, outbound links and site search); keep only deliberate page-view collection. Leave Google signals, user-provided data and advertising links off.
 3. Set event/user retention to 2 months without reset on activity, and disclose verified retention in privacy policy. Verify processing/transfer settings in the actual account.
 4. Set PUBLIC_GA_MEASUREMENT_ID for the production build, then run build and consent tests.
-5. Deploy only the consent changes on the deployed base, or first verify the two existing local commits and their Supabase MFA migration. Do not silently deploy those unrelated commits.
+5. The consent release was deployed first. The later MFA, QR, blog and local SEO work was built and checked before being merged into the same production branch on 21 September 2026.
 6. Confirm production network: zero Google Analytics requests before choice/refusal; collection only after acceptance; withdrawal clears accessible _ga cookies and prevents future events. Confirm an event in GA4 Realtime. Development unit tests stub the Google loader and do not prove real delivery.
 
 Company registered name, CRO/registered address and VAT/insurance particulars are still unconfirmed. These technical changes are not a certification of overall legal compliance.
