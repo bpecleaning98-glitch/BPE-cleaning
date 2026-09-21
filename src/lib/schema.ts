@@ -48,6 +48,7 @@ const PRODUCTION_ORIGIN = 'https://bpecleaning.ie';
 export const PATHS = {
   home: '/',
   services: '/services/',
+  areas: '/areas/',
   prices: '/prices/',
   quote: '/quote/',
   about: '/about/',

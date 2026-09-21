@@ -118,16 +118,10 @@ const jsonLd = graph(
         confirm we reach you.
       </p>
 
-      {/* The live Google map, loaded with the page on Artiom's decision after
-          the click-to-load gate was offered twice: he wants the map simply
-          there, like every other business site. The privacy page names this
-          as the site's one always-on third party, so the promise and the
-          page still agree. loading="lazy" means Google is only contacted
-          when the visitor actually scrolls down to it, and no-referrer keeps
-          the page address out of the request. */}
+      {/* No third-party connection until the visitor requests the map. */}
       <div class="mt-14 border border-ink/15">
         <iframe
-          src={mapSrc}
+          data-external-src={mapSrc}
           title="Map of Dublin, Ireland, the main service area of BPE Cleaning Services"
           class="block aspect-[4/3] w-full md:aspect-[21/9]"
           style="border: 0"

@@ -30,11 +30,11 @@ const particulars = legalParticulars();
 
 const sections: LegalSection[] = [
   {
-    title: 'Nothing stored in your browser, and no trackers belonging to anyone else',
+    title: 'Your privacy choices and optional analytics',
     body: [
-      'This site sets no cookies and keeps no identifier of any kind in your browser: no cookie, no local storage, no session marker, no fingerprint. It carries no advertising, no Google Analytics, no Facebook pixel, no fonts fetched from another company and no share buttons that watch you. Nothing here follows you to any other website.',
+      'Google Analytics 4 is optional and loads only after you accept analytics cookies. We use it to understand visits, engagement and broad device information, based on your consent under Article 6(1)(a) of the GDPR. Google Ireland Limited provides the service; Google may process data outside the EEA under its applicable data processing terms and transfer safeguards. See <a href="https://business.safety.google/adsprocessorterms/">Google’s data processing terms</a> and <a href="https://policies.google.com/privacy">privacy policy</a>. We do not enable advertising personalisation or send quote-form contents to Analytics.',
       'There is one word the site keeps for a single page load. When you tap the logo to go back to the homepage, a note reading "skip the intro" is written for the next page, which reads it, deletes it and skips the opening animation you have already seen. It holds no identifier, cannot be read by anyone else, and exists only to do what you just asked. The <a href="/cookies/">cookies page</a> describes it in full.',
-      'There is no consent banner because there is nothing stored to consent to. The two places where something from outside can load, the map on the contact page and a video inside an article, are named further down, and neither happens until you reach them.',
+      'We remember your acceptance or refusal for 180 days in local storage. Use “Cookie settings” on any page to withdraw or change consent. Refusing leaves the website usable. Withdrawing stops future Analytics collection and removes its accessible first-party cookies, without affecting the lawfulness of earlier processing. Google Analytics is also blocked when your browser sends Global Privacy Control. The <a href="/cookies/">cookie policy</a> lists the storage, durations and separate controls for external content.',
     ],
   },
   {
@@ -61,12 +61,13 @@ const sections: LegalSection[] = [
     body: [
       'Only BPE Cleaning Services and the person who maintains this website. The data lives in a database that requires a named account to open, and the list of accounts allowed in is short and fixed. It is never sold, never shared with advertisers, and never used to contact you about anything other than the request you sent.',
       'Three companies hold data on our behalf, under written data processing terms, and do nothing else with it. <a href="https://supabase.com/privacy" rel="noopener">Supabase</a> runs the database, on servers inside the European Union. <a href="https://vercel.com/legal/privacy-policy" rel="noopener">Vercel</a> serves the website from the European Union and runs the small programs that write the visit statistics and your request. <a href="https://resend.com/legal/privacy-policy" rel="noopener">Resend</a> delivers the notification email, and only that email: it is a United States company, so that one message leaves the European Union under the EU-US Data Privacy Framework and the standard contractual clauses in Resend\'s data processing agreement. The email lands in the owner\'s mailbox, which is provided by Google, so Google holds it the way any email provider holds mail.',
-      'There are exactly two places where something from outside loads on the site itself, and both are visible when they happen. The map on the contact page comes from Google: when you scroll down to it, Google receives your IP address and can set its own cookies, exactly as it does on any site with a Google map. An article on the blog may carry a video, which is loaded from YouTube in its no cookie mode or from Vimeo. If you never visit the contact page and never open an article with a video, nothing of yours reaches either company.',
+      'Google Maps and embedded YouTube or Vimeo videos load only after you click the accompanying “Load external content” control. Loading shares your IP address and browser information with that provider and may allow its cookies. These controls are separate from Analytics consent and apply only to the current page. External links such as WhatsApp follow the destination provider’s policy.',
     ],
   },
   {
     title: 'How long it is kept',
     body: [
+      'For optional Google Analytics, user-level and event-level data retention is set to two months, without resetting the user-data period on new activity. This setting does not apply to aggregated standard reports. Analytics cookies and your consent preference expire after 180 days. <a href="https://policies.google.com/technologies/partner-sites">How Google uses information from sites using its services</a> explains Google’s processing.',
       'Visit statistics and campaign clicks are deleted after 13 months. That is a full year of comparison plus a month, and then they are gone.',
       'A quote request is deleted 24 months after the last time anyone touched it. A request being worked on is never lost, and one that was dealt with two years ago does not sit in a database forever.',
       'Both are enforced by the database itself, on a job that runs every night, not by somebody remembering to do it. The notification email is kept in the owner\'s mailbox for as long as the owner keeps her mail, and is deleted on request along with the rest.',
@@ -93,7 +94,7 @@ const sections: LegalSection[] = [
   description="What this website records, what it does not, who holds it for us, how long it is kept and what you can ask for. Written in plain English, and checked against the code."
   kicker="Privacy"
   headline={{ line1: 'What this site', pre: 'knows', accent: 'about', post: 'you' }}
-  intro="Short version: no cookies, nothing stored in your browser, no advertising trackers, no IP addresses kept, and nothing about you sold or handed to an advertiser. The long version, including the three companies that hold data for us and the two places something can load from outside, is below."
+  intro="Your enquiries are used to answer your request. Optional Google Analytics needs your consent, external maps and videos need a separate click, and your cookie choice can be changed at any time. Our own limited server-side visit counts are explained separately below."
   sections={sections}
   path={PATHS.privacy}
   crumb="Privacy"

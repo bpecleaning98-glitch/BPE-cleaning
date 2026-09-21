@@ -1,0 +1,126 @@
+---
+import Base from '../layouts/Base.astro';
+import HeroPhoto from '../components/HeroPhoto.astro';
+import Diamond from '../components/Diamond.astro';
+import { COUNTIES, LOCALITIES } from '../data/areas';
+import { SERVICES, SITE } from '../data/site';
+import { PATHS, breadcrumbs, faqPage, graph } from '../lib/schema';
+import heroPhoto from '../assets/ai/hero-house.jpg';
+
+const faqs = [
+  {
+    q: 'Do you cover every Dublin postcode?',
+    a: 'County Dublin is our main service area, including Dublin city, Northside, Southside and the D1 to D24 postal districts. Send your Eircode and preferred service so we can confirm the date and team.',
+  },
+  {
+    q: 'Do you travel outside Dublin?',
+    a: 'Yes. We travel across Kildare, Wicklow, Louth, Westmeath, Offaly, Carlow and Meath. Availability depends on the service, the property and the date, so we confirm travel before booking.',
+  },
+  {
+    q: 'Which cleaning services are available in my area?',
+    a: 'We provide house, deep, end of tenancy, after builders, office and Airbnb cleaning. Share the property type, service and Eircode and we will confirm the best option for your location.',
+  },
+  {
+    q: 'Will there be an extra travel charge?',
+    a: 'Your quote confirms the full price before the booking. If location or travel changes the price, it is explained and agreed first, with nothing added without your agreement.',
+  },
+] as const;
+
+const jsonLd = graph(
+  faqPage(faqs, PATHS.areas, Astro.site),
+  breadcrumbs([{ name: 'Areas We Cover', path: PATHS.areas }], Astro.site)
+);
+---
+<Base
+  title="Cleaning Services Dublin & Leinster | Areas We Cover"
+  description="BPE Cleaning serves County Dublin plus Kildare, Wicklow, Louth, Westmeath, Offaly, Carlow and Meath. Check your town and request a local quote."
+  jsonLd={jsonLd}
+>
+  <section data-first-screen class="relative flex min-h-[76svh] flex-col justify-end overflow-hidden bg-night pb-20 pt-40 text-cream md:min-h-[40rem] md:pb-24 md:pt-48">
+    <HeroPhoto src={heroPhoto} alt="A bright, carefully cleaned Dublin home with clear floors and warm neutral finishes" position="68% 50%" />
+    <div class="container-wide relative">
+      <p class="kicker !text-gold" data-reveal>Areas We Cover</p>
+      <h1 class="display-caps mt-6 max-w-5xl text-[clamp(2.6rem,7vw,5.5rem)]" data-reveal>
+        <span class="line-mask"><span>Cleaning services</span></span>
+        <span class="line-mask"><span style="--d: 0.1s">across <span class="accent-word text-gold-soft">Dublin</span> and Leinster</span></span>
+      </h1>
+      <p class="mt-8 max-w-2xl text-base leading-relaxed text-cream/75" data-reveal style="--d: 0.2s">
+        County Dublin is our home base. We also travel to seven neighbouring counties for
+        planned home, rental, office and post-construction cleaning.
+      </p>
+      <div class="mt-10 flex flex-wrap gap-4" data-reveal style="--d: 0.3s">
+        <a href="/quote/" class="btn-gold">Check my Eircode</a>
+        <a href={SITE.phoneHref} class="btn-outline text-cream">Call {SITE.phoneDisplay}</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-pad bg-porcelain">
+    <div class="container-wide grid gap-14 lg:grid-cols-[0.78fr_1.22fr] lg:gap-20">
+      <div class="lg:sticky lg:top-32 lg:self-start">
+        <p class="kicker" data-reveal>Local Coverage</p>
+        <h2 class="display mt-6 text-[clamp(2.2rem,5vw,4rem)] text-ink" data-reveal>
+          Dublin first,<br /><span class="accent-word text-gold-deep">then further</span> when the job needs it
+        </h2>
+        <p class="mt-8 max-w-md text-base leading-relaxed text-ink/70" data-reveal>
+          We cover Dublin city and county, Northside and Southside, from D1 to D24. For the
+          other counties below, send the Eircode and the service you need so we can confirm
+          availability before you book.
+        </p>
+      </div>
+
+      <div class="border-t border-ink/15">
+        {COUNTIES.map((county, index) => (
+          <article class="grid gap-5 border-b border-ink/15 py-8 md:grid-cols-[3rem_0.55fr_1fr] md:gap-8" data-reveal style={`--d: ${0.05 * index}s`}>
+            <span class="font-sans text-[0.66rem] font-semibold tracking-[0.2em] text-stone">{String(index + 1).padStart(2, '0')}</span>
+            <div>
+              <h3 class="display text-2xl text-ink">{county.name}</h3>
+              {county.primary && <p class="mt-2 font-sans text-[0.62rem] font-semibold uppercase tracking-[0.22em] text-gold-deep">Primary service area</p>}
+            </div>
+            <p class="text-sm leading-[1.9] text-ink/65">{LOCALITIES[county.name].join(' · ')}</p>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="relative overflow-hidden bg-night py-20 text-cream md:py-28">
+    <Diamond class="pointer-events-none absolute -right-40 -top-44 h-[38rem] w-[38rem] opacity-[0.05]" aria-hidden="true" />
+    <div class="container-wide relative">
+      <p class="kicker !text-gold" data-reveal>What We Bring</p>
+      <h2 class="display mt-6 max-w-3xl text-[clamp(2.2rem,5vw,4rem)]" data-reveal>
+        The same six services,<br /><span class="accent-word text-gold-soft">wherever</span> we meet you
+      </h2>
+      <div class="mt-12 grid border-t border-cream/15 sm:grid-cols-2 lg:grid-cols-3">
+        {SERVICES.map((service, index) => (
+          <a href={service.slug} class="group border-b border-cream/15 py-7 sm:px-7 sm:[&:nth-child(odd)]:pl-0 lg:[&:nth-child(3n+1)]:pl-0" data-reveal style={`--d: ${0.06 * index}s`}>
+            <span class="font-sans text-[0.62rem] font-semibold uppercase tracking-[0.22em] text-gold">{service.from}</span>
+            <span class="display mt-3 block text-xl text-cream transition-colors group-hover:text-gold-soft">{service.name}</span>
+            <span class="mt-3 block text-sm leading-relaxed text-cream/60">{service.blurb}</span>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section-pad bg-ivory">
+    <div class="container-wide grid gap-14 lg:grid-cols-[0.75fr_1.25fr] lg:gap-20">
+      <div>
+        <p class="kicker" data-reveal>Local Questions</p>
+        <h2 class="display mt-6 text-[clamp(2.2rem,5vw,4rem)] text-ink" data-reveal>
+          Before we <span class="accent-word text-gold-deep">set off</span>
+        </h2>
+      </div>
+      <div class="border-t border-ink/15">
+        {faqs.map((faq) => (
+          <details class="group border-b border-ink/15 py-6">
+            <summary class="flex cursor-pointer list-none items-center justify-between gap-6 font-sans text-base font-semibold text-ink">
+              {faq.q}<span class="text-gold-deep transition-transform group-open:rotate-45" aria-hidden="true">+</span>
+            </summary>
+            <p class="max-w-2xl pt-5 text-sm leading-relaxed text-ink/65">{faq.a}</p>
+          </details>
+        ))}
+      </div>
+    </div>
+  </section>
+</Base>

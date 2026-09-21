@@ -21,6 +21,7 @@ type StaticPage = { path: string; changefreq: string; priority: string };
 const STATIC_PAGES: StaticPage[] = [
   { path: '/', changefreq: 'monthly', priority: '1.0' },
   { path: '/services/', changefreq: 'monthly', priority: '0.9' },
+  { path: '/areas/', changefreq: 'monthly', priority: '0.8' },
   { path: '/prices/', changefreq: 'monthly', priority: '0.9' },
   { path: '/quote/', changefreq: 'monthly', priority: '0.9' },
   { path: '/house-cleaning-dublin/', changefreq: 'monthly', priority: '0.8' },

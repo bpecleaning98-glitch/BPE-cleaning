@@ -99,7 +99,7 @@ export const LEGAL: {
   croNumber: null,
   registeredOffice: null,
   vatNumber: null,
-  updated: '8 September 2026',
+  updated: '14 September 2026',
 };
 
 /**

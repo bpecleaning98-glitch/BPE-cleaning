@@ -1,5 +1,10 @@
 @import "tailwindcss";
 
+.external-consent { padding: 48px 24px; text-align: center; background: #efeae0; color: #191512; font: 14px/1.7 var(--font-sans); }
+.external-consent p { max-width: 520px; margin: 0 auto 20px; }
+.external-consent button { padding: 12px 20px; border: 1px solid #191512; cursor: pointer; }
+.external-consent a { display: block; margin-top: 12px; text-decoration: underline; }
+
 @theme {
   /*
    * BPE palette v2, 9 Aug. Direction: elicyon.com. Calm, warm, editorial.

@@ -32,3 +32,33 @@ export const COUNTY_NAMES = COUNTIES.map((c) => c.name);
 /** Short prose version, for body copy and the footer. */
 export const AREAS_SENTENCE =
   'We cover County Dublin and travel across Kildare, Wicklow, Louth, Westmeath, Offaly, Carlow and Meath.';
+
+/**
+ * Searchers use town and suburb names, not county boundaries. These are
+ * useful locality examples inside the eight confirmed counties, published on
+ * one substantial coverage page rather than as near-identical doorway pages.
+ * The page always asks for an Eircode before promising availability.
+ */
+export const LOCALITIES: Record<(typeof COUNTIES)[number]['name'], readonly string[]> = {
+  'County Dublin': [
+    'Dublin City Centre',
+    'Swords',
+    'Malahide',
+    'Howth',
+    'Blanchardstown',
+    'Lucan',
+    'Clondalkin',
+    'Tallaght',
+    'Rathfarnham',
+    'Sandyford',
+    'Blackrock',
+    'Dún Laoghaire',
+  ],
+  'County Kildare': ['Naas', 'Newbridge', 'Maynooth', 'Leixlip', 'Celbridge', 'Kildare Town', 'Athy'],
+  'County Wicklow': ['Bray', 'Greystones', 'Wicklow Town', 'Arklow', 'Blessington', 'Enniskerry'],
+  'County Louth': ['Drogheda', 'Dundalk', 'Ardee'],
+  'County Westmeath': ['Athlone', 'Mullingar', 'Moate'],
+  'County Offaly': ['Tullamore', 'Birr', 'Edenderry'],
+  'County Carlow': ['Carlow Town', 'Tullow', 'Bagenalstown'],
+  'County Meath': ['Ashbourne', 'Ratoath', 'Dunboyne', 'Navan', 'Trim', 'Kells'],
+};
