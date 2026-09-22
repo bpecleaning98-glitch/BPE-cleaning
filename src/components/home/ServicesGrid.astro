@@ -135,7 +135,11 @@ const cards = SERVICES.map((service, i) => ({ ...service, photo: photos[i], nr: 
     const SPREAD = 1.12;
 
     const EASE = 'cubic-bezier(0.22, 1, 0.36, 1)';
-    const wrapTimers = new Map<HTMLElement, ReturnType<typeof setTimeout>>();
+    const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
+    const DURATION = 600;
+    let moving = false;
+    let pendingDirection = 0;
+    let resizePending = false;
 
     const applyState = (card: HTMLElement, d: number, w: number) => {
       const scale = d === 0 ? 1 : Math.abs(d) === 1 ? 0.85 : 0.7;
@@ -145,82 +149,62 @@ const cards = SERVICES.map((service, i) => ({ ...service, photo: photos[i], nr: 
       card.style.opacity = Math.abs(d) > 2 ? '0' : '1';
       card.style.pointerEvents = d === 0 ? 'auto' : 'none';
       card.classList.toggle('is-active', d === 0);
+      card.dataset.d = String(d);
+      card.tabIndex = d === 0 ? 0 : -1;
     };
 
-    // Restores the stylesheet transition after a one-frame override.
-    const restoreSoon = (card: HTMLElement) =>
-      requestAnimationFrame(() => requestAnimationFrame(() => (card.style.transition = '')));
-
-    const render = () => {
+    // Recycle only the invisible card, before the next move. On an even
+    // ring the opposite card must start on the side we are moving towards.
+    const render = (dir = 1) => {
       cards.forEach((card, i) => {
-        // Shortest signed distance on the ring, so wrapping feels continuous.
         let d = i - active;
         if (d > n / 2) d -= n;
         if (d < -n / 2) d += n;
-
-        // dataset.d is only committed when a position is actually APPLIED,
-        // so an interrupted wrap can never desync the maths from what the
-        // visitor sees on screen.
-        const prev = card.dataset.d === undefined ? d : Number(card.dataset.d);
-        const w = card.offsetWidth;
-
-        const pending = wrapTimers.get(card);
-        if (pending) {
-          clearTimeout(pending);
-          wrapTimers.delete(card);
-        }
-
-        // Wrap-around handling. A card never streaks across the stage and
-        // never pops: leaving the visible row it FADES OUT where it stands
-        // and only then snaps; arriving from the other side it snaps while
-        // still invisible and FADES IN at its new place.
-        const wrapped = Math.abs(d - prev) > 2;
-        if (wrapped && Math.abs(prev) <= 2) {
-          card.style.transition = `opacity 0.5s ${EASE}`;
-          card.style.opacity = '0';
-          card.classList.remove('is-active');
-          card.style.pointerEvents = 'none';
-          wrapTimers.set(
-            card,
-            setTimeout(() => {
-              card.style.transition = 'none';
-              applyState(card, d, w);
-              card.dataset.d = String(d);
-              restoreSoon(card);
-              wrapTimers.delete(card);
-            }, 520)
-          );
-          return;
-        }
-        if (wrapped) {
-          card.style.transition = `opacity 0.7s ${EASE}`;
-          restoreSoon(card);
-        }
-        applyState(card, d, w);
-        card.dataset.d = String(d);
+        if (n % 2 === 0 && Math.abs(d) === n / 2) d = dir * n / 2;
+        card.style.transition = 'none';
+        applyState(card, d, card.offsetWidth);
       });
-      captions.forEach((cap, i) => cap.classList.toggle('active', i === active));
     };
 
-    // A step is ignored while the previous one is still settling: rapid
-    // clicking can never overlap two moves into a glitchy in-between state.
-    let lastStep = 0;
+    const updateCaptions = () => captions.forEach((cap, i) => {
+      cap.classList.toggle('active', i === active);
+      cap.inert = i !== active;
+    });
+
+    // One animation owns the whole row. Rapid input keeps the latest next
+    // direction, rather than cancelling individual cards' wrap timers or
+    // building a long backlog of movement after the visitor stops clicking.
     const step = (dir: number) => {
-      const now = performance.now();
-      if (now - lastStep < 420) return;
-      lastStep = now;
+      if (moving) { pendingDirection = dir; return; }
+      render(dir);
+      void root.offsetWidth; // Commit the invisible recycle before animating.
       active = (active + dir + n) % n;
-      render();
+      updateCaptions();
+      if (reducedMotion.matches) { render(dir); return; }
+      moving = true;
+      cards.forEach(card => {
+        card.style.transition = `transform ${DURATION}ms ${EASE}, opacity ${DURATION}ms ${EASE}`;
+        applyState(card, Number(card.dataset.d) - dir, card.offsetWidth);
+      });
+      setTimeout(() => {
+        moving = false;
+        if (resizePending) { render(dir); resizePending = false; }
+        const next = pendingDirection;
+        pendingDirection = 0;
+        if (next) step(next);
+      }, DURATION);
     };
 
     root.querySelectorAll('[data-svc-prev]').forEach((b) => b.addEventListener('click', () => step(-1)));
     root.querySelectorAll('[data-svc-next]').forEach((b) => b.addEventListener('click', () => step(1)));
-    addEventListener('resize', render, { passive: true });
+    addEventListener('resize', () => {
+      if (moving) resizePending = true;
+      else render();
+    }, { passive: true });
 
     // First layout is instant: the row must simply BE in place on load, not
     // splay outward from a stack.
-    cards.forEach((c) => (c.style.transition = 'none'));
     render();
-    requestAnimationFrame(() => requestAnimationFrame(() => cards.forEach((c) => (c.style.transition = ''))));
+    updateCaptions();
   }
 </script>
