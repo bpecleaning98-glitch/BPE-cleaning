@@ -321,8 +321,8 @@ document.addEventListener('click', (e) => {
 
 /* Custom cursor, taken 1:1 from Elicyon's production bundle: their default
  * pointer is a small GOLD ARROW (their exact SVG path and #907533 fill)
- * inside a fixed, mix-blend-mode: difference container, so it re-colours
- * against anything it crosses. It follows the mouse INSTANTLY, no lerp,
+ * inside a fixed container with contrasting edges. Interactive elements
+ * turn it cream. It follows the mouse INSTANTLY, no lerp,
  * exactly as they position theirs. A gold text label rides 16px beside it
  * over elements with data-cursor-label, and elements with
  * data-cursor-arrow="left|right" swap it for their white chevron (55x36 in
@@ -344,20 +344,25 @@ if (matchMedia('(pointer: fine)').matches) {
     '<path d="M1 31L16 16L1 1" stroke="white" stroke-width="2"/></svg>' +
     '<span class="c-label"></span>';
   document.body.appendChild(cursor);
-  document.documentElement.classList.add('has-cursor');
   const label = cursor.querySelector<HTMLElement>('.c-label')!;
 
   window.addEventListener('mousemove', (e) => {
     cursor.style.transform = `translate3d(${e.clientX}px, ${e.clientY}px, 0)`;
     cursor.classList.add('is-on');
+    document.documentElement.classList.add('has-cursor');
   }, { passive: true });
-  document.documentElement.addEventListener('mouseleave', () => cursor.classList.remove('is-on'));
-  document.documentElement.addEventListener('mouseenter', () => cursor.classList.add('is-on'));
+  const hideCursor = () => {
+    cursor.classList.remove('is-on');
+    document.documentElement.classList.remove('has-cursor');
+  };
+  document.documentElement.addEventListener('mouseleave', hideCursor);
+  window.addEventListener('blur', hideCursor);
 
   document.addEventListener('mouseover', (e) => {
     const target = e.target as HTMLElement;
     const labelled = target.closest?.('[data-cursor-label]') as HTMLElement | null;
     const arrowed = target.closest?.('[data-cursor-arrow]') as HTMLElement | null;
+    cursor.classList.toggle('is-interactive', !!target.closest?.('a, button, input, select, textarea, summary, [role="button"], label[for]'));
     label.textContent = labelled ? labelled.dataset.cursorLabel || '' : '';
     cursor.classList.toggle('is-label', !!labelled);
     cursor.classList.toggle('is-chevron', !!arrowed);

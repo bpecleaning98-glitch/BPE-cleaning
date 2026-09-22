@@ -753,9 +753,9 @@ html.js #bpe-intro .intro-logo {
 
 /*
  * Custom cursor (built by motion.ts, fine pointers only), 1:1 with
- * Elicyon's: a small gold arrow under mix-blend-mode: difference, its tip
- * at the exact pointer position, instant follow. The blend keeps it
- * readable on anything: bronze over the dark bands, shifted over light.
+ * Elicyon's: a small gold arrow with its tip at the exact pointer position.
+ * Dark and light edges preserve contrast even over gold buttons and photos.
+ * Interactive controls turn the arrow cream without blending it away.
  * Over data-cursor-label elements a gold label rides 16px beside the tip;
  * over data-cursor-arrow elements the arrow becomes their white chevron.
  */
@@ -765,12 +765,28 @@ html.js #bpe-intro .intro-logo {
   top: 0;
   z-index: 10001; /* Keep the cursor above the cookie banner (10000). */
   pointer-events: none;
-  mix-blend-mode: difference;
+  mix-blend-mode: normal;
   opacity: 0;
   transition: opacity 0.2s ease;
 }
 .bpe-cursor.is-on {
   opacity: 1;
+}
+.bpe-cursor .c-arrow {
+  overflow: visible;
+  filter: drop-shadow(0 0 1px #faf8f4);
+}
+.bpe-cursor .c-arrow path {
+  stroke: #191512;
+  stroke-width: 1.2px;
+  stroke-linejoin: round;
+  paint-order: stroke fill;
+}
+.bpe-cursor.is-interactive .c-arrow path {
+  fill: #faf8f4;
+}
+.bpe-cursor .c-chevron {
+  filter: drop-shadow(0 0 1px #191512) drop-shadow(0 1px 1px #191512);
 }
 .bpe-cursor .c-arrow,
 .bpe-cursor .c-chevron,
@@ -802,6 +818,8 @@ html.js #bpe-intro .intro-logo {
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: #907533;
+  background: #191512;
+  padding: 3px 6px;
   opacity: 0;
   transition: opacity 0.25s;
 }
