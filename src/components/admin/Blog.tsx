@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { Marked } from 'marked';
+import { blogSearchTitle, DEFAULT_BLOG_COVER } from '../../data/blog';
 import type { Post } from '../../lib/types';
 import { fmtDate, slugify, supabase } from './client';
 import { Btn, Caps, Empty, Field, Notice, Panel, Pill, Spinner, areaClass, inputClass } from './ui';
@@ -49,8 +50,8 @@ const EMPTY_DRAFT: Draft = {
   title: '',
   excerpt: '',
   content: '',
-  cover_url: null,
-  cover_alt: '',
+  cover_url: DEFAULT_BLOG_COVER.url,
+  cover_alt: DEFAULT_BLOG_COVER.alt,
   tags: '',
   seo_title: '',
   seo_description: '',
@@ -846,7 +847,7 @@ function Editor({
   ];
   const done = checklist.filter((item) => item.ok).length;
 
-  const seoTitle = draft.seo_title.trim() || draft.title.trim();
+  const seoTitle = blogSearchTitle(draft.seo_title.trim() || draft.title.trim());
   const seoDescription = draft.seo_description.trim() || draft.excerpt.trim();
 
   return (
@@ -967,7 +968,7 @@ function Editor({
 
               <Group
                 label="Photo file"
-                hint="JPG, PNG or WebP, up to 8 MB. A wide photo works best, around 1600 pixels across."
+                hint="New articles start with the shared BPE cover, suitable for any cleaning topic. Replace it if a specific photo suits the article better. JPG, PNG or WebP, up to 8 MB."
               >
                 <div className="flex flex-wrap items-center gap-2">
                   <input

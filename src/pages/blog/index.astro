@@ -59,13 +59,15 @@ function accentTitle(title: string): { before: string; accent: string; after: st
 const leadTitle = lead ? accentTitle(lead.title) : null;
 const href = (post: Post) => `/blog/${post.slug}/`;
 
+const blogUrl = new URL('/blog/', Astro.site).href;
 const jsonLd = {
   '@context': 'https://schema.org',
   '@type': 'Blog',
+  '@id': blogUrl,
   name: 'Cleaning advice from BPE Cleaning Services',
   description:
     'Practical cleaning advice for homes, offices and Airbnb properties in Dublin, written by the team that does the work.',
-  url: new URL('/blog/', Astro.site).href,
+  url: blogUrl,
   inLanguage: 'en-IE',
   // The one business node the rest of the site publishes, by @id, so the company
   // is a single entity in the graph rather than a nameless second copy of itself.

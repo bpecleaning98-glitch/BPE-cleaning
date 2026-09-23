@@ -3,8 +3,10 @@ export const prerender = false;
 
 import Base from '../../layouts/Base.astro';
 import Diamond from '../../components/Diamond.astro';
+import HeroPhoto from '../../components/HeroPhoto.astro';
+import { blogSearchTitle, DEFAULT_BLOG_COVER } from '../../data/blog';
 import { SITE } from '../../data/site';
-import { businessRef } from '../../lib/schema';
+import { breadcrumbs, businessRef, graph } from '../../lib/schema';
 import {
   getPostBySlug,
   getPublishedPosts,
@@ -48,6 +50,15 @@ It may have been moved, or the link may have been mistyped.</p>
 
 const article: Post = post;
 
+// One shared editorial backdrop for every article heading. It is separate from
+// each post's own cover, which remains in the article body and blog cards.
+const articleHeroPhoto = {
+  src: '/hero/blog-article-1280.webp',
+  srcset: [480, 768, 1280, 1600].map((w) => `/hero/blog-article-${w}.webp ${w}w`).join(', '),
+  width: 1600,
+  height: 900,
+};
+
 /**
  * marked renders `![alt](src "caption")` as an <img title="caption">, and the
  * title is the only way a writer in the cabinet can caption a photograph, so
@@ -79,9 +90,11 @@ const body = prepareBody(renderMarkdown(article.content));
 const minutes = readingMinutes(article);
 const summary = postSummary(article, 220);
 const canonical = new URL(`/blog/${article.slug}/`, Astro.site).href;
-const seoTitle = `${article.seo_title?.trim() || article.title} | ${SITE.name}`;
+const seoTitle = blogSearchTitle(article.seo_title?.trim() || article.title);
 const seoDescription = article.seo_description?.trim() || summary;
-const coverAbsolute = article.cover_url || new URL('/og-image.jpg', Astro.site).href;
+const coverUrl = article.cover_url?.trim() || DEFAULT_BLOG_COVER.url;
+const coverAbsolute = new URL(coverUrl, Astro.site).href;
+const hasCustomCover = coverUrl !== DEFAULT_BLOG_COVER.url;
 
 const tags = Array.isArray(article.tags) ? article.tags : [];
 
@@ -99,11 +112,12 @@ const shareLinks = [
   },
 ];
 
-const jsonLd = {
-  '@context': 'https://schema.org',
+const articleJsonLd = {
   '@type': 'BlogPosting',
+  '@id': `${canonical}#article`,
   headline: article.title,
   description: seoDescription,
+  url: canonical,
   datePublished: postIso(article),
   dateModified: new Date(article.updated_at || article.published_at || article.created_at).toISOString(),
   author: {
@@ -117,20 +131,37 @@ const jsonLd = {
   publisher: businessRef(Astro.site),
   image: [coverAbsolute],
   inLanguage: 'en-IE',
+  isPartOf: { '@type': 'Blog', '@id': new URL('/blog/', Astro.site).href },
   mainEntityOfPage: { '@type': 'WebPage', '@id': canonical },
   ...(tags.length ? { keywords: tags.join(', ') } : {}),
 };
+const jsonLd = graph(
+  articleJsonLd,
+  breadcrumbs([{ name: 'All articles', path: '/blog/' }], Astro.site)
+);
 ---
 <Base
   title={seoTitle}
   description={seoDescription}
-  image={article.cover_url || undefined}
+  image={coverAbsolute}
+  imageAlt={article.cover_alt?.trim() || DEFAULT_BLOG_COVER.alt}
   ogType="article"
   jsonLd={jsonLd}
 >
-  <section data-first-screen class="bg-night pt-40 pb-16 text-cream md:pt-48 md:pb-20">
+  <section data-first-screen class="relative overflow-hidden bg-night pt-40 pb-16 text-cream md:pt-48 md:pb-20">
+    <HeroPhoto
+      src={articleHeroPhoto}
+      alt="A bright, tidy home interior with folded linens and a small cleaning bottle in soft daylight"
+      position="72% 50%"
+    />
     <div class="container-wide">
-      <a href="/blog/" class="link-caps text-cream/60 hover:text-cream" data-reveal>All articles</a>
+      <nav aria-label="Breadcrumb" data-reveal>
+        <ol class="flex flex-wrap items-center gap-2 font-sans text-[0.62rem] font-semibold uppercase tracking-[0.22em] text-cream/60">
+          <li><a href="/" class="transition-colors hover:text-cream">Home</a></li>
+          <li aria-hidden="true" class="text-gold">/</li>
+          <li><a href="/blog/" class="transition-colors hover:text-cream">All articles</a></li>
+        </ol>
+      </nav>
 
       <h1 class="display mt-8 max-w-4xl text-[clamp(2.2rem,5.4vw,4.2rem)]" data-reveal style="--d: 0.06s">
         {article.title}
@@ -162,10 +193,10 @@ const jsonLd = {
 
   <section class="bg-porcelain pt-10 pb-20 md:pt-14 md:pb-28">
     <div class="container-wide">
-      {article.cover_url && (
+      {hasCustomCover && (
         <figure class="media-zoom overflow-hidden border border-ink/10" data-reveal>
           <img
-            src={article.cover_url}
+            src={coverUrl}
             alt={article.cover_alt}
             class="aspect-[16/9] w-full scale-110 object-cover"
             loading="eager"

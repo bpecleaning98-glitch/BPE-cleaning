@@ -1,9 +1,11 @@
 # Generated imagery
 
-Eleven frames live here, one for the header of each interior page. They are
-**AI generated**, not photographs of anything, and they exist for one reason:
-every page other than the homepage opened on a bare night band with an empty
-right half and, on a phone, nothing above the fold but type.
+Eleven original frames live here, one for the header of each interior page. A
+twelfth frame, `hero-blog-article.jpg`, is the shared background behind
+individual article headings. They are **AI generated**, not photographs of
+anything, and they exist for one reason: every page other than the homepage
+opened on a bare night band with an empty right half and, on a phone, nothing
+above the fold but type.
 
 They are atmosphere. They are never presented as a BPE job.
 
@@ -43,6 +45,14 @@ part of why the brief kept people out of every frame.
 | `hero-end-of-tenancy.jpg` | `/end-of-tenancy-cleaning-dublin/` |
 | `hero-after-builders.jpg` | `/after-builders-cleaning-dublin/` |
 | `hero-office.jpg` | `/office-cleaning-dublin/` |
+
+`hero-blog-article.jpg` is the shared background behind every individual
+article heading. It was generated on 23 September 2026 with OpenAI image
+generation for that role. The existing `HeroPhoto` component adds the site's
+dark veils above it. It is also prefilled as the cover for new articles. A
+writer can replace it with a specific photo, which then appears in the cards,
+article body and social sharing preview. The shared default is not repeated in
+the article body.
 
 They are placed by `src/components/HeroPhoto.astro`, full bleed behind the
 headline under three ink veils, the way the homepage hero is built. A first
