@@ -32,6 +32,18 @@ Setup, deployment and the client walkthrough live in **[docs/CABINET-RO.md](docs
 the designer goes in that folder and the script is rerun as it is. It needs the four
 NEGRU-AURIU exports present.
 
+## Temporary website pause
+
+`site-pause.json` controls the public pause page. When `enabled` is `true`,
+`npm run build` adds a routing rule before Vercel's filesystem handler: public
+pages and API requests return the pause page with HTTP 503 and no caching.
+The existing `/admin` cabinet, its assets and site verification files stay reachable.
+The original pages and all stored data are preserved.
+
+To restore the website, set `enabled` to `false`, then build and deploy again.
+The page design lives in `src/maintenance/page.html`. `astro dev` does not apply
+Vercel routing; verify the pause on a Vercel deployment or inspect the build output.
+
 ## Environment
 
 Copy `.env.example` to `.env` and fill it in. Without those values the public site works
