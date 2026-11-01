@@ -883,28 +883,20 @@ async function boot() {
     }
   }
 
-  /* The closing line, Artiom's brief, third pass: the three caps words
-   * first appear STACKED as a column, one under the other, each revealing
-   * itself bottom-up in turn; then the column unfolds, every word
-   * travelling to its own place in the sentence. "you" never takes part in
-   * the flight and condenses in, opacity and blur, once the others have
-   * landed.
+  /* The closing line, Artiom's brief, fourth pass (1 Nov 2026): the words
+   * used to gather in a stacked column and then fly across the line to
+   * their places, and he found the flight chaotic. Now nothing travels
+   * sideways. Each caps word rises out of its own baseline, left to right,
+   * the same masked lift the BPE sign-off below uses, so the footer reads
+   * as one calm gesture. "you" still condenses in, opacity and blur, once
+   * the others are up, and the buttons come last.
    *
-   * The mechanics are FLIP: the words never leave the document flow, the
-   * layout IS the finished sentence. When the line scrolls into view their
-   * final rectangles are measured, each word is offset by transform into
-   * the column (anchored on the first word, one line-height per row), and
-   * flying home is nothing more than animating those offsets back to zero.
-   * Measuring inside onEnter, not at build time, keeps the numbers honest
-   * after webfont swaps and late layout shifts.
+   * The mask is a clip-path on the word itself, closed from the bottom by
+   * exactly as much as the word is pushed down, so only the part above
+   * its own baseline ever shows. No wrapper elements in the markup.
    *
-   * The column reveal uses a clip-path on each word rather than mask
-   * elements in the markup: the flight home crosses half the line's width,
-   * and any overflow-hidden wrapper would cut the word mid-journey.
-   *
-   * Until the trigger fires the words simply sit at opacity 0, set from
-   * here and never in markup, so a visitor without this chunk sees the
-   * finished line. */
+   * Until the trigger fires the words sit hidden, set from here and never
+   * in markup, so a visitor without this chunk sees the finished line. */
   if (ScrollTrigger) {
     document.querySelectorAll<HTMLElement>('[data-footer-line]').forEach((line) => {
       const words = Array.from(line.querySelectorAll<HTMLElement>('.fw-word'));
@@ -912,7 +904,7 @@ async function boot() {
       // The buttons live in the row next to the line, not inside it.
       const cta = line.parentElement?.querySelector<HTMLElement>('[data-footer-cta]');
       if (!words.length) return;
-      gsap.set(words, { opacity: 0 });
+      gsap.set(words, { yPercent: 100, clipPath: 'inset(0% 0% 100% 0%)' });
       if (you) gsap.set(you, { opacity: 0, filter: 'blur(12px)' });
       if (cta) gsap.set(cta, { opacity: 0 });
 
@@ -921,38 +913,22 @@ async function boot() {
         start: 'top 88%',
         once: true,
         onEnter: () => {
-          // The words are opacity 0 but fully laid out, so these are the
-          // rectangles of the finished sentence.
-          const rects = words.map((w) => w.getBoundingClientRect());
-          const rowHeight = parseFloat(getComputedStyle(line).fontSize) * 1.04;
           const tl = gsap.timeline();
-          words.forEach((w, i) => {
-            // Into the column: align with the first word's left edge, one
-            // row down per word. The first word's offset is zero by
-            // definition, which is what anchors the column to the layout.
-            const dx = rects[0].left - rects[i].left;
-            const dy = rects[0].top + i * rowHeight - rects[i].top;
-            gsap.set(w, { x: dx, y: dy, opacity: 1, clipPath: 'inset(0% 0% 102% 0%)' });
-            // Phase one, the column: each word rises open bottom-up in
-            // its row, one after another.
-            tl.to(
-              w,
-              { clipPath: 'inset(0% 0% -8% 0%)', duration: 0.55, ease: 'power2.out' },
-              i * 0.14
-            );
-            // Phase two, the unfolding: each word travels home. inOut, so
-            // it leaves as gently as it lands; no pop at either end.
-            tl.to(
-              w,
-              { x: 0, y: 0, duration: 0.95, ease: 'power3.inOut' },
-              0.75 + i * 0.1
-            );
+          // The clip closes from the bottom by exactly the distance the word
+          // is still pushed down, so the cut always sits on the baseline.
+          // Cleared at the end, so a glyph's overshoot is never trimmed.
+          tl.to(words, {
+            yPercent: 0,
+            clipPath: 'inset(0% 0% 0% 0%)',
+            duration: 1.05,
+            ease: 'power3.out',
+            stagger: 0.12,
+            clearProps: 'clipPath',
           });
           if (you) {
-            tl.to(you, { opacity: 1, filter: 'blur(0px)', duration: 0.8, ease: 'power2.out' }, 1.7);
+            tl.to(you, { opacity: 1, filter: 'blur(0px)', duration: 0.8, ease: 'power2.out' }, 0.55);
           }
-          // Last, once nothing is flying over them any more.
-          if (cta) tl.to(cta, { opacity: 1, duration: 0.6, ease: 'power2.out' }, 1.85);
+          if (cta) tl.to(cta, { opacity: 1, duration: 0.6, ease: 'power2.out' }, 0.8);
         },
       });
     });
