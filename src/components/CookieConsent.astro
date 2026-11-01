@@ -1,10 +1,8 @@
 ---
-import { Image } from 'astro:assets';
-import cookieIcon from '../assets/cookie-consent.png';
 const measurementId = import.meta.env.PUBLIC_GA_MEASUREMENT_ID || 'G-HN2411LNWT';
 ---
 <section id="cookie-banner" class="cookie-banner" aria-labelledby="cookie-title" hidden data-ga-id={measurementId}>
-  <div class="cookie-heading"><Image src={cookieIcon} alt="" width={72} height={72} widths={[72, 144]} sizes="72px" format="webp" /><p>Your privacy, your choice</p></div>
+  <div class="cookie-heading"><img src="/consent/cookie-consent-72.webp" srcset="/consent/cookie-consent-72.webp 72w, /consent/cookie-consent-144.webp 144w" sizes="72px" alt="" width="72" height="72" loading="lazy" decoding="async" /><p>Your privacy, your choice</p></div>
   <h2 id="cookie-title">A little clarity on cookies.</h2>
   <p>With your permission, we use Google Analytics cookies to understand visits and improve our website. Optional analytics stays off until you accept. You can change your choice at any time.</p>
   <div class="cookie-actions">
