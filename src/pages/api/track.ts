@@ -55,6 +55,14 @@ const WINDOW_MS = 60_000;
 /** A view older than this is history. Dwell is only written while it is news. */
 const DWELL_WINDOW_MS = 6 * 60 * 60 * 1000;
 
+/**
+ * Any other method gets a plain 405 naming the one that works. Without it a
+ * GET from a crawler or a curious visitor fell through to the 404 page,
+ * which a server route cannot render, and Vercel answered 500.
+ */
+export const ALL: APIRoute = () =>
+  new Response(null, { status: 405, headers: { Allow: 'POST', 'cache-control': 'no-store' } });
+
 export const POST: APIRoute = async ({ request, clientAddress }) => {
   // A view payload is a few hundred bytes and an exit beacon is under a
   // hundred. Four kilobytes is already generous. Nothing our own script sends

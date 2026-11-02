@@ -173,9 +173,11 @@ export const onRequest = defineMiddleware(async (context, next) => {
   }
 
   // Sent only over https, so a local dev origin is never pinned.
+  // A prerendered page has no real request to read, and Astro warns on
+  // every build if one is touched; its headers come from vercel.json anyway.
   const secure =
     context.url.protocol === 'https:' ||
-    context.request.headers.get('x-forwarded-proto') === 'https';
+    (!context.isPrerendered && context.request.headers.get('x-forwarded-proto') === 'https');
   if (secure) headers.set('Strict-Transport-Security', HSTS);
 
   return response;
