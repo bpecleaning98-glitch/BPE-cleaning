@@ -3,14 +3,14 @@
   "buildCommand": "npm run build",
   "redirects": [
     {
-      "source": "/:path*",
+      "source": "/(.*)",
       "has": [
         {
           "type": "host",
           "value": "www.bpecleaning.ie"
         }
       ],
-      "destination": "https://bpecleaning.ie/:path*",
+      "destination": "https://bpecleaning.ie/$1",
       "permanent": true
     }
   ],
