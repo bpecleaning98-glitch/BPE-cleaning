@@ -6,7 +6,7 @@ name: Scheduled pause
 
 on:
   schedule:
-    - cron: '0 6 16 11 *'   # 06:00 UTC, 16 noiembrie
+    - cron: '0 0 16 11 *'   # 00:00 UTC, 16 noiembrie
   workflow_dispatch:
 
 permissions:
