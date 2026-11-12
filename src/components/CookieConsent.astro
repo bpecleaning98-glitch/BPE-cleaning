@@ -2,7 +2,6 @@
 const measurementId = import.meta.env.PUBLIC_GA_MEASUREMENT_ID || 'G-HN2411LNWT';
 ---
 <section id="cookie-banner" class="cookie-banner" aria-labelledby="cookie-title" hidden data-ga-id={measurementId}>
-  <div class="cookie-heading"><img src="/consent/cookie-consent-72.webp" srcset="/consent/cookie-consent-72.webp 72w, /consent/cookie-consent-144.webp 144w" sizes="72px" alt="" width="72" height="72" loading="lazy" decoding="async" /><p>Your privacy, your choice</p></div>
   <h2 id="cookie-title">A little clarity on cookies.</h2>
   <p>With your permission, we use Google Analytics cookies to understand visits and improve our website. Optional analytics stays off until you accept. You can change your choice at any time.</p>
   <div class="cookie-actions">
@@ -19,10 +18,7 @@ const measurementId = import.meta.env.PUBLIC_GA_MEASUREMENT_ID || 'G-HN2411LNWT'
 <style>
   [hidden] { display: none !important; }
   .cookie-banner { position: fixed; z-index: 10000; bottom: 24px; left: 24px; width: min(480px, calc(100vw - 48px)); padding: 28px; background: #faf8f4; color: #191512; border: 1px solid #d8cdbd; box-shadow: 0 12px 60px #19151226; max-height: calc(100dvh - 48px); overflow-y: auto; }
-  .cookie-heading { display: flex; align-items: center; gap: 10px; color: #846439; }
-  .cookie-heading img { width: 72px; height: 72px; flex: 0 0 72px; object-fit: contain; }
-  .cookie-heading p { font-size: 10px; text-transform: uppercase; letter-spacing: .14em; font-weight: 700; }
-  h2 { font-family: var(--font-display); font-size: 28px; line-height: 1.2; margin: 12px 0; }
+  h2 { font-family: var(--font-display); font-size: 28px; line-height: 1.2; margin: 0 0 12px; }
   .cookie-banner > p { font-size: 13px; line-height: 1.7; }
   .cookie-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 22px 0 16px; }
   .cookie-actions button { padding: 13px 8px; border: 1px solid #191512; background: #191512; color: #faf8f4; font-size: 12px; font-weight: 600; min-height: 44px; cursor: pointer; }

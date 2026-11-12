@@ -16,32 +16,38 @@ export const prerender = false;
 
 const FALLBACK_SITE = 'https://bpecleaning.ie';
 
-type StaticPage = { path: string; changefreq: string; priority: string };
+/**
+ * lastmod is the date the page's own content last changed, taken from the
+ * commit that changed it, never the deploy date: Google only trusts the field
+ * when it is accurate. Move it by hand when a page's text changes. /blog/ has
+ * none here because it is derived from the newest article below.
+ */
+type StaticPage = { path: string; changefreq: string; priority: string; lastmod?: string };
 
 const STATIC_PAGES: StaticPage[] = [
-  { path: '/', changefreq: 'monthly', priority: '1.0' },
-  { path: '/services/', changefreq: 'monthly', priority: '0.9' },
-  { path: '/areas/', changefreq: 'monthly', priority: '0.8' },
-  { path: '/prices/', changefreq: 'monthly', priority: '0.9' },
-  { path: '/quote/', changefreq: 'monthly', priority: '0.9' },
-  { path: '/house-cleaning-dublin/', changefreq: 'monthly', priority: '0.8' },
-  { path: '/deep-cleaning-dublin/', changefreq: 'monthly', priority: '0.8' },
-  { path: '/end-of-tenancy-cleaning-dublin/', changefreq: 'monthly', priority: '0.8' },
-  { path: '/after-builders-cleaning-dublin/', changefreq: 'monthly', priority: '0.8' },
-  { path: '/office-cleaning-dublin/', changefreq: 'monthly', priority: '0.8' },
-  { path: '/airbnb-cleaning-dublin/', changefreq: 'monthly', priority: '0.8' },
-  { path: '/about/', changefreq: 'yearly', priority: '0.6' },
-  { path: '/contact/', changefreq: 'yearly', priority: '0.6' },
+  { path: '/', changefreq: 'monthly', priority: '1.0', lastmod: '2026-09-22' },
+  { path: '/services/', changefreq: 'monthly', priority: '0.9', lastmod: '2026-09-09' },
+  { path: '/areas/', changefreq: 'monthly', priority: '0.8', lastmod: '2026-09-21' },
+  { path: '/prices/', changefreq: 'monthly', priority: '0.9', lastmod: '2026-09-09' },
+  { path: '/quote/', changefreq: 'monthly', priority: '0.9', lastmod: '2026-09-09' },
+  { path: '/house-cleaning-dublin/', changefreq: 'monthly', priority: '0.8', lastmod: '2026-11-02' },
+  { path: '/deep-cleaning-dublin/', changefreq: 'monthly', priority: '0.8', lastmod: '2026-11-02' },
+  { path: '/end-of-tenancy-cleaning-dublin/', changefreq: 'monthly', priority: '0.8', lastmod: '2026-11-02' },
+  { path: '/after-builders-cleaning-dublin/', changefreq: 'monthly', priority: '0.8', lastmod: '2026-11-02' },
+  { path: '/office-cleaning-dublin/', changefreq: 'monthly', priority: '0.8', lastmod: '2026-09-09' },
+  { path: '/airbnb-cleaning-dublin/', changefreq: 'monthly', priority: '0.8', lastmod: '2026-11-02' },
+  { path: '/about/', changefreq: 'yearly', priority: '0.6', lastmod: '2026-09-09' },
+  { path: '/contact/', changefreq: 'yearly', priority: '0.6', lastmod: '2026-09-21' },
   { path: '/blog/', changefreq: 'weekly', priority: '0.7' },
-  { path: '/guides/', changefreq: 'monthly', priority: '0.7' },
-  { path: '/guides/end-of-tenancy-cleaning-checklist/', changefreq: 'yearly', priority: '0.6' },
-  { path: '/guides/deep-cleaning-vs-regular-cleaning/', changefreq: 'yearly', priority: '0.6' },
-  { path: '/guides/airbnb-turnover-checklist/', changefreq: 'yearly', priority: '0.6' },
-  { path: '/guides/after-builders-cleaning-guide/', changefreq: 'yearly', priority: '0.6' },
-  { path: '/privacy/', changefreq: 'yearly', priority: '0.3' },
-  { path: '/cookies/', changefreq: 'yearly', priority: '0.3' },
-  { path: '/terms/', changefreq: 'yearly', priority: '0.3' },
-  { path: '/refunds/', changefreq: 'yearly', priority: '0.3' },
+  { path: '/guides/', changefreq: 'monthly', priority: '0.7', lastmod: '2026-09-08' },
+  { path: '/guides/end-of-tenancy-cleaning-checklist/', changefreq: 'yearly', priority: '0.6', lastmod: '2026-09-08' },
+  { path: '/guides/deep-cleaning-vs-regular-cleaning/', changefreq: 'yearly', priority: '0.6', lastmod: '2026-09-23' },
+  { path: '/guides/airbnb-turnover-checklist/', changefreq: 'yearly', priority: '0.6', lastmod: '2026-09-23' },
+  { path: '/guides/after-builders-cleaning-guide/', changefreq: 'yearly', priority: '0.6', lastmod: '2026-09-08' },
+  { path: '/privacy/', changefreq: 'yearly', priority: '0.3', lastmod: '2026-09-23' },
+  { path: '/cookies/', changefreq: 'yearly', priority: '0.3', lastmod: '2026-09-21' },
+  { path: '/terms/', changefreq: 'yearly', priority: '0.3', lastmod: '2026-09-23' },
+  { path: '/refunds/', changefreq: 'yearly', priority: '0.3', lastmod: '2026-09-08' },
 ];
 
 function esc(value: unknown): string {
@@ -69,9 +75,21 @@ function entry(loc: string, changefreq: string, priority: string, lastmod?: stri
 export const GET: APIRoute = async ({ site }) => {
   const origin = (site ?? new URL(FALLBACK_SITE)).origin;
   const posts = await getPublishedPosts(500);
+  // The blog index changes whenever an article is published or edited.
+  const newestPost = posts
+    .map((post) => new Date(post.updated_at || post.published_at || post.created_at).toISOString())
+    .sort()
+    .pop();
 
   const urls = [
-    ...STATIC_PAGES.map((page) => entry(`${origin}${page.path}`, page.changefreq, page.priority)),
+    ...STATIC_PAGES.map((page) =>
+      entry(
+        `${origin}${page.path}`,
+        page.changefreq,
+        page.priority,
+        page.path === '/blog/' ? newestPost : page.lastmod
+      )
+    ),
     ...posts.map((post) =>
       entry(
         `${origin}/blog/${post.slug}/`,
