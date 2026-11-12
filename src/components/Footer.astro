@@ -80,7 +80,7 @@ const isHome = Astro.url.pathname === '/';
         <ul class="mt-5 space-y-1 text-sm text-cream/70">
           <li><a href={SITE.phoneHref} class="block py-1.5 font-semibold text-cream transition-colors hover:text-gold-soft">{SITE.phoneDisplay}</a></li>
           <li><a href={SITE.whatsappHref} class="block py-1.5 transition-colors hover:text-gold-soft" rel="noopener">WhatsApp us</a></li>
-          <li><span id="footer-email" data-user="bpecleaning98" data-domain="gmail.com"></span></li>
+          <li><span id="footer-email" data-user={SITE.email.split('@')[0]} data-domain={SITE.email.split('@')[1]}></span></li>
           <li class="py-1.5">{SITE.hours}</li>
         </ul>
       </div>

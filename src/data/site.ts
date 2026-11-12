@@ -6,7 +6,7 @@ export const SITE = {
   phoneDisplay: '089 960 5606',
   phoneHref: 'tel:+353899605606',
   whatsappHref: 'https://wa.me/353899605606',
-  email: 'bpecleaning98@gmail.com',
+  email: 'info@bpecleaning.ie',
   area: 'Dublin, Ireland',
   hours: 'Mon to Sun, 8:00 to 20:00',
   /**

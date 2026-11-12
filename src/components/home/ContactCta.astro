@@ -33,7 +33,7 @@ const channels = [
         <div class="flex items-baseline justify-between gap-6 border-t border-ink/15 py-5" data-reveal style={`--d: ${0.08 * i}s`}>
           <span class="font-sans text-[0.66rem] font-semibold uppercase tracking-[0.24em] text-stone">{channel.label}</span>
           {channel.label === 'Email' ? (
-            <span id="contact-cta-email" data-user="bpecleaning98" data-domain="gmail.com"></span>
+            <span id="contact-cta-email" data-user={SITE.email.split('@')[0]} data-domain={SITE.email.split('@')[1]}></span>
           ) : channel.href ? (
             <a
               href={channel.href}
