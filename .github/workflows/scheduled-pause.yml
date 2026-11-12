@@ -1,0 +1,45 @@
+name: Scheduled pause
+
+# Pune site-ul public pe pauza automat pe 16 noiembrie 2026 (termen anuntat clientei).
+# Daca se achita restul, STERGETI acest fisier (un commit) si site-ul ramane normal.
+# Butonul "Run workflow" (workflow_dispatch) il poti folosi oricand ca sa testezi.
+
+on:
+  schedule:
+    - cron: '0 6 16 11 *'   # 06:00 UTC, 16 noiembrie
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  pause:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Doar in 2026
+        run: |
+          Y=$(date -u +%Y)
+          if [ "$Y" != "2026" ]; then
+            echo "Anul $Y nu e 2026, nu fac nimic."
+            echo "SKIP=1" >> "$GITHUB_ENV"
+          fi
+
+      - name: Pune flag-ul de pauza
+        if: env.SKIP != '1'
+        run: |
+          node -e "const f='site-pause.json',fs=require('fs');const j=JSON.parse(fs.readFileSync(f));if(j.enabled){console.log('deja pe pauza');process.exit(0)}j.enabled=true;fs.writeFileSync(f,JSON.stringify(j,null,2)+'\n');console.log('setat pe pauza')"
+
+      - name: Commit si push daca s-a schimbat
+        if: env.SKIP != '1'
+        run: |
+          if git diff --quiet; then
+            echo "Nimic de comis (era deja pe pauza)."
+            exit 0
+          fi
+          git config user.name "BPE scheduler"
+          git config user.email "bpecleaning98@users.noreply.github.com"
+          git add site-pause.json
+          git commit -m "chore: pause public website (scheduled)"
+          git push
